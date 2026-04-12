@@ -290,7 +290,58 @@
     }
 
     .chat-msg--user .chat-msg__text    { color: var(--gold); text-align: right; }
-    .chat-msg--derrick .chat-msg__text  { color: var(--fg); }
+    .chat-msg--derrick .chat-msg__text  {
+      color: var(--fg);
+      font-size: 9px;
+      line-height: 2.4;
+      white-space: normal;
+    }
+
+    /* ── Markdown rendering in Derrick's replies ─────────────────── */
+    .chat-msg--derrick .chat-msg__text h2 {
+      font-family: var(--font-pixel);
+      font-size: 9px;
+      color: var(--orange);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin: 16px 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--border-dim);
+    }
+
+    .chat-msg--derrick .chat-msg__text strong {
+      color: var(--gold);
+      font-weight: normal;
+      text-shadow: 0 0 6px rgba(255,180,0,0.3);
+    }
+
+    .chat-msg--derrick .chat-msg__text ul {
+      margin: 8px 0 12px;
+      padding-left: 0;
+      list-style: none;
+    }
+
+    .chat-msg--derrick .chat-msg__text ul li {
+      position: relative;
+      padding-left: 16px;
+      margin-bottom: 8px;
+      line-height: 2.2;
+    }
+
+    .chat-msg--derrick .chat-msg__text ul li::before {
+      content: "▸";
+      position: absolute;
+      left: 0;
+      color: var(--orange);
+    }
+
+    .chat-msg--derrick .chat-msg__text p {
+      margin: 0 0 12px;
+    }
+
+    .chat-msg--derrick .chat-msg__text p:last-child {
+      margin-bottom: 0;
+    }
 
     .chat-thinking {
       display: flex;
@@ -415,6 +466,64 @@
       });
     });
 
+    /* ── Markdown renderer ───────────────────────────────────────── */
+    function renderMarkdown(text) {
+      const lines = text.split('\n');
+      const out = [];
+      let inList = false;
+
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+
+        // Heading ## ...
+        if (/^##\s+/.test(line)) {
+          if (inList) { out.push('</ul>'); inList = false; }
+          const content = line.replace(/^##\s+/, '');
+          out.push('<h2>' + escMd(content) + '</h2>');
+          continue;
+        }
+
+        // Bullet - or *
+        if (/^[-*]\s+/.test(line)) {
+          if (!inList) { out.push('<ul>'); inList = true; }
+          const content = line.replace(/^[-*]\s+/, '');
+          out.push('<li>' + inlineMd(content) + '</li>');
+          continue;
+        }
+
+        // Close list if needed
+        if (inList) { out.push('</ul>'); inList = false; }
+
+        // Blank line → paragraph break
+        if (line.trim() === '') {
+          out.push('</p><p>');
+          continue;
+        }
+
+        out.push(inlineMd(line));
+      }
+
+      if (inList) out.push('</ul>');
+
+      return '<p>' + out.join('\n') + '</p>'
+        // collapse empty paragraphs
+        .replace(/<p>\s*<\/p>/g, '')
+        .replace(/<p>\n*<\/p>/g, '');
+    }
+
+    function escMd(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function inlineMd(str) {
+      // Escape HTML first, then apply inline markdown
+      str = escMd(str);
+      // Bold: **text** or __text__
+      str = str.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      str = str.replace(/__(.+?)__/g, '<strong>$1</strong>');
+      return str;
+    }
+
     /* ── Render helpers ──────────────────────────────────────────── */
     function appendMessage(role, text) {
       const wrap  = document.createElement('div');
@@ -426,7 +535,12 @@
 
       const body  = document.createElement('div');
       body.className = 'chat-msg__text';
-      body.textContent = text;
+
+      if (role === 'user') {
+        body.textContent = text;
+      } else {
+        body.innerHTML = renderMarkdown(text);
+      }
 
       wrap.appendChild(label);
       wrap.appendChild(body);
