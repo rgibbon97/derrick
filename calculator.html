@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pressure &amp; Mud Calculator — DRILL-O-DORO</title>
+  <meta name="description" content="Drilling pressure and mud weight calculator: hydrostatic pressure, kill mud weight, MAASP, EMW, pressure gradient, and overbalance.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Page layout ─────────────────────────────────────────────── */
+    .page-wrap {
+      width: 100%;
+      max-width: 960px;
+    }
+
+    .page-subtitle {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-align: center;
+      margin-top: 10px;
+      margin-bottom: 40px;
+    }
+
+    /* ── Calculator grid ─────────────────────────────────────────── */
+    .calc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      width: 100%;
+    }
+
+    /* ── Calculator card ─────────────────────────────────────────── */
+    .calc-card {
+      background: var(--bg-card);
+      border: 4px solid var(--border-dim);
+      padding: 22px 18px 18px;
+      position: relative;
+      transition: border-color 0.15s;
+    }
+
+    /* top-left corner pixel accent */
+    .calc-card::before {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      width: 10px;
+      height: 10px;
+      background: var(--bg-page);
+      border-right: 4px solid var(--border-dim);
+      border-bottom: 4px solid var(--border-dim);
+      transition: border-color 0.15s;
+    }
+
+    .calc-card:focus-within {
+      border-color: var(--gold);
+      box-shadow: 0 0 20px var(--gold-dim);
+    }
+
+    .calc-card:focus-within::before {
+      border-color: var(--gold);
+    }
+
+    /* scanlines on cards */
+    .calc-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 3px,
+        rgba(0, 0, 0, 0.07) 3px,
+        rgba(0, 0, 0, 0.07) 4px
+      );
+      pointer-events: none;
+    }
+
+    .calc-card h2 {
+      font-size: 8px;
+      color: var(--orange);
+      text-shadow: 1px 1px 0 var(--orange-shadow);
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+      margin-top: 0;
+    }
+
+    /* ── Formula display ─────────────────────────────────────────── */
+    .calc-formula {
+      font-family: var(--font-pixel);
+      font-size: 7.5px;
+      color: var(--gold);
+      letter-spacing: 1px;
+      line-height: 2;
+      margin-bottom: 16px;
+      padding: 10px 12px;
+      border-left: 3px solid var(--gold);
+      background: #12122a;
+      box-shadow: inset 0 0 12px rgba(232, 212, 77, 0.06);
+    }
+
+    /* ── Field rows ──────────────────────────────────────────────── */
+    .calc-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .calc-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .calc-row label {
+      font-family: var(--font-pixel);
+      font-size: 6px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      white-space: nowrap;
+      min-width: 120px;
+    }
+
+    .calc-row input {
+      flex: 1;
+      min-width: 0;
+      font-size: 9px;
+      padding: 6px 7px;
+    }
+
+    .calc-row input:focus {
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+
+    .calc-unit {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--muted);
+      white-space: nowrap;
+      min-width: 48px;
+      text-align: left;
+      letter-spacing: 1px;
+    }
+
+    /* ── Divider between inputs and outputs ──────────────────────── */
+    .calc-sep {
+      height: 1px;
+      background: var(--border-dim);
+      margin: 12px 0;
+    }
+
+    /* ── Output rows ─────────────────────────────────────────────── */
+    .calc-output {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .calc-output:last-child {
+      margin-bottom: 0;
+    }
+
+    .calc-output label {
+      font-family: var(--font-pixel);
+      font-size: 6px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      white-space: nowrap;
+      min-width: 120px;
+    }
+
+    .calc-result {
+      flex: 1;
+      font-family: var(--font-pixel);
+      font-size: 10px;
+      color: var(--green-glow);
+      text-shadow: 0 0 8px var(--green-glow);
+      letter-spacing: 1px;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .calc-result-unit {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--muted);
+      white-space: nowrap;
+      min-width: 48px;
+      letter-spacing: 1px;
+    }
+
+    /* ── Responsive ──────────────────────────────────────────────── */
+    @media (max-width: 700px) {
+      .calc-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      body {
+        padding: 24px 16px 60px;
+        align-items: flex-start;
+      }
+
+      .calc-card h2 {
+        font-size: 7px;
+      }
+
+      .calc-row label,
+      .calc-output label {
+        min-width: 90px;
+        font-size: 5px;
+      }
+
+      .calc-unit,
+      .calc-result-unit {
+        min-width: 38px;
+        font-size: 6px;
+      }
+    }
+
+    /* ── SEO content section ─────────────────────────────────────── */
+    .seo-section {
+      width: 100%;
+      max-width: 960px;
+      margin-top: 64px;
+      border: 4px solid var(--border-dim);
+      background: var(--bg-card);
+    }
+
+    .seo-inner {
+      padding: 48px 44px;
+      font-family: var(--font-prose);
+      font-size: 15px;
+      color: #b8b8cc;
+      line-height: 1.8;
+    }
+
+    .seo-inner h2 {
+      font-family: var(--font-pixel);
+      font-size: 13px;
+      color: var(--gold);
+      text-shadow: 2px 2px 0 var(--gold-shadow);
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+      margin-top: 0;
+    }
+
+    .seo-inner h3 {
+      font-family: var(--font-pixel);
+      font-size: 9px;
+      color: var(--orange);
+      text-shadow: 1px 1px 0 var(--orange-shadow);
+      letter-spacing: 2px;
+      margin-top: 40px;
+      margin-bottom: 16px;
+    }
+
+    .seo-inner p {
+      margin-bottom: 14px;
+    }
+
+    .seo-divider {
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(to right, transparent, var(--border-dim), transparent);
+      margin: 36px 0;
+    }
+
+    .seo-features {
+      list-style: none;
+      padding: 0;
+    }
+
+    .seo-features li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--row-divider);
+      font-size: 15px;
+    }
+
+    .seo-features li:last-child {
+      border-bottom: none;
+    }
+
+    .seo-features li::before {
+      content: '▸';
+      font-family: var(--font-pixel);
+      font-size: 9px;
+      color: var(--green-glow);
+      flex-shrink: 0;
+      margin-top: 3px;
+    }
+
+    @media (max-width: 700px) {
+      .seo-section {
+        border-left: none;
+        border-right: none;
+        margin-top: 40px;
+      }
+
+      .seo-inner {
+        padding: 36px 24px;
+      }
+
+      .seo-inner h2 { font-size: 11px; }
+      .seo-inner h3 { font-size: 8px; }
+      .seo-inner p,
+      .seo-features li { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+
+    <nav class="site-nav">
+      <a href="index.html">&#9654; HOME</a>
+      <a href="timer.html">&#9654; TIMER</a>
+      <a href="converter.html">&#9654; CONVERTER</a>
+      <a href="calculator.html" aria-current="page">&#9654; CALCULATOR</a>
+      <a href="acronyms.html">&#9654; ACRONYMS</a>
+      <a href="derrick.html">&#9654; ASK DERRICK</a>
+      <a href="wellcontrol.html">&#9654; WELL CONTROL</a>
+    </nav>
+
+    <h1>DRILLING PRESSURE &amp; MUD CALCULATOR</h1>
+    <p class="page-subtitle">ENTER ANY INPUT &mdash; RESULTS UPDATE IN REAL TIME</p>
+
+    <div class="calc-grid">
+
+      <!-- ── 1. Hydrostatic Pressure ──────────────────────────── -->
+      <div class="calc-card" id="card-hydro">
+        <h2>1. HYDROSTATIC PRESSURE</h2>
+        <div class="calc-formula">
+          HP (psi) = MW &times; 0.052 &times; TVD<br>
+          HP (bar) = HP (psi) &times; 0.0689476
+        </div>
+
+        <div class="calc-row">
+          <label for="hydro-mw">MUD WEIGHT</label>
+          <input type="number" id="hydro-mw" placeholder="0.00" step="any" min="0">
+          <span class="calc-unit">ppg</span>
+        </div>
+        <div class="calc-row">
+          <label for="hydro-tvd">TVD</label>
+          <input type="number" id="hydro-tvd" placeholder="0" step="any" min="0">
+          <span class="calc-unit">ft</span>
+        </div>
+
+        <div class="calc-sep"></div>
+
+        <div class="calc-output">
+          <label>PRESSURE</label>
+          <span class="calc-result" id="hydro-psi">—</span>
+          <span class="calc-result-unit">psi</span>
+        </div>
+        <div class="calc-output">
+          <label>PRESSURE</label>
+          <span class="calc-result" id="hydro-bar">—</span>
+          <span class="calc-result-unit">bar</span>
+        </div>
+      </div>
+
+      <!-- ── 2. Kill Mud Weight ───────────────────────────────── -->
+      <div class="calc-card" id="card-kmw">
+        <h2>2. KILL MUD WEIGHT</h2>
+        <div class="calc-formula">
+          KMW = CMW + (SIDPP &divide; (0.052 &times; TVD))
+        </div>
+
+        <div class="calc-row">
+          <label for="kmw-cmw">CURRENT MW</label>
+          <input type="number" id="kmw-cmw" placeholder="0.00" step="any" min="0">
+          <span class="calc-unit">ppg</span>
+        </div>
+        <div class="calc-row">
+          <label for="kmw-sidpp">SIDPP</label>
+          <input type="number" id="kmw-sidpp" placeholder="0" step="any" min="0">
+          <span class="calc-unit">psi</span>
+        </div>
+        <div class="calc-row">
+          <label for="kmw-tvd">TVD</label>
+          <input type="number" id="kmw-tvd" placeholder="0" step="any" min="0">
+          <span class="calc-unit">ft</span>
+        </div>
+
+        <div class="calc-sep"></div>
+
+        <div class="calc-output">
+          <label>KILL MUD WT</label>
+          <span class="calc-result" id="kmw-result">—</span>
+          <span class="calc-result-unit">ppg</span>
+        </div>
+      </div>
+
+      <!-- ── 3. MAASP ─────────────────────────────────────────── -->
+      <div class="calc-card" id="card-maasp">
+        <h2>3. MAASP</h2>
+        <div class="calc-formula">
+          MAASP = (LOT EMW &minus; CMW) &times; 0.052 &times; Shoe TVD
+        </div>
+
+        <div class="calc-row">
+          <label for="maasp-lot">LOT EMW</label>
+          <input type="number" id="maasp-lot" placeholder="0.00" step="any" min="0">
+          <span class="calc-unit">ppg</span>
+        </div>
+        <div class="calc-row">
+          <label for="maasp-cmw">CURRENT MW</label>
+          <input type="number" id="maasp-cmw" placeholder="0.00" step="any" min="0">
+          <span class="calc-unit">ppg</span>
+        </div>
+        <div class="calc-row">
+          <label for="maasp-shoe">SHOE TVD</label>
+          <input type="number" id="maasp-shoe" placeholder="0" step="any" min="0">
+          <span class="calc-unit">ft</span>
+        </div>
+
+        <div class="calc-sep"></div>
+
+        <div class="calc-output">
+          <label>MAASP</label>
+          <span class="calc-result" id="maasp-result">—</span>
+          <span class="calc-result-unit">psi</span>
+        </div>
+      </div>
+
+      <!-- ── 4. EMW from Surface Pressure ────────────────────── -->
+      <div class="calc-card" id="card-emw">
+        <h2>4. EQUIV. MUD WEIGHT</h2>
+        <div class="calc-formula">
+          EMW = CMW + (SP &divide; (0.052 &times; TVD))
+        </div>
+
+        <div class="calc-row">
+          <label for="emw-sp">SURFACE PRESS.</label>
+          <input type="number" id="emw-sp" placeholder="0" step="any" min="0">
+          <span class="calc-unit">psi</span>
+        </div>
+        <div class="calc-row">
+          <label for="emw-tvd">TVD</label>
+          <input type="number" id="emw-tvd" placeholder="0" step="any" min="0">
+          <span class="calc-unit">ft</span>
+        </div>
+        <div class="calc-row">
+          <label for="emw-cmw">CURRENT MW</label>
+          <input type="number" id="emw-cmw" placeholder="0.00" step="any" min="0">
+          <span class="calc-unit">ppg</span>
+        </div>
+
+        <div class="calc-sep"></div>
+
+        <div class="calc-output">
+          <label>EMW</label>
+          <span class="calc-result" id="emw-result">—</span>
+          <span class="calc-result-unit">ppg</span>
+        </div>
+      </div>
+
+      <!-- ── 5. Pressure Gradient ─────────────────────────────── -->
+      <div class="calc-card" id="card-grad">
+        <h2>5. PRESSURE GRADIENT</h2>
+        <div class="calc-formula">
+          Grad (psi/ft) = MW &times; 0.052<br>
+          Grad (kPa/m) = MW &times; 1.1767
+        </div>
+
+        <div class="calc-row">
+          <label for="grad-mw">MUD WEIGHT</label>
+          <input type="number" id="grad-mw" placeholder="0.00" step="any" min="0">
+          <span class="calc-unit">ppg</span>
+        </div>
+
+        <div class="calc-sep"></div>
+
+        <div class="calc-output">
+          <label>GRADIENT</label>
+          <span class="calc-result" id="grad-psift">—</span>
+          <span class="calc-result-unit">psi/ft</span>
+        </div>
+        <div class="calc-output">
+          <label>GRADIENT</label>
+          <span class="calc-result" id="grad-kpam">—</span>
+          <span class="calc-result-unit">kPa/m</span>
+        </div>
+      </div>
+
+      <!-- ── 6. Overbalance ──────────────────────────────────── -->
+      <div class="calc-card" id="card-ob">
+        <h2>6. OVERBALANCE</h2>
+        <div class="calc-formula">
+          OB = (MW &times; 0.052 &minus; PPG) &times; TVD
+        </div>
+
+        <div class="calc-row">
+          <label for="ob-mw">MUD WEIGHT</label>
+          <input type="number" id="ob-mw" placeholder="0.00" step="any" min="0">
+          <span class="calc-unit">ppg</span>
+        </div>
+        <div class="calc-row">
+          <label for="ob-ppg">PORE PRESS. GRAD.</label>
+          <input type="number" id="ob-ppg" placeholder="0.000" step="any" min="0">
+          <span class="calc-unit">psi/ft</span>
+        </div>
+        <div class="calc-row">
+          <label for="ob-tvd">TVD</label>
+          <input type="number" id="ob-tvd" placeholder="0" step="any" min="0">
+          <span class="calc-unit">ft</span>
+        </div>
+
+        <div class="calc-sep"></div>
+
+        <div class="calc-output">
+          <label>OVERBALANCE</label>
+          <span class="calc-result" id="ob-result">—</span>
+          <span class="calc-result-unit">psi</span>
+        </div>
+      </div>
+
+    </div><!-- /calc-grid -->
+
+    <!-- ── SEO Content ─────────────────────────────────────────── -->
+    <section class="seo-section" aria-label="About Drilling Pressure Calculations">
+      <div class="seo-inner">
+
+        <h2>DRILLING PRESSURE CALCULATIONS EXPLAINED</h2>
+        <p>
+          Every well is a pressure management problem. From spud to TD, the drilling engineer's job is to keep
+          wellbore pressure inside a narrow window — above pore pressure to prevent a kick, below fracture pressure
+          to prevent lost circulation. The calculations on this page are the core tools for that job. They translate
+          fluid density, depth, and surface pressure into the numbers that govern every decision made at the wellsite.
+        </p>
+
+        <div class="seo-divider"></div>
+
+        <h3>HYDROSTATIC PRESSURE</h3>
+        <p>
+          Hydrostatic pressure is the pressure exerted by a static column of fluid due to gravity. In a wellbore,
+          it is the primary mechanism by which the drilling fluid holds back formation fluids and prevents a kick.
+          The formula is simple: <strong>HP (psi) = mud weight (ppg) × 0.052 × TVD (ft)</strong>. The constant
+          0.052 is a unit conversion factor that accounts for the relationship between pounds per gallon, feet,
+          and pounds per square inch.
+        </p>
+        <p>
+          Hydrostatic pressure increases linearly with depth and with mud weight, which is why both are critical
+          inputs to any well control calculation. A 10 ppg mud exerts 0.52 psi per foot of depth — at 10,000 ft
+          TVD that is 5,200 psi of bottomhole pressure. Understanding and calculating hydrostatic pressure is a
+          fundamental skill for any drilling engineer, mud engineer, or well control specialist.
+        </p>
+
+        <div class="seo-divider"></div>
+
+        <h3>KILL MUD WEIGHT</h3>
+        <p>
+          When a well takes an influx — gas, oil, or water entering the wellbore — the rig crew must circulate
+          out the kick and replace the drilling fluid with a heavier kill weight mud that can hold the formation
+          pressure on its own. Kill mud weight (KMW) is calculated from the shut-in drill pipe pressure (SIDPP),
+          which represents the underbalance between the current mud weight and the formation pressure:
+          <strong>KMW = CMW + (SIDPP ÷ (0.052 × TVD))</strong>.
+        </p>
+        <p>
+          The SIDPP is read directly from the drill pipe gauge after the well is shut in and pressures have
+          stabilised. Accurate kill mud weight calculation is the first step in both the Driller's Method and
+          the Wait and Weight Method — the two standard well kill procedures used across the industry. Getting
+          it wrong means either failing to kill the well or fracturing the shoe trying.
+        </p>
+
+        <div class="seo-divider"></div>
+
+        <h3>MAASP — MAXIMUM ALLOWABLE ANNULAR SURFACE PRESSURE</h3>
+        <p>
+          MAASP is the maximum pressure that can be applied at surface without fracturing the weakest exposed
+          formation — typically the formation just below the previous casing shoe. It sets the upper limit on
+          how much casing pressure can be held during a well control event before the well must be bullheaded
+          or the choke opened to prevent shoe breakdown.
+        </p>
+        <p>
+          MAASP is derived from the leak-off test (LOT) or formation integrity test (FIT) conducted after
+          drilling out each casing shoe. The formula is:
+          <strong>MAASP = (LOT EMW − CMW) × 0.052 × shoe TVD</strong>. The difference between the LOT
+          equivalent mud weight and the current mud weight represents the margin available before fracture.
+          As mud weight increases during a kill operation, MAASP decreases — a critical relationship to
+          track in real time during well control.
+        </p>
+
+        <div class="seo-divider"></div>
+
+        <h3>EQUIVALENT MUD WEIGHT (EMW)</h3>
+        <p>
+          Equivalent mud weight converts a surface pressure — applied at the wellhead during a kick or a managed
+          pressure drilling operation — into a mud weight equivalent at a given depth. This allows engineers to
+          express the total bottomhole pressure as a single density value and compare it directly against pore
+          pressure and fracture pressure gradients on the same scale.
+        </p>
+        <p>
+          The formula is <strong>EMW = CMW + (surface pressure ÷ (0.052 × TVD))</strong>. EMW is central to
+          managed pressure drilling (MPD), underbalanced drilling, and any situation where applied surface pressure
+          is being used to fine-tune bottomhole pressure. It is also used in well control to determine whether the
+          current wellbore pressure profile is inside the drilling window at all depths.
+        </p>
+
+        <div class="seo-divider"></div>
+
+        <h3>PRESSURE GRADIENT AND OVERBALANCE</h3>
+        <p>
+          The pressure gradient of a fluid is simply its hydrostatic pressure per unit depth:
+          <strong>gradient (psi/ft) = mud weight (ppg) × 0.052</strong>. Gradients allow engineers to compare
+          fluid pressures across different depths and different fluids on a common basis. Pore pressure gradients,
+          fracture gradients, and mud weight gradients are all plotted together on the casing design and well
+          control chart to define the drilling window at each depth.
+        </p>
+        <p>
+          Overbalance is the pressure difference between the wellbore and the formation — the margin by which
+          the hydrostatic head exceeds pore pressure. Some overbalance is necessary to maintain wellbore stability
+          and prevent a kick, but excessive overbalance increases the risk of differential sticking, formation
+          damage, and lost circulation. The overbalance calculation on this page quantifies that margin in psi
+          so it can be deliberately managed rather than left to chance.
+        </p>
+
+        <div class="seo-divider"></div>
+
+        <h3>WHY THESE CALCULATIONS MATTER</h3>
+        <ul class="seo-features">
+          <li>Hydrostatic pressure is the primary barrier between the wellbore and a blowout — it must be calculated accurately at every stage of drilling</li>
+          <li>Kill mud weight is the first number computed in any well kill procedure; an error here prolongs a well control event</li>
+          <li>MAASP defines the hard limit on casing pressure during a kick circulation — exceeding it risks underground blowout</li>
+          <li>EMW ties surface pressure and mud weight together into a single pressure profile for managed pressure and underbalanced operations</li>
+          <li>Pressure gradient is the currency of formation evaluation — it connects fluid densities to the pore and fracture pressure plots that govern casing design</li>
+          <li>Overbalance management balances well control security against differential sticking and formation damage risks</li>
+        </ul>
+
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <p>DRILL-O-DORO &mdash; drillodoro.com</p>
+    </footer>
+
+  </div><!-- /page-wrap -->
+
+  <script>
+    function fmt(val, dp = 2) {
+      if (!isFinite(val)) return '—';
+      return val.toFixed(dp);
+    }
+
+    function val(id) {
+      const v = parseFloat(document.getElementById(id).value);
+      return isNaN(v) ? null : v;
+    }
+
+    function set(id, text) {
+      document.getElementById(id).textContent = text;
+    }
+
+    // ── 1. Hydrostatic Pressure ───────────────────────────────────
+    function calcHydro() {
+      const mw  = val('hydro-mw');
+      const tvd = val('hydro-tvd');
+      if (mw !== null && tvd !== null) {
+        const psi = mw * 0.052 * tvd;
+        const bar = psi * 0.0689476;
+        set('hydro-psi', fmt(psi, 1));
+        set('hydro-bar', fmt(bar, 2));
+      } else {
+        set('hydro-psi', '—');
+        set('hydro-bar', '—');
+      }
+    }
+
+    // ── 2. Kill Mud Weight ────────────────────────────────────────
+    function calcKMW() {
+      const cmw   = val('kmw-cmw');
+      const sidpp = val('kmw-sidpp');
+      const tvd   = val('kmw-tvd');
+      if (cmw !== null && sidpp !== null && tvd !== null && tvd !== 0) {
+        const kmw = cmw + (sidpp / (0.052 * tvd));
+        set('kmw-result', fmt(kmw, 2));
+      } else {
+        set('kmw-result', '—');
+      }
+    }
+
+    // ── 3. MAASP ──────────────────────────────────────────────────
+    function calcMAASP() {
+      const lot  = val('maasp-lot');
+      const cmw  = val('maasp-cmw');
+      const shoe = val('maasp-shoe');
+      if (lot !== null && cmw !== null && shoe !== null) {
+        const maasp = (lot - cmw) * 0.052 * shoe;
+        set('maasp-result', fmt(maasp, 1));
+      } else {
+        set('maasp-result', '—');
+      }
+    }
+
+    // ── 4. EMW from Surface Pressure ─────────────────────────────
+    function calcEMW() {
+      const sp  = val('emw-sp');
+      const tvd = val('emw-tvd');
+      const cmw = val('emw-cmw');
+      if (sp !== null && tvd !== null && cmw !== null && tvd !== 0) {
+        const emw = cmw + (sp / (0.052 * tvd));
+        set('emw-result', fmt(emw, 2));
+      } else {
+        set('emw-result', '—');
+      }
+    }
+
+    // ── 5. Pressure Gradient ──────────────────────────────────────
+    function calcGrad() {
+      const mw = val('grad-mw');
+      if (mw !== null) {
+        set('grad-psift', fmt(mw * 0.052, 4));
+        set('grad-kpam',  fmt(mw * 1.1767, 4));
+      } else {
+        set('grad-psift', '—');
+        set('grad-kpam',  '—');
+      }
+    }
+
+    // ── 6. Overbalance ────────────────────────────────────────────
+    function calcOB() {
+      const mw  = val('ob-mw');
+      const ppg = val('ob-ppg');
+      const tvd = val('ob-tvd');
+      if (mw !== null && ppg !== null && tvd !== null) {
+        const ob = (mw * 0.052 - ppg) * tvd;
+        set('ob-result', fmt(ob, 1));
+      } else {
+        set('ob-result', '—');
+      }
+    }
+
+    // ── Wire up all inputs ────────────────────────────────────────
+    const bindings = [
+      [['hydro-mw', 'hydro-tvd'],                    calcHydro],
+      [['kmw-cmw', 'kmw-sidpp', 'kmw-tvd'],          calcKMW],
+      [['maasp-lot', 'maasp-cmw', 'maasp-shoe'],     calcMAASP],
+      [['emw-sp', 'emw-tvd', 'emw-cmw'],             calcEMW],
+      [['grad-mw'],                                   calcGrad],
+      [['ob-mw', 'ob-ppg', 'ob-tvd'],                calcOB],
+    ];
+
+    bindings.forEach(([ids, fn]) => {
+      ids.forEach(id => {
+        document.getElementById(id).addEventListener('input', fn);
+      });
+    });
+  </script>
+</body>
+</html>

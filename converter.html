@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unit Converter — DRILL-O-DORO</title>
+  <meta name="description" content="Drilling unit converter for mud weight, pressure, length, volume, temperature, flow rate, torque, dogleg severity, and more.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Converter-page layout ───────────────────────────────────── */
+    .page-wrap {
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .page-subtitle {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-align: center;
+      margin-top: 10px;
+      margin-bottom: 40px;
+    }
+
+    /* ── Converter grid ──────────────────────────────────────────── */
+    .conv-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      width: 100%;
+    }
+
+    /* ── Converter card ──────────────────────────────────────────── */
+    .conv-card {
+      background: var(--bg-card);
+      border: 4px solid var(--border-dim);
+      padding: 22px 18px 18px;
+      position: relative;
+      transition: border-color 0.15s;
+    }
+
+    .conv-card::before {
+      /* top-left corner pixel accent */
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      width: 10px;
+      height: 10px;
+      background: var(--bg-page);
+      border-right: 4px solid var(--border-dim);
+      border-bottom: 4px solid var(--border-dim);
+    }
+
+    .conv-card:focus-within {
+      border-color: var(--gold);
+      box-shadow: 0 0 20px var(--gold-dim);
+    }
+
+    .conv-card:focus-within::before {
+      border-color: var(--gold);
+    }
+
+    .conv-card h2 {
+      font-size: 8px;
+      color: var(--orange);
+      text-shadow: 1px 1px 0 var(--orange-shadow);
+      letter-spacing: 2px;
+      margin-bottom: 18px;
+      margin-top: 0;
+    }
+
+    /* ── Field row ───────────────────────────────────────────────── */
+    .conv-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .conv-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .conv-row input {
+      flex: 1;
+      min-width: 0;
+      font-size: 9px;
+      padding: 6px 7px;
+    }
+
+    .conv-row input:focus {
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+
+    .conv-unit {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--muted);
+      white-space: nowrap;
+      min-width: 54px;
+      text-align: left;
+      letter-spacing: 1px;
+    }
+
+    /* ── Scanlines on cards ──────────────────────────────────────── */
+    .conv-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 3px,
+        rgba(0, 0, 0, 0.07) 3px,
+        rgba(0, 0, 0, 0.07) 4px
+      );
+      pointer-events: none;
+    }
+
+    /* ── Responsive ──────────────────────────────────────────────── */
+    @media (max-width: 620px) {
+      .conv-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      body {
+        padding: 24px 16px 60px;
+        align-items: flex-start;
+      }
+
+      .conv-card h2 {
+        font-size: 7px;
+      }
+
+      .conv-unit {
+        min-width: 48px;
+        font-size: 6px;
+      }
+    }
+
+    /* ── SEO content section ─────────────────────────────────────── */
+    .seo-section {
+      width: 100%;
+      max-width: 900px;
+      margin-top: 64px;
+      border: 4px solid var(--border-dim);
+      background: var(--bg-card);
+    }
+
+    .seo-inner {
+      padding: 48px 44px;
+      font-family: var(--font-prose);
+      font-size: 15px;
+      color: #b8b8cc;
+      line-height: 1.8;
+    }
+
+    .seo-inner h2 {
+      font-family: var(--font-pixel);
+      font-size: 13px;
+      color: var(--gold);
+      text-shadow: 2px 2px 0 var(--gold-shadow);
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+      margin-top: 0;
+    }
+
+    .seo-inner h3 {
+      font-family: var(--font-pixel);
+      font-size: 9px;
+      color: var(--orange);
+      text-shadow: 1px 1px 0 var(--orange-shadow);
+      letter-spacing: 2px;
+      margin-top: 40px;
+      margin-bottom: 16px;
+    }
+
+    .seo-inner p {
+      margin-bottom: 14px;
+    }
+
+    .seo-divider {
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(to right, transparent, var(--border-dim), transparent);
+      margin: 36px 0;
+    }
+
+    .seo-features {
+      list-style: none;
+      padding: 0;
+    }
+
+    .seo-features li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--row-divider);
+      font-size: 15px;
+    }
+
+    .seo-features li:last-child {
+      border-bottom: none;
+    }
+
+    .seo-features li::before {
+      content: '▸';
+      font-family: var(--font-pixel);
+      font-size: 9px;
+      color: var(--green-glow);
+      flex-shrink: 0;
+      margin-top: 3px;
+    }
+
+    @media (max-width: 620px) {
+      .seo-section {
+        border-left: none;
+        border-right: none;
+        margin-top: 40px;
+      }
+
+      .seo-inner {
+        padding: 36px 24px;
+      }
+
+      .seo-inner h2 { font-size: 11px; }
+      .seo-inner h3 { font-size: 8px; }
+      .seo-inner p,
+      .seo-features li { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+
+    <nav class="site-nav">
+      <a href="index.html">&#9654; HOME</a>
+      <a href="timer.html">&#9654; TIMER</a>
+      <a href="converter.html" aria-current="page">&#9654; CONVERTER</a>
+      <a href="calculator.html">&#9654; CALCULATOR</a>
+      <a href="acronyms.html">&#9654; ACRONYMS</a>
+      <a href="derrick.html">&#9654; ASK DERRICK</a>
+      <a href="wellcontrol.html">&#9654; WELL CONTROL</a>
+    </nav>
+
+    <h1>DRILLING UNIT CONVERTER</h1>
+    <p class="page-subtitle">TYPE IN ANY FIELD &mdash; ALL UNITS UPDATE IN REAL TIME</p>
+
+    <div class="conv-grid" id="converters"></div>
+
+    <!-- ── SEO Content ─────────────────────────────────────────── -->
+    <section class="seo-section" aria-label="About the Drilling Unit Converter">
+      <div class="seo-inner">
+
+        <h2>DRILLING UNIT CONVERTER</h2>
+        <p>
+          In oil and gas drilling, calculations span two measurement systems that don't always play nicely together.
+          Mud weight is reported in pounds per gallon on US rigs and in kilograms per cubic metre or specific gravity
+          on international projects. Pressure may be given in psi in one report and bar or kilopascals in another.
+          Depths shift between feet and metres depending on which operator, which contractor, and which decade the
+          well plan was written in. This converter handles all of those translations in a single page, with every
+          field updating in real time as you type.
+        </p>
+        <p>
+          Whether you're a drilling engineer reconciling a well programme, a mud engineer checking fluid density
+          across supplier datasheets, or a student working through drilling calculations for the first time, having
+          all the common unit conversions in one place removes a persistent source of error on the rig and in the office.
+        </p>
+
+        <div class="seo-divider"></div>
+
+        <h3>MUD WEIGHT: PPG, SG, PSI/FT AND KPA/M</h3>
+        <p>
+          Mud weight — also called drilling fluid density — is the single most important parameter in well control.
+          It must be heavy enough to provide hydrostatic pressure that overbalances pore pressure and prevents a kick,
+          but not so heavy that it fractures the formation and causes lost circulation.
+        </p>
+        <p>
+          In North America, mud weight is almost universally expressed in pounds per gallon (ppg). Internationally,
+          specific gravity (SG) is more common, representing the ratio of the fluid's density to that of fresh water.
+          A 10 ppg mud has an SG of roughly 1.198. The pressure gradient equivalents — psi per foot and kilopascals
+          per metre — are used directly in hydrostatic pressure calculations and appear frequently in formation
+          evaluation and well control worksheets.
+        </p>
+        <p>
+          Converting between these units by hand introduces rounding errors that compound over deep wells. A
+          conversion tool that locks all four representations together eliminates that risk entirely.
+        </p>
+
+        <div class="seo-divider"></div>
+
+        <h3>PRESSURE: PSI, BAR, KPA AND MPA</h3>
+        <p>
+          Wellbore pressure appears in every corner of a drilling operation. Standpipe pressure, casing pressure,
+          formation pressure, and fracture pressure are all measured and reported in pressure units. The problem is
+          that those units vary by geography and by discipline. Reservoir engineers often work in psi. European
+          operators prefer bar. Academic literature frequently uses MPa or kPa. Directional and MWD reports may
+          mix all of them.
+        </p>
+        <p>
+          The conversions are straightforward once you know the factors — 1 psi = 0.0689476 bar = 6.89476 kPa —
+          but under time pressure on the rig floor, mental arithmetic on numbers like those is where mistakes happen.
+          This converter keeps all four pressure units synchronised so you can move between system conventions
+          without breaking your workflow.
+        </p>
+
+        <div class="seo-divider"></div>
+
+        <h3>WHAT ELSE THIS CONVERTER COVERS</h3>
+        <ul class="seo-features">
+          <li><strong>Length (metres / feet)</strong> — for TVD, MD, casing setting depths, and string tallies</li>
+          <li><strong>Volume (barrels / litres / m³)</strong> — for pit volumes, cement slurry, and displacement calculations</li>
+          <li><strong>Temperature (°C / °F)</strong> — for BHT, mud temperature, and cement hydration planning</li>
+          <li><strong>Flow rate (bpm / lpm / gpm)</strong> — for pump rate and annular velocity</li>
+          <li><strong>Weight (tonnes / pounds / kg)</strong> — for hook load, WOB, and string weight</li>
+          <li><strong>Torque (ft-lbs / Nm / kNm)</strong> — for make-up torque, rotary torque limits, and BHA design</li>
+          <li><strong>Bit size (inches / mm)</strong> — for matching bit records to metric hole size specifications</li>
+          <li><strong>Dogleg severity (°/30m / °/100ft)</strong> — for comparing survey data across metric and imperial well plans</li>
+          <li><strong>Pump output (bbl/stk / L/stk)</strong> — for lag time and bottoms-up calculations</li>
+          <li><strong>Pipe dimensions (inches / mm)</strong> — for matching OD and ID specs across tubular catalogues</li>
+        </ul>
+
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <p>DRILL-O-DORO &mdash; BUILT FOR DRILLERS</p>
+    </footer>
+
+  </div>
+
+  <script>
+    /* ── Conversion definitions ──────────────────────────────────────
+       Each category has a list of fields.
+       toBase  : converts FROM this field's unit TO the canonical base unit (first field).
+       fromBase: converts FROM the canonical base unit TO this field's unit.
+       The first field IS the base, so its functions are identity.
+    ────────────────────────────────────────────────────────────────── */
+    const CATEGORIES = [
+      {
+        id: 'mud-weight',
+        title: 'MUD WEIGHT',
+        fields: [
+          { id: 'mw-ppg',  label: 'ppg',    toBase: v => v,               fromBase: v => v },
+          { id: 'mw-sg',   label: 'sg',      toBase: v => v * 8.33098,     fromBase: v => v / 8.33098 },
+          { id: 'mw-psift',label: 'psi/ft',  toBase: v => v / 0.051948,    fromBase: v => v * 0.051948 },
+          { id: 'mw-kpam', label: 'kPa/m',   toBase: v => v / 1.17495,     fromBase: v => v * 1.17495 },
+        ]
+      },
+      {
+        id: 'pressure',
+        title: 'PRESSURE',
+        fields: [
+          { id: 'pr-psi', label: 'psi', toBase: v => v,               fromBase: v => v },
+          { id: 'pr-bar', label: 'bar', toBase: v => v / 0.0689476,   fromBase: v => v * 0.0689476 },
+          { id: 'pr-kpa', label: 'kPa', toBase: v => v / 6.89476,     fromBase: v => v * 6.89476 },
+          { id: 'pr-mpa', label: 'MPa', toBase: v => v / 0.00689476,  fromBase: v => v * 0.00689476 },
+        ]
+      },
+      {
+        id: 'length',
+        title: 'LENGTH',
+        fields: [
+          { id: 'ln-m',  label: 'metres', toBase: v => v,           fromBase: v => v },
+          { id: 'ln-ft', label: 'feet',   toBase: v => v * 0.3048,  fromBase: v => v / 0.3048 },
+        ]
+      },
+      {
+        id: 'volume',
+        title: 'VOLUME',
+        fields: [
+          { id: 'vl-bbl', label: 'barrels', toBase: v => v,             fromBase: v => v },
+          { id: 'vl-ltr', label: 'litres',  toBase: v => v / 158.987,   fromBase: v => v * 158.987 },
+          { id: 'vl-m3',  label: 'm\u00B3', toBase: v => v / 0.158987,  fromBase: v => v * 0.158987 },
+        ]
+      },
+      {
+        id: 'temperature',
+        title: 'TEMPERATURE',
+        fields: [
+          { id: 'tp-c', label: '\u00B0C', toBase: v => v,               fromBase: v => v },
+          { id: 'tp-f', label: '\u00B0F', toBase: v => (v - 32) * 5/9,  fromBase: v => v * 9/5 + 32 },
+        ]
+      },
+      {
+        id: 'flow-rate',
+        title: 'FLOW RATE',
+        fields: [
+          { id: 'fr-bpm', label: 'bpm', toBase: v => v,            fromBase: v => v },
+          { id: 'fr-lpm', label: 'lpm', toBase: v => v / 158.987,  fromBase: v => v * 158.987 },
+          { id: 'fr-gpm', label: 'gpm', toBase: v => v / 42,       fromBase: v => v * 42 },
+        ]
+      },
+      {
+        id: 'weight',
+        title: 'WEIGHT',
+        fields: [
+          { id: 'wt-t',   label: 'tonnes', toBase: v => v,             fromBase: v => v },
+          { id: 'wt-lbs', label: 'pounds', toBase: v => v / 2204.623,  fromBase: v => v * 2204.623 },
+          { id: 'wt-kg',  label: 'kg',     toBase: v => v / 1000,      fromBase: v => v * 1000 },
+        ]
+      },
+      {
+        id: 'torque',
+        title: 'TORQUE',
+        fields: [
+          { id: 'tq-ftlb', label: 'ft-lbs', toBase: v => v,               fromBase: v => v },
+          { id: 'tq-nm',   label: 'Nm',      toBase: v => v / 1.35582,     fromBase: v => v * 1.35582 },
+          { id: 'tq-knm',  label: 'kNm',     toBase: v => v / 0.00135582,  fromBase: v => v * 0.00135582 },
+        ]
+      },
+      {
+        id: 'bit-size',
+        title: 'BIT SIZE',
+        fields: [
+          { id: 'bs-in', label: 'inches', toBase: v => v,        fromBase: v => v },
+          { id: 'bs-mm', label: 'mm',     toBase: v => v / 25.4, fromBase: v => v * 25.4 },
+        ]
+      },
+      {
+        id: 'pipe-dim',
+        title: 'PIPE DIMENSIONS',
+        fields: [
+          { id: 'pd-in', label: 'inches', toBase: v => v,        fromBase: v => v },
+          { id: 'pd-mm', label: 'mm',     toBase: v => v / 25.4, fromBase: v => v * 25.4 },
+        ]
+      },
+      {
+        id: 'dogleg',
+        title: 'DOGLEG SEVERITY',
+        fields: [
+          // 30m = 98.4252 ft, so deg/30m × (100/98.4252) = deg/100ft
+          { id: 'dl-30m',   label: '\u00B0/30m',   toBase: v => v,          fromBase: v => v },
+          { id: 'dl-100ft', label: '\u00B0/100ft',  toBase: v => v / 1.016,  fromBase: v => v * 1.016 },
+        ]
+      },
+      {
+        id: 'pump-output',
+        title: 'PUMP OUTPUT',
+        fields: [
+          { id: 'po-bbl', label: 'bbl/stk', toBase: v => v,            fromBase: v => v },
+          { id: 'po-ltr', label: 'L/stk',   toBase: v => v / 158.987,  fromBase: v => v * 158.987 },
+        ]
+      },
+    ];
+
+    /* ── Format a number for display ─────────────────────────────── */
+    function fmt(v) {
+      if (!isFinite(v) || isNaN(v)) return '';
+      if (v === 0) return '0';
+      const abs = Math.abs(v);
+      let s;
+      if      (abs >= 100000) s = v.toFixed(1);
+      else if (abs >= 10000)  s = v.toFixed(2);
+      else if (abs >= 1000)   s = v.toFixed(3);
+      else if (abs >= 100)    s = v.toFixed(4);
+      else if (abs >= 10)     s = v.toFixed(5);
+      else if (abs >= 1)      s = v.toFixed(6);
+      else                    s = v.toPrecision(6);
+      return s.includes('.') ? s.replace(/\.?0+$/, '') : s;
+    }
+
+    /* ── Build UI ────────────────────────────────────────────────── */
+    const grid = document.getElementById('converters');
+
+    CATEGORIES.forEach(cat => {
+      const card = document.createElement('div');
+      card.className = 'conv-card';
+
+      const heading = document.createElement('h2');
+      heading.textContent = cat.title;
+      card.appendChild(heading);
+
+      cat.fields.forEach(field => {
+        const row = document.createElement('div');
+        row.className = 'conv-row';
+
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.id = field.id;
+        input.step = 'any';
+        input.placeholder = '0';
+        input.autocomplete = 'off';
+        input.spellcheck = false;
+
+        const unit = document.createElement('span');
+        unit.className = 'conv-unit';
+        unit.textContent = field.label;
+
+        row.appendChild(input);
+        row.appendChild(unit);
+        card.appendChild(row);
+      });
+
+      grid.appendChild(card);
+    });
+
+    /* ── Wire up real-time conversions ───────────────────────────── */
+    CATEGORIES.forEach(cat => {
+      cat.fields.forEach(src => {
+        const srcEl = document.getElementById(src.id);
+
+        srcEl.addEventListener('input', () => {
+          const raw = srcEl.value.trim();
+
+          if (raw === '' || raw === '-' || raw === '.') {
+            cat.fields.forEach(f => {
+              if (f.id !== src.id) document.getElementById(f.id).value = '';
+            });
+            return;
+          }
+
+          const v = parseFloat(raw);
+          if (isNaN(v)) return;
+
+          const base = src.toBase(v);
+
+          cat.fields.forEach(f => {
+            if (f.id !== src.id) {
+              document.getElementById(f.id).value = fmt(f.fromBase(base));
+            }
+          });
+        });
+      });
+    });
+  </script>
+</body>
+</html>

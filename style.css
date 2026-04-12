@@ -1,0 +1,483 @@
+/* ================================================================
+   DRILL-O-DORO — Shared Stylesheet
+   drillodoro.com
+   ================================================================
+   Usage: <link rel="stylesheet" href="style.css">
+   Also add to <head>:
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+   ================================================================ */
+
+
+/* ── Design Tokens ──────────────────────────────────────────────
+   Reference these custom properties anywhere on the site to keep
+   colours, shadows, and borders consistent across pages.
+   ────────────────────────────────────────────────────────────── */
+:root {
+  /* Backgrounds */
+  --bg-page:        #0a0a1a;   /* main page background             */
+  --bg-panel:       #0a0a1a;   /* app panel / sidebar background   */
+  --bg-card:        #0d0d20;   /* slightly lighter card background */
+  --bg-input:       #1a1a3a;   /* input / button resting state     */
+
+  /* Brand colours */
+  --gold:           #e8d44d;   /* primary gold — borders, text     */
+  --gold-shadow:    #7a5900;   /* gold drop-shadow                 */
+  --gold-dim:       #e8d44d33; /* gold at 20 % opacity (glows)     */
+  --orange:         #ff6b35;   /* accent orange — headings, alerts */
+  --orange-shadow:  #7a2e00;   /* orange drop-shadow               */
+  --green-glow:     #88ff88;   /* positive / depth readout         */
+
+  /* Neutral / muted */
+  --muted:          #aaa;      /* secondary labels                 */
+  --subtle:         #555;      /* de-emphasised text / units       */
+  --border-dim:     #333340;   /* divider / card border colour     */
+  --row-divider:    #1e1e38;   /* fine list-item rule              */
+
+  /* Typography */
+  --font-pixel:     'Press Start 2P', monospace;
+  --font-prose:     Georgia, 'Times New Roman', serif;
+
+  /* Borders */
+  --border-ui:      4px solid var(--gold);
+  --border-card:    4px solid var(--border-dim);
+
+  /* Shadows */
+  --shadow-app:     0 0 0 4px var(--gold-shadow), 0 0 40px var(--gold-dim);
+  --shadow-app-mobile: 0 0 24px var(--gold-dim);
+}
+
+
+/* ── Reset ──────────────────────────────────────────────────────*/
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+
+/* ── Base page ──────────────────────────────────────────────────*/
+body {
+  background: var(--bg-page);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  padding: 48px 20px 80px;
+  font-family: var(--font-pixel);
+  color: var(--gold);
+}
+
+
+/* ── Typography ─────────────────────────────────────────────────
+   Use these heading styles on any page to stay on-brand.
+   ────────────────────────────────────────────────────────────── */
+
+/* Page / app title */
+h1 {
+  font-family: var(--font-pixel);
+  font-size: 14px;
+  color: var(--orange);
+  text-shadow: 2px 2px 0 var(--orange-shadow);
+  letter-spacing: 2px;
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* Section heading — pixel style */
+h2 {
+  font-family: var(--font-pixel);
+  font-size: 13px;
+  color: var(--gold);
+  text-shadow: 2px 2px 0 var(--gold-shadow);
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+}
+
+/* Sub-section heading — pixel style */
+h3 {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: var(--orange);
+  text-shadow: 1px 1px 0 var(--orange-shadow);
+  letter-spacing: 2px;
+  margin-top: 40px;
+  margin-bottom: 16px;
+}
+
+/* Prose paragraph (use .prose class on a parent to activate) */
+.prose p {
+  font-family: var(--font-prose);
+  font-size: 15px;
+  color: #b8b8cc;
+  line-height: 1.8;
+  margin-bottom: 14px;
+}
+
+
+/* ── Pixel-border card ──────────────────────────────────────────
+   A bordered box that matches the main app shell aesthetic.
+   Apply class="pixel-card" to any container.
+   ────────────────────────────────────────────────────────────── */
+.pixel-card {
+  background: var(--bg-card);
+  border: var(--border-card);
+  color: #b8b8cc;
+  font-family: var(--font-prose);
+  line-height: 1.8;
+}
+
+.pixel-card__inner {
+  padding: 48px 44px;
+}
+
+
+/* ── Horizontal divider ─────────────────────────────────────────
+   Matches the panel separators and SEO section dividers.
+   <div class="divider"></div>
+   ────────────────────────────────────────────────────────────── */
+.divider {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--border-dim), transparent);
+  flex-shrink: 0;
+}
+
+/* Spacious variant used between prose sections */
+.divider--spaced {
+  margin: 36px 0;
+}
+
+
+/* ── Buttons ────────────────────────────────────────────────────
+   Default button matches the START / RESET style in the app.
+   ────────────────────────────────────────────────────────────── */
+button,
+.btn {
+  display: inline-block;
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  background: var(--bg-input);
+  color: var(--gold);
+  border: 3px solid var(--gold);
+  padding: 11px 14px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-decoration: none;
+  transition: background 0.1s, color 0.1s;
+}
+
+button:hover,
+.btn:hover {
+  background: var(--gold);
+  color: var(--bg-page);
+}
+
+button:active,
+.btn:active {
+  transform: translateY(2px);
+}
+
+/* Orange accent variant */
+.btn--orange {
+  color: var(--orange);
+  border-color: var(--orange);
+}
+
+.btn--orange:hover {
+  background: var(--orange);
+  color: var(--bg-page);
+}
+
+
+/* ── Text inputs ────────────────────────────────────────────────*/
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="search"],
+textarea {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  background: var(--bg-input);
+  color: var(--gold);
+  border: 3px solid var(--gold);
+  padding: 7px 8px;
+  outline: none;
+  width: 100%;
+  -moz-appearance: textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--orange);
+  color: var(--orange);
+}
+
+input:disabled,
+textarea:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+
+/* ── Status / label text ────────────────────────────────────────
+   Small pixel-font labels and readouts.
+   ────────────────────────────────────────────────────────────── */
+.label {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--muted);
+  letter-spacing: 2px;
+}
+
+.label--gold {
+  color: var(--gold);
+}
+
+.label--orange {
+  color: var(--orange);
+  font-size: 7px;
+}
+
+.label--green {
+  color: var(--green-glow);
+  text-shadow: 0 0 8px var(--green-glow);
+}
+
+
+/* ── Scanlines effect ───────────────────────────────────────────
+   Apply to any element that should have the CRT scanline overlay.
+   The element must have position: relative.
+   ────────────────────────────────────────────────────────────── */
+.scanlines {
+  position: relative;
+  image-rendering: pixelated;
+}
+
+.scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0, 0, 0, 0.18) 3px,
+    rgba(0, 0, 0, 0.18) 4px
+  );
+  pointer-events: none;
+}
+
+
+/* ── Glowing border box ─────────────────────────────────────────
+   The characteristic gold-glow border used on the main app shell.
+   ────────────────────────────────────────────────────────────── */
+.glow-border {
+  border: var(--border-ui);
+  box-shadow: var(--shadow-app);
+}
+
+
+/* ── Numbered steps list ────────────────────────────────────────
+   Used on how-to / guide pages.
+   <ol class="steps-list">
+   ────────────────────────────────────────────────────────────── */
+.steps-list {
+  list-style: none;
+  padding: 0;
+  counter-reset: step-counter;
+}
+
+.steps-list li {
+  counter-increment: step-counter;
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+  font-family: var(--font-prose);
+  font-size: 15px;
+  color: #b8b8cc;
+  line-height: 1.8;
+}
+
+.steps-list li::before {
+  content: counter(step-counter);
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  color: var(--bg-page);
+  background: var(--gold);
+  min-width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+
+/* ── Feature / bullet list ──────────────────────────────────────
+   Clean ruled list with pixel arrow bullet.
+   <ul class="feature-list">
+   ────────────────────────────────────────────────────────────── */
+.feature-list {
+  list-style: none;
+  padding: 0;
+}
+
+.feature-list li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--row-divider);
+  font-family: var(--font-prose);
+  font-size: 15px;
+  color: #b8b8cc;
+  line-height: 1.8;
+}
+
+.feature-list li:last-child {
+  border-bottom: none;
+}
+
+.feature-list li::before {
+  content: '▸';
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: var(--green-glow);
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+
+/* ── Buy Me a Coffee button ─────────────────────────────────────*/
+.bmc-btn {
+  display: block;
+  opacity: 0.55;
+  transition: opacity 0.2s;
+  image-rendering: auto;
+}
+
+.bmc-btn:hover {
+  opacity: 1;
+}
+
+.bmc-btn img {
+  height: 36px;
+  width: auto;
+  border: 2px solid var(--subtle);
+  image-rendering: auto;
+}
+
+
+/* ── Navigation bar ─────────────────────────────────────────────
+   Optional site-wide nav for multi-page use.
+   <nav class="site-nav"> <a href="/">HOME</a> … </nav>
+   ────────────────────────────────────────────────────────────── */
+.site-nav {
+  width: 100%;
+  max-width: 760px;
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+
+.site-nav a {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--muted);
+  text-decoration: none;
+  letter-spacing: 1px;
+  padding: 8px 12px;
+  border: 2px solid transparent;
+  text-transform: uppercase;
+  transition: color 0.1s, border-color 0.1s;
+}
+
+.site-nav a:hover {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
+.site-nav a[aria-current="page"] {
+  color: var(--orange);
+  border-color: var(--orange);
+}
+
+
+/* ── Page footer ────────────────────────────────────────────────*/
+.site-footer {
+  margin-top: 64px;
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--subtle);
+  letter-spacing: 1px;
+  text-align: center;
+  line-height: 2.2;
+}
+
+.site-footer a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  color: var(--gold);
+}
+
+
+/* ── Responsive — short desktop / laptop screens ────────────────*/
+@media (max-height: 760px) and (min-width: 621px) {
+  h1 { font-size: 12px; }
+}
+
+@media (max-height: 640px) and (min-width: 621px) {
+  h1 { font-size: 11px; }
+}
+
+
+/* ── Responsive — mobile ────────────────────────────────────────*/
+@media (max-width: 620px) {
+  body {
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 0 0 60px;
+  }
+
+  h1 { font-size: 15px; letter-spacing: 3px; }
+  h2 { font-size: 11px; }
+  h3 { font-size: 8px; }
+
+  button,
+  .btn {
+    font-size: 11px;
+    padding: 13px 18px;
+  }
+
+  .pixel-card__inner {
+    padding: 36px 24px;
+  }
+
+  .prose p,
+  .steps-list li,
+  .feature-list li {
+    font-size: 14px;
+  }
+
+  .bmc-btn img {
+    height: 40px;
+  }
+
+  .site-nav {
+    padding: 0 16px;
+  }
+}

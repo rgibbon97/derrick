@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(open:*)",
+      "Bash(sed -n '243,249p' /Users/rossgibbon/my-first-project/converter.html)",
+      "Bash(sed -n '324,330p' /Users/rossgibbon/my-first-project/calculator.html)",
+      "Bash(sed -n '213,219p' /Users/rossgibbon/my-first-project/acronyms.html)"
+    ]
+  }
+}
