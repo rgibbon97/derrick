@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DRILL-O-DORO</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0a0a1a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 48px 20px 80px;
+      font-family: 'Press Start 2P', monospace;
+      color: #e8d44d;
+    }
+
+    /* ── Outer shell ─────────────────────────────────────────── */
+    #app {
+      display: flex;
+      flex-direction: row;
+      border: 4px solid #e8d44d;
+      box-shadow: 0 0 0 4px #7a5900, 0 0 40px #e8d44d55;
+    }
+
+    /* ── Canvas column ───────────────────────────────────────── */
+    #canvas-wrap {
+      position: relative;
+      border-right: 4px solid #e8d44d;
+      image-rendering: pixelated;
+      flex-shrink: 0;
+    }
+
+    /* Desktop default: 2× logical size (220×340 → 440×680) */
+    canvas {
+      display: block;
+      width: 440px;
+      height: 680px;
+      image-rendering: pixelated;
+    }
+
+    /* Scanlines overlay */
+    #canvas-wrap::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 3px,
+        rgba(0,0,0,0.18) 3px,
+        rgba(0,0,0,0.18) 4px
+      );
+      pointer-events: none;
+    }
+
+    /* ── Right panel ─────────────────────────────────────────── */
+    #right-panel {
+      width: 260px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 18px 24px;
+      background: #0a0a1a;
+    }
+
+    /* Groups keep related elements clustered; space-between distributes between groups */
+    .panel-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+    }
+
+    h1 {
+      font-size: 14px;
+      color: #ff6b35;
+      text-shadow: 2px 2px 0 #7a2e00;
+      letter-spacing: 2px;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    #mode-label {
+      font-size: 8px;
+      color: #aaa;
+      letter-spacing: 2px;
+    }
+
+    .panel-sep {
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(to right, transparent, #333340, transparent);
+      flex-shrink: 0;
+    }
+
+    #timer-display {
+      font-size: 44px;
+      color: #e8d44d;
+      text-shadow: 3px 3px 0 #7a5900;
+      letter-spacing: 4px;
+    }
+
+    #depth-display {
+      font-size: 8px;
+      color: #88ff88;
+      letter-spacing: 2px;
+    }
+
+    #sparkle-msg {
+      font-size: 8px;
+      color: #88ff88;
+      height: 14px;
+      letter-spacing: 1px;
+      text-shadow: 0 0 8px #88ff88;
+      text-align: center;
+    }
+
+    #controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      background: #1a1a3a;
+      color: #e8d44d;
+      border: 3px solid #e8d44d;
+      padding: 11px 14px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: background 0.1s, color 0.1s;
+    }
+
+    button:hover {
+      background: #e8d44d;
+      color: #0a0a1a;
+    }
+
+    button:active {
+      transform: translateY(2px);
+    }
+
+    #session-count {
+      font-size: 7px;
+      color: #ff6b35;
+      letter-spacing: 2px;
+    }
+
+    #duration-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .dur-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .dur-label {
+      font-size: 7px;
+      color: #aaa;
+      letter-spacing: 1px;
+      width: 32px;
+      text-align: right;
+    }
+
+    .dur-input {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      width: 48px;
+      background: #1a1a3a;
+      color: #e8d44d;
+      border: 3px solid #e8d44d;
+      padding: 7px 4px;
+      text-align: center;
+      outline: none;
+      -moz-appearance: textfield;
+    }
+
+    .dur-input::-webkit-outer-spin-button,
+    .dur-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+    }
+
+    .dur-input:focus {
+      border-color: #ff6b35;
+      color: #ff6b35;
+    }
+
+    .dur-input:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .dur-unit {
+      font-size: 7px;
+      color: #555;
+      letter-spacing: 1px;
+      width: 24px;
+    }
+
+    /* ── Scale down for shorter desktop / laptop screens ─────── */
+    /* 1.7× — viewport height ≤ 760px */
+    @media (max-height: 760px) and (min-width: 621px) {
+      canvas         { width: 374px; height: 578px; }
+      #right-panel   { width: 240px; padding-top: 20px; }
+      #timer-display { font-size: 38px; }
+      h1             { font-size: 12px; }
+    }
+
+    /* 1.5× — viewport height ≤ 640px */
+    @media (max-height: 640px) and (min-width: 621px) {
+      canvas         { width: 330px; height: 510px; }
+      #right-panel   { width: 215px; padding: 16px 14px; }
+      #timer-display { font-size: 32px; letter-spacing: 3px; }
+      h1             { font-size: 11px; }
+    }
+
+    /* ── Mobile: stack vertically, canvas fills screen width ─── */
+    @media (max-width: 620px) {
+      body {
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding: 0 0 60px;
+      }
+
+      #app {
+        flex-direction: column;
+        width: 100%;
+        /* drop side borders so the 4px doesn't cause horizontal overflow */
+        border-left: none;
+        border-right: none;
+        box-shadow: 0 0 24px #e8d44d33;
+      }
+
+      #canvas-wrap {
+        border-right: none;
+        border-bottom: 4px solid #e8d44d;
+        width: 100%;
+      }
+
+      /* Canvas fills full width; height follows the 220:340 aspect ratio */
+      canvas {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 220 / 340;
+      }
+
+      #right-panel {
+        width: 100%;
+        padding: 24px 28px 32px;
+      }
+
+      /* Scale up text now that there's more horizontal room */
+      h1             { font-size: 15px; letter-spacing: 3px; }
+      #mode-label    { font-size: 9px; }
+      #timer-display { font-size: 52px; letter-spacing: 5px; }
+      #depth-display { font-size: 9px; }
+      #sparkle-msg   { font-size: 9px; height: 16px; }
+
+      button         { font-size: 11px; padding: 13px 18px; }
+
+      .dur-label     { font-size: 8px; width: 36px; }
+      .dur-input     { font-size: 11px; width: 54px; padding: 8px 4px; }
+      .dur-unit      { font-size: 8px; }
+    }
+    /* ── SEO Content Section ─────────────────────────────────── */
+    #seo-content {
+      width: 100%;
+      max-width: 760px;
+      margin-top: 64px;
+      border: 4px solid #333340;
+      background: #0d0d20;
+      font-family: Georgia, 'Times New Roman', serif;
+      color: #b8b8cc;
+      line-height: 1.8;
+    }
+
+    .seo-inner {
+      padding: 48px 44px;
+    }
+
+    .seo-inner h2 {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 13px;
+      color: #e8d44d;
+      text-shadow: 2px 2px 0 #7a5900;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+    }
+
+    .seo-inner h3 {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      color: #ff6b35;
+      text-shadow: 1px 1px 0 #7a2e00;
+      letter-spacing: 2px;
+      margin-top: 40px;
+      margin-bottom: 16px;
+    }
+
+    .seo-inner p {
+      font-size: 15px;
+      margin-bottom: 14px;
+    }
+
+    .seo-divider {
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(to right, transparent, #333340, transparent);
+      margin: 36px 0;
+    }
+
+    .seo-steps {
+      list-style: none;
+      padding: 0;
+      counter-reset: step-counter;
+    }
+
+    .seo-steps li {
+      counter-increment: step-counter;
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+      margin-bottom: 18px;
+      font-size: 15px;
+    }
+
+    .seo-steps li::before {
+      content: counter(step-counter);
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      color: #0a0a1a;
+      background: #e8d44d;
+      min-width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .seo-features {
+      list-style: none;
+      padding: 0;
+    }
+
+    .seo-features li {
+      font-size: 15px;
+      padding: 10px 0;
+      border-bottom: 1px solid #1e1e38;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .seo-features li:last-child {
+      border-bottom: none;
+    }
+
+    .seo-features li::before {
+      content: '▸';
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      color: #88ff88;
+      flex-shrink: 0;
+      margin-top: 3px;
+    }
+
+    @media (max-width: 620px) {
+      #seo-content {
+        border-left: none;
+        border-right: none;
+        margin-top: 40px;
+      }
+
+      .seo-inner {
+        padding: 36px 24px;
+      }
+
+      .seo-inner h2 { font-size: 11px; }
+      .seo-inner h3 { font-size: 8px; }
+      .seo-inner p,
+      .seo-steps li,
+      .seo-features li { font-size: 14px; }
+    }
+
+    /* ── Site navigation ─────────────────────────────────────── */
+    .site-nav {
+      width: 100%;
+      max-width: 760px;
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+
+    .site-nav a {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      color: #aaa;
+      text-decoration: none;
+      letter-spacing: 1px;
+      padding: 8px 12px;
+      border: 2px solid transparent;
+      text-transform: uppercase;
+      transition: color 0.1s, border-color 0.1s;
+    }
+
+    .site-nav a:hover {
+      color: #e8d44d;
+      border-color: #e8d44d;
+    }
+
+    .site-nav a[aria-current="page"] {
+      color: #ff6b35;
+      border-color: #ff6b35;
+    }
+
+  </style>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="index.html">&#9654; HOME</a>
+    <a href="timer.html" aria-current="page">&#9654; TIMER</a>
+    <a href="converter.html">&#9654; CONVERTER</a>
+    <a href="calculator.html">&#9654; CALCULATOR</a>
+    <a href="acronyms.html">&#9654; ACRONYMS</a>
+    <a href="derrick.html">&#9654; ASK DERRICK</a>
+    <a href="wellcontrol.html">&#9654; WELL CONTROL</a>
+  </nav>
+  <div id="app">
+    <div id="canvas-wrap">
+      <canvas id="c" width="220" height="340"></canvas>
+    </div>
+    <div id="right-panel">
+      <div class="panel-group">
+        <h1>DRILL-O-DORO</h1>
+        <div id="mode-label">WORK SESSION</div>
+      </div>
+      <div class="panel-sep"></div>
+      <div class="panel-group">
+        <div id="timer-display">25:00</div>
+        <div id="depth-display">DEPTH: 0 FT</div>
+        <div id="sparkle-msg"></div>
+      </div>
+      <div class="panel-sep"></div>
+      <div class="panel-group">
+        <div id="controls">
+          <button id="btn-start">START</button>
+          <button id="btn-reset">RESET</button>
+        </div>
+        <div id="session-count">SESSIONS: 0</div>
+      </div>
+      <div class="panel-sep"></div>
+      <div id="duration-controls">
+        <div class="dur-group">
+          <span class="dur-label">WORK</span>
+          <input class="dur-input" id="inp-work" type="number" min="1" max="99" value="25">
+          <span class="dur-unit">MIN</span>
+        </div>
+        <div class="dur-group">
+          <span class="dur-label">BRK</span>
+          <input class="dur-input" id="inp-break" type="number" min="1" max="99" value="5">
+          <span class="dur-unit">MIN</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SEO Content ───────────────────────────────────────────── -->
+  <section id="seo-content" aria-label="About Drill-O-Doro">
+    <div class="seo-inner">
+
+      <h2>WHAT IS DRILL-O-DORO?</h2>
+      <p>
+        Drill-O-Doro is a Pomodoro timer with a twist. As you work, a pixel-art oil rig drills deeper
+        through animated geological layers — from topsoil all the way down to a hidden reservoir.
+        Each completed work session brings the drill closer to striking oil, turning focused productivity
+        into a satisfying visual journey underground.
+      </p>
+      <p>
+        The name is a portmanteau of <em>drill</em> and <em>Pomodoro</em>, combining the drilling
+        animation theme with the time-management technique that powers it. Whether you're writing,
+        coding, studying, or designing, Drill-O-Doro keeps you on task with a retro aesthetic that
+        makes work feel like an excavation worth completing.
+      </p>
+
+      <div class="seo-divider"></div>
+
+      <h3>THE POMODORO TECHNIQUE</h3>
+      <p>
+        The Pomodoro Technique is a time-management method developed by Francesco Cirillo in the late
+        1980s. Named after the tomato-shaped kitchen timer he used as a student (<em>pomodoro</em>
+        means "tomato" in Italian), the method breaks work into short, focused intervals separated by
+        brief rest periods.
+      </p>
+      <p>
+        The core idea is simple: sustained concentration is mentally taxing, and the brain benefits
+        from regular, scheduled breaks. By committing fully to a task for a defined window — and
+        knowing a break is coming — you reduce the urge to procrastinate, minimise interruptions, and
+        maintain a higher quality of attention throughout the day.
+      </p>
+      <p>
+        Research in cognitive psychology supports this rhythm. Short breaks restore attentional
+        resources, prevent decision fatigue, and help consolidate what you've learned. Over time,
+        tracking completed sessions also gives you an honest picture of how long tasks actually take —
+        a skill that improves planning and reduces overcommitment.
+      </p>
+
+      <div class="seo-divider"></div>
+
+      <h3>HOW TO USE DRILL-O-DORO</h3>
+      <ol class="seo-steps">
+        <li>
+          <span>Set your work and break durations using the <strong>WORK</strong> and <strong>BRK</strong> inputs.
+          The classic Pomodoro is 25 minutes of work followed by a 5-minute break, but adjust to whatever
+          suits your focus style.</span>
+        </li>
+        <li>
+          <span>Press <strong>START</strong> to begin your work session. The drill will begin descending
+          through the earth as the timer counts down — your progress is shown visually layer by layer.</span>
+        </li>
+        <li>
+          <span>Work without interruption until the timer completes. Avoid switching tasks, checking
+          notifications, or stepping away. The session only counts if you see it through.</span>
+        </li>
+        <li>
+          <span>When the alarm sounds, take your break. The timer automatically switches to break mode.
+          Step away from the screen, stretch, or get a drink — let your brain reset before the next dig.</span>
+        </li>
+        <li>
+          <span>Repeat. Each completed work session is tracked in the <strong>SESSIONS</strong> counter.
+          After four sessions, consider taking a longer break of 15–30 minutes before continuing.</span>
+        </li>
+      </ol>
+
+      <div class="seo-divider"></div>
+
+      <h3>FEATURES</h3>
+      <ul class="seo-features">
+        <li>Animated pixel-art oil drilling rig that progresses through nine geological layers as you work</li>
+        <li>Fully customisable work and break durations from 1 to 99 minutes</li>
+        <li>Automatic mode switching between work and break sessions</li>
+        <li>Session counter to track your daily focus blocks</li>
+        <li>Retro scanline display with a dark colour scheme designed for extended use</li>
+        <li>No sign-up, no account, no tracking — runs entirely in the browser</li>
+        <li>Responsive layout that works on desktop and mobile</li>
+      </ul>
+
+    </div>
+  </section>
+
+  <script>
+  (() => {
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+
+    // ─── Palette ───────────────────────────────────────────────
+    const PAL = {
+      sky:     '#87ceeb',
+      skyDark: '#4a7fa5',
+      ground:  '#6b4c2a',
+      dirt1:   '#8b6340',
+      dirt2:   '#7a5530',
+      clay:    '#c0784a',
+      clay2:   '#a85c30',
+      sand:    '#d4b483',
+      sand2:   '#c4a060',
+      rock:    '#7a7a8a',
+      rock2:   '#5a5a6a',
+      granite: '#9a8070',
+      granite2:'#7a6050',
+      coal:    '#2a2a2a',
+      coal2:   '#1a1a1a',
+      ore:     '#c8a020',
+      ore2:    '#a07010',
+      lava:    '#ff4400',
+      lava2:   '#cc2200',
+      black:   '#000000',
+      white:   '#ffffff',
+      rigMetal:'#c0c0b0',
+      rigDark: '#808070',
+      drillBit:'#e0e0e0',
+      drillShaft:'#a0a090',
+      smoke:   '#aaaaaa',
+      oilBlack:'#111111',
+      sparks:  '#ffdd00',
+    };
+
+    // ─── Layers (y-ranges in canvas coords, layer starts at y=60) ──
+    const SURFACE_Y = 60; // where ground starts on canvas
+    const DRILL_CANVAS_BOTTOM = 333; // lowest the drill tip can go
+
+    // Layer heights sum to 275 (= DRILL_CANVAS_BOTTOM - SURFACE_Y),
+    // so the drill tip arrives at the RESERVOIR top exactly as the session ends.
+    const LAYERS = [
+      { name: 'TOPSOIL',   h: 22, c1: PAL.dirt1,   c2: PAL.dirt2,   label: '#d4a04a' },
+      { name: 'CLAY',      h: 26, c1: PAL.clay,    c2: PAL.clay2,   label: '#ff9966' },
+      { name: 'SANDSTONE', h: 30, c1: PAL.sand,    c2: PAL.sand2,   label: '#ffe0a0' },
+      { name: 'LIMESTONE', h: 30, c1: PAL.rock,    c2: PAL.rock2,   label: '#aaaacc' },
+      { name: 'GRANITE',   h: 36, c1: PAL.granite, c2: PAL.granite2,label: '#ddbbaa' },
+      { name: 'COAL BED',  h: 26, c1: PAL.coal,    c2: PAL.coal2,   label: '#888888' },
+      { name: 'ORE VEIN',  h: 30, c1: PAL.ore,     c2: PAL.ore2,    label: '#ffdd44' },
+      { name: 'BEDROCK',   h: 41, c1: '#444450',   c2: '#333340',   label: '#9999bb' },
+      { name: 'RESERVOIR', h: 34, c1: '#0d0907',   c2: '#090605',   label: '#aa8844' },
+    ];
+
+    // Precompute layer y positions
+    let layerY = [];
+    let acc = SURFACE_Y;
+    for (const l of LAYERS) { layerY.push(acc); acc += l.h; }
+
+    // ─── State ─────────────────────────────────────────────────
+    let WORK_TIME  = 25 * 60;
+    let BREAK_TIME =  5 * 60;
+
+    function applyDurations() {
+      const wm = Math.max(1, Math.min(99, parseInt(document.getElementById('inp-work').value)  || 25));
+      const bm = Math.max(1, Math.min(99, parseInt(document.getElementById('inp-break').value) ||  5));
+      // Clamp displayed values in case user typed out-of-range
+      document.getElementById('inp-work').value  = wm;
+      document.getElementById('inp-break').value = bm;
+      WORK_TIME  = wm * 60;
+      BREAK_TIME = bm * 60;
+    }
+
+    function syncInputState() {
+      const off = running;
+      document.getElementById('inp-work').disabled  = off;
+      document.getElementById('inp-break').disabled = off;
+    }
+
+    let mode = 'work'; // 'work' | 'break'
+    let timeLeft = WORK_TIME;
+    let running = false;
+    let sessions = 0;
+    let intervalId = null;
+
+    // Visual
+    let drillProgress = 0; // 0..1 (fraction of session)
+    let drillAnimOffset = 0;
+    let mudAnimOffset = 0;
+    let rigAnimFrame = 0;
+    let smokeParticles = [];
+    let sparkParticles = [];
+    let oilDroplets = [];
+    let frameCount = 0;
+    let sparkleMsg = '';
+    let sparkleMsgTimer = 0;
+    let blink = true;
+    let celebrating = false;
+
+    // ─── Pixel helpers ─────────────────────────────────────────
+    function px(x, y, c) {
+      ctx.fillStyle = c;
+      ctx.fillRect(x, y, 1, 1);
+    }
+    function rect(x, y, w, h, c) {
+      ctx.fillStyle = c;
+      ctx.fillRect(x, y, w, h);
+    }
+    function hline(x, y, w, c) { rect(x, y, w, 1, c); }
+    function vline(x, y, h, c) { rect(x, y, 1, h, c); }
+
+    // ─── Draw layers ───────────────────────────────────────────
+    function drawLayers() {
+      for (let i = 0; i < LAYERS.length; i++) {
+        const l = LAYERS[i];
+        const y0 = layerY[i];
+        if (l.name === 'RESERVOIR') {
+          drawReservoirLayer(y0, l.h);
+        } else {
+          // Alternate rows of two colors for texture
+          for (let row = 0; row < l.h; row++) {
+            const c = (row % 4 < 2) ? l.c1 : l.c2;
+            rect(0, y0 + row, W, 1, c);
+          }
+          // Noise dots
+          for (let dot = 0; dot < 18; dot++) {
+            const dx = (i * 73 + dot * 17) % W;
+            const dy = y0 + (i * 31 + dot * 11) % l.h;
+            rect(dx, dy, 2, 1, l.c2);
+          }
+        }
+        // Layer label (tiny, right edge)
+        drawPixelText(l.name, W - l.name.length * 12 - 2, y0 + 2, l.label, 3);
+      }
+      // Fill below layers
+      const lastY = layerY[LAYERS.length-1] + LAYERS[LAYERS.length-1].h;
+      if (lastY < H) {
+        rect(0, lastY, W, H - lastY, '#222230');
+      }
+    }
+
+    // ─── Reservoir layer ───────────────────────────────────────
+    // Porous rock saturated with crude oil: very dark, with scattered
+    // pore voids (near-black oil pockets) and faint grain outlines.
+    function drawReservoirLayer(y0, h) {
+      // Dark oily base – slightly warmer than bedrock
+      for (let row = 0; row < h; row++) {
+        const c = (row % 8 < 4) ? '#0d0907' : '#0a0705';
+        rect(0, y0 + row, W, 1, c);
+      }
+      // Grain boundaries (slightly lighter warm-brown lines)
+      for (let i = 0; i < 44; i++) {
+        const gx = (i * 53 + 11) % W;
+        const gy = y0 + (i * 37 + 5) % h;
+        const gw = 2 + (i * 7) % 5;
+        rect(gx, gy, gw, 1, '#1e140a');
+      }
+      // Oil-filled pores: near-black with faint blue-black crude tint
+      for (let i = 0; i < 32; i++) {
+        const px = (i * 71 + 23) % W;
+        const py = y0 + (i * 43 + 15) % h;
+        const pw = 2 + (i * 3) % 4;
+        const ph = 1 + (i * 5) % 3;
+        rect(px, py, pw, ph, '#060608');
+      }
+      // Occasional quartz grain highlights
+      for (let i = 0; i < 18; i++) {
+        const qx = (i * 89 + 7) % W;
+        const qy = y0 + (i * 67 + 9) % h;
+        rect(qx, qy, 1, 1, '#2a1f10');
+      }
+      // Hard top boundary – clear transition from bedrock
+      hline(0, y0, W, '#1a1208');
+      hline(0, y0 + 1, W, '#110d06');
+    }
+
+    // ─── Sky ───────────────────────────────────────────────────
+    function drawSky() {
+      // Gradient sky
+      for (let y = 0; y < SURFACE_Y; y++) {
+        const t = y / SURFACE_Y;
+        const r = Math.round(0x87 + (0x4a - 0x87) * t);
+        const g = Math.round(0xce + (0x7f - 0xce) * t);
+        const b = Math.round(0xeb + (0xa5 - 0xeb) * t);
+        rect(0, y, W, 1, `rgb(${r},${g},${b})`);
+      }
+      // Sun
+      rect(170, 6, 12, 12, '#ffee44');
+      rect(172, 4, 8, 16, '#ffee44');
+      rect(168, 8, 16, 8, '#ffee44');
+      // Sun rays
+      ctx.fillStyle = '#ffee44';
+      px(166, 6, '#ffee44'); px(184, 6, '#ffee44');
+      px(166, 18, '#ffee44'); px(184, 18, '#ffee44');
+    }
+
+    // ─── Rig ───────────────────────────────────────────────────
+    // Center of drill: x=110
+    const RIG_X = 88;
+    const RIG_W = 44;
+
+    function drawRig() {
+      // Platform base
+      rect(RIG_X - 4, SURFACE_Y - 6, RIG_W + 8, 6, PAL.rigMetal);
+      hline(RIG_X - 4, SURFACE_Y - 6, RIG_W + 8, PAL.rigDark);
+      hline(RIG_X - 4, SURFACE_Y - 1, RIG_W + 8, PAL.black);
+
+      // Left leg
+      vline(RIG_X + 2, SURFACE_Y - 20, 14, PAL.rigMetal);
+      vline(RIG_X + 3, SURFACE_Y - 20, 14, PAL.rigDark);
+      // Right leg
+      vline(RIG_X + RIG_W - 4, SURFACE_Y - 20, 14, PAL.rigMetal);
+      vline(RIG_X + RIG_W - 3, SURFACE_Y - 20, 14, PAL.rigDark);
+
+      // Cross brace
+      for (let i = 0; i <= 14; i++) {
+        const t = i / 14;
+        const x1 = Math.round(RIG_X + 2 + t * (RIG_W - 6));
+        const x2 = Math.round(RIG_X + RIG_W - 4 - t * (RIG_W - 6));
+        px(x1, SURFACE_Y - 20 + i, PAL.rigDark);
+        px(x2, SURFACE_Y - 20 + i, PAL.rigDark);
+      }
+
+      // Top crown
+      rect(RIG_X + 8, SURFACE_Y - 28, RIG_W - 16, 8, PAL.rigMetal);
+      hline(RIG_X + 8, SURFACE_Y - 28, RIG_W - 16, PAL.white);
+      hline(RIG_X + 8, SURFACE_Y - 21, RIG_W - 16, PAL.black);
+      vline(RIG_X + 8, SURFACE_Y - 28, 8, PAL.black);
+      vline(RIG_X + RIG_W - 9, SURFACE_Y - 28, 8, PAL.black);
+
+      // Derrick crown spires
+      px(RIG_X + 14, SURFACE_Y - 30, PAL.rigMetal);
+      px(RIG_X + 15, SURFACE_Y - 32, PAL.rigMetal);
+      px(RIG_X + RIG_W - 15, SURFACE_Y - 30, PAL.rigMetal);
+      px(RIG_X + RIG_W - 16, SURFACE_Y - 32, PAL.rigMetal);
+
+      // Motor box (bobbing)
+      const bob = running ? (frameCount % 8 < 4 ? 0 : 1) : 0;
+      rect(RIG_X + 10, SURFACE_Y - 18 + bob, 12, 8, '#886644');
+      rect(RIG_X + 12, SURFACE_Y - 16 + bob, 8, 4, '#664422');
+      hline(RIG_X + 10, SURFACE_Y - 18 + bob, 12, '#aaaaaa');
+      vline(RIG_X + 10, SURFACE_Y - 18 + bob, 8, '#aaaaaa');
+
+      // Exhaust pipe
+      rect(RIG_X + 24, SURFACE_Y - 20, 4, 12, PAL.rigDark);
+      rect(RIG_X + 23, SURFACE_Y - 22, 6, 4, PAL.rigMetal);
+      hline(RIG_X + 23, SURFACE_Y - 22, 6, PAL.white);
+    }
+
+    // ─── Drill string ──────────────────────────────────────────
+    function getDrillTipY() {
+      return SURFACE_Y + drillProgress * (DRILL_CANVAS_BOTTOM - SURFACE_Y);
+    }
+
+    function drawDrillString(tipY) {
+      const shaftX = 108; // center
+      const shaftW = 4;
+      // Draw shaft segments (animated with offset)
+      const segH = 8;
+      let y = SURFACE_Y;
+      let seg = 0;
+      while (y < tipY - 10) {
+        const anim = running ? ((frameCount * 2 + seg * segH) % (segH * 2) < segH ? 0 : 1) : 0;
+        rect(shaftX - shaftW/2, y, shaftW, Math.min(segH, tipY - 10 - y), anim === 0 ? PAL.drillShaft : '#888880');
+        // Pipe joint marks
+        if ((y - SURFACE_Y) % 16 === 0) {
+          rect(shaftX - shaftW/2 - 1, y, shaftW + 2, 2, '#666660');
+        }
+        y += segH; seg++;
+      }
+      // Drill bit
+      drawDrillBit(shaftX, tipY);
+    }
+
+    function drawDrillBit(cx, tipY) {
+      const rot = running ? (frameCount % 4) : 0;
+      // Collar
+      rect(cx - 4, tipY - 12, 8, 8, '#888880');
+      hline(cx - 4, tipY - 12, 8, '#ccccbb');
+      // Bit head
+      rect(cx - 3, tipY - 4, 6, 6, PAL.drillBit);
+      hline(cx - 3, tipY - 4, 6, '#ffffff');
+      // Bit teeth (rotating)
+      const offsets = [[0,0],[1,0],[0,1],[1,1]];
+      const o = offsets[rot];
+      px(cx - 4 + o[0], tipY + 2, '#ffdd00');
+      px(cx + 3 - o[0], tipY + 2, '#ffdd00');
+      px(cx - 2 + o[1], tipY + 4, '#ffaa00');
+      px(cx + 1 - o[1], tipY + 4, '#ffaa00');
+      // Tip point
+      px(cx - 1, tipY + 5, PAL.drillBit);
+      px(cx,     tipY + 5, PAL.drillBit);
+      px(cx,     tipY + 6, '#ccccbb');
+    }
+
+    // ─── Smoke & sparks ────────────────────────────────────────
+    function spawnSmoke() {
+      if (!running) return;
+      if (frameCount % 6 === 0) {
+        smokeParticles.push({
+          x: RIG_X + 25 + Math.random() * 2,
+          y: SURFACE_Y - 22,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: -0.8 - Math.random() * 0.5,
+          life: 20 + Math.random() * 15,
+          size: 2,
+        });
+      }
+    }
+
+    function spawnSparks(tipY) {
+      if (!running) return;
+      if (frameCount % 3 === 0) {
+        for (let i = 0; i < 2; i++) {
+          sparkParticles.push({
+            x: 108 + (Math.random() - 0.5) * 6,
+            y: tipY + 4,
+            vx: (Math.random() - 0.5) * 2,
+            vy: (Math.random() - 0.5) * 2 - 0.5,
+            life: 6 + Math.random() * 6,
+          });
+        }
+      }
+    }
+
+    function updateAndDrawParticles() {
+      // Smoke
+      smokeParticles = smokeParticles.filter(p => p.life > 0);
+      for (const p of smokeParticles) {
+        p.x += p.vx; p.y += p.vy; p.life--;
+        const alpha = p.life / 35;
+        const g = Math.round(160 + (1 - alpha) * 60);
+        ctx.fillStyle = `rgba(${g},${g},${g},${alpha})`;
+        ctx.fillRect(Math.round(p.x), Math.round(p.y), p.size, p.size);
+      }
+      // Sparks
+      sparkParticles = sparkParticles.filter(p => p.life > 0);
+      for (const p of sparkParticles) {
+        p.x += p.vx; p.y += p.vy; p.life--;
+        const c = p.life > 4 ? PAL.sparks : '#ff8800';
+        rect(Math.round(p.x), Math.round(p.y), 1, 1, c);
+      }
+    }
+
+    // ─── Tiny pixel font (3×5) ─────────────────────────────────
+    const FONT3 = {
+      'A':[[0,1,0],[1,0,1],[1,1,1],[1,0,1],[1,0,1]],
+      'B':[[1,1,0],[1,0,1],[1,1,0],[1,0,1],[1,1,0]],
+      'C':[[0,1,1],[1,0,0],[1,0,0],[1,0,0],[0,1,1]],
+      'D':[[1,1,0],[1,0,1],[1,0,1],[1,0,1],[1,1,0]],
+      'E':[[1,1,1],[1,0,0],[1,1,0],[1,0,0],[1,1,1]],
+      'F':[[1,1,1],[1,0,0],[1,1,0],[1,0,0],[1,0,0]],
+      'G':[[0,1,1],[1,0,0],[1,0,1],[1,0,1],[0,1,1]],
+      'H':[[1,0,1],[1,0,1],[1,1,1],[1,0,1],[1,0,1]],
+      'I':[[1,1,1],[0,1,0],[0,1,0],[0,1,0],[1,1,1]],
+      'J':[[0,0,1],[0,0,1],[0,0,1],[1,0,1],[0,1,0]],
+      'K':[[1,0,1],[1,0,1],[1,1,0],[1,0,1],[1,0,1]],
+      'L':[[1,0,0],[1,0,0],[1,0,0],[1,0,0],[1,1,1]],
+      'M':[[1,0,1],[1,1,1],[1,0,1],[1,0,1],[1,0,1]],
+      'N':[[1,0,1],[1,1,1],[1,1,1],[1,0,1],[1,0,1]],
+      'O':[[0,1,0],[1,0,1],[1,0,1],[1,0,1],[0,1,0]],
+      'P':[[1,1,0],[1,0,1],[1,1,0],[1,0,0],[1,0,0]],
+      'Q':[[0,1,0],[1,0,1],[1,0,1],[1,1,1],[0,1,1]],
+      'R':[[1,1,0],[1,0,1],[1,1,0],[1,0,1],[1,0,1]],
+      'S':[[0,1,1],[1,0,0],[0,1,0],[0,0,1],[1,1,0]],
+      'T':[[1,1,1],[0,1,0],[0,1,0],[0,1,0],[0,1,0]],
+      'U':[[1,0,1],[1,0,1],[1,0,1],[1,0,1],[0,1,0]],
+      'V':[[1,0,1],[1,0,1],[1,0,1],[0,1,0],[0,1,0]],
+      'W':[[1,0,1],[1,0,1],[1,0,1],[1,1,1],[1,0,1]],
+      'X':[[1,0,1],[1,0,1],[0,1,0],[1,0,1],[1,0,1]],
+      'Y':[[1,0,1],[1,0,1],[0,1,0],[0,1,0],[0,1,0]],
+      'Z':[[1,1,1],[0,0,1],[0,1,0],[1,0,0],[1,1,1]],
+      '0':[[0,1,0],[1,0,1],[1,0,1],[1,0,1],[0,1,0]],
+      '1':[[0,1,0],[1,1,0],[0,1,0],[0,1,0],[1,1,1]],
+      '2':[[1,1,0],[0,0,1],[0,1,0],[1,0,0],[1,1,1]],
+      '3':[[1,1,0],[0,0,1],[0,1,0],[0,0,1],[1,1,0]],
+      '4':[[1,0,1],[1,0,1],[1,1,1],[0,0,1],[0,0,1]],
+      '5':[[1,1,1],[1,0,0],[1,1,0],[0,0,1],[1,1,0]],
+      '6':[[0,1,1],[1,0,0],[1,1,0],[1,0,1],[0,1,0]],
+      '7':[[1,1,1],[0,0,1],[0,1,0],[0,1,0],[0,1,0]],
+      '8':[[0,1,0],[1,0,1],[0,1,0],[1,0,1],[0,1,0]],
+      '9':[[0,1,0],[1,0,1],[0,1,1],[0,0,1],[0,1,0]],
+      ' ':[[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]],
+      ':':[[0,0,0],[0,1,0],[0,0,0],[0,1,0],[0,0,0]],
+      '-':[[0,0,0],[0,0,0],[1,1,1],[0,0,0],[0,0,0]],
+      '/':[[0,0,1],[0,0,1],[0,1,0],[1,0,0],[1,0,0]],
+    };
+
+    function drawPixelText(str, x, y, color, scale=1) {
+      ctx.fillStyle = color;
+      let cx = x;
+      for (const ch of str.toUpperCase()) {
+        const g = FONT3[ch] || FONT3[' '];
+        for (let row = 0; row < 5; row++) {
+          for (let col = 0; col < 3; col++) {
+            if (g[row][col]) {
+              ctx.fillRect(cx + col * scale, y + row * scale, scale, scale);
+            }
+          }
+        }
+        cx += (3 + 1) * scale;
+      }
+    }
+
+    // ─── Bore hole ─────────────────────────────────────────────
+    function drawBorehole(tipY) {
+      if (tipY <= SURFACE_Y) return;
+      const holeX = 102;
+      const holeW = 12;
+      // Dark hole
+      rect(holeX, SURFACE_Y, holeW, tipY - SURFACE_Y, '#111118');
+      // Hole edges
+      vline(holeX, SURFACE_Y, tipY - SURFACE_Y, '#333330');
+      vline(holeX + holeW - 1, SURFACE_Y, tipY - SURFACE_Y, '#333330');
+    }
+
+    // ─── Mud returns ───────────────────────────────────────────
+    // Fluid pumped down inside the drill string returns up the
+    // annulus (the gap between the string and borehole wall).
+    // Left annulus:  x=102-105 (4px)
+    // Drill shaft:   x=106-109 (4px)
+    // Right annulus: x=110-113 (4px)
+    function drawMudReturns(tipY) {
+      if (tipY <= SURFACE_Y + 4) return;
+
+      const segH    = 4;
+      // alternating dark/mid browns for that dirty-fluid look
+      const colors  = ['#7a4a1e', '#553010', '#8b5530', '#664018'];
+      const nc      = colors.length;
+      const cycleH  = segH * nc; // 16px full cycle
+      const off     = Math.floor(mudAnimOffset) % cycleH;
+
+      const bottom  = Math.floor(tipY);
+      for (let y = SURFACE_Y; y < bottom; y++) {
+        // As mudAnimOffset increases the pattern shifts upward
+        const relY  = ((y - SURFACE_Y - off) % cycleH + cycleH) % cycleH;
+        const color = colors[Math.floor(relY / segH)];
+        rect(102, y, 4, 1, color); // left annulus
+        rect(110, y, 4, 1, color); // right annulus
+      }
+
+      // Surface return exit – shimmer where mud spills out of the hole
+      if (drillProgress > 0.01) {
+        const shimmer = frameCount % 6 < 3 ? '#9b6a3b' : '#664018';
+        rect(102, SURFACE_Y, 4, 2, shimmer);
+        rect(110, SURFACE_Y, 4, 2, shimmer);
+      }
+    }
+
+    // ─── Oil droplets (celebration) ────────────────────────────
+    function spawnOilDroplet() {
+      const spread = Math.random() < 0.7 ? 0 : (Math.random() - 0.5) * 30;
+      oilDroplets.push({
+        x: 102 + Math.random() * 12 + spread,
+        y: DRILL_CANVAS_BOTTOM - Math.random() * 6,
+        vx: (Math.random() - 0.5) * 1.2,
+        vy: -(1.4 + Math.random() * 2.2),
+        life: 70 + Math.random() * 50,
+        // mix of dark oil, crude amber, and occasional gas-green
+        color: Math.random() < 0.15 ? '#88cc22'
+             : Math.random() < 0.4  ? '#443318'
+             :                        '#221408',
+        size: Math.random() < 0.4 ? 2 : 1,
+      });
+    }
+
+    function updateAndDrawOilDroplets() {
+      if (celebrating && frameCount % 2 === 0) {
+        spawnOilDroplet();
+        if (Math.random() < 0.3) spawnOilDroplet(); // occasional burst
+      }
+      oilDroplets = oilDroplets.filter(d => d.life > 0);
+      for (const d of oilDroplets) {
+        d.x += d.vx; d.y += d.vy; d.life--;
+        d.vy += 0.04; // slight gravity
+        rect(Math.round(d.x), Math.round(d.y), d.size, d.size, d.color);
+      }
+    }
+
+    // ─── Celebration overlay ────────────────────────────────────
+    function drawCelebration() {
+      // Dark overlay – leave a window at the bottom so the reservoir is visible
+      ctx.fillStyle = 'rgba(0,0,0,0.62)';
+      ctx.fillRect(0, 14, W, H - 14);
+
+      // Text box
+      const bx = 8, by = 112, bw = W - 16, bh = 46;
+      rect(bx, by, bw, bh, '#050403');
+      hline(bx, by,      bw, '#886622');
+      hline(bx, by+bh-1, bw, '#886622');
+      vline(bx,      by, bh, '#886622');
+      vline(bx+bw-1, by, bh, '#886622');
+      hline(bx+2, by+2,      bw-4, '#443311');
+      hline(bx+2, by+bh-3,   bw-4, '#443311');
+
+      // Flashing gold / orange text
+      const textColor = Math.floor(frameCount / 10) % 2 === 0 ? '#ffdd44' : '#ff8800';
+
+      // 'RESERVOIR' – 9 chars × 8px/char (scale 2) = 70px rendered width, centre at 110
+      drawPixelText('RESERVOIR', 75, by + 8,  textColor, 2);
+      // 'REACHED'   – 7 chars × 8px/char       = 54px rendered width
+      drawPixelText('REACHED',   83, by + 28, textColor, 2);
+    }
+
+    // ─── Layer name at depth ────────────────────────────────────
+    function getLayerAtY(y) {
+      for (let i = LAYERS.length - 1; i >= 0; i--) {
+        if (y >= layerY[i]) return LAYERS[i];
+      }
+      return null;
+    }
+
+    // ─── Main draw ─────────────────────────────────────────────
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+
+      drawSky();
+      drawLayers();
+
+      if (running) mudAnimOffset++;
+
+      const tipY = getDrillTipY();
+      drawBorehole(tipY);
+      drawMudReturns(tipY);
+      drawRig();
+      drawDrillString(tipY);
+
+      spawnSmoke();
+      spawnSparks(tipY);
+      updateAndDrawParticles();
+      updateAndDrawOilDroplets();
+
+      // Depth marker line
+      if ((running || drillProgress > 0) && !celebrating) {
+        const layer = getLayerAtY(tipY);
+        if (layer) {
+          // Flash the current layer
+          const ly = layerY[LAYERS.indexOf(layer)];
+          rect(0, ly, 2, layer.h, layer.label);
+          rect(W - 2, ly, 2, layer.h, layer.label);
+        }
+      }
+
+      // Celebration screen
+      if (celebrating) drawCelebration();
+
+      // Top HUD overlay (semi-opaque bar)
+      ctx.fillStyle = 'rgba(0,0,20,0.7)';
+      ctx.fillRect(0, 0, W, 14);
+
+      // Progress bar (top)
+      const barW = Math.round(drillProgress * (W - 4));
+      rect(2, 2, W - 4, 10, '#222230');
+      rect(2, 2, barW, 10, mode === 'work' ? '#ff6b35' : '#44aa44');
+      hline(2, 2, W - 4, '#444450');
+      hline(2, 11, W - 4, '#444450');
+      vline(2, 2, 10, '#444450');
+      vline(W - 3, 2, 10, '#444450');
+
+      // Blink cursor if not running
+      if (!running && blink) {
+        drawPixelText('II', W/2 - 8, 4, '#ffffff', 1);
+      }
+
+      frameCount++;
+    }
+
+    // ─── Timer logic ───────────────────────────────────────────
+    function formatTime(s) {
+      const m = Math.floor(s / 60);
+      const ss = s % 60;
+      return `${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;
+    }
+
+    function updateUI() {
+      document.getElementById('timer-display').textContent = formatTime(timeLeft);
+      const totalTime = mode === 'work' ? WORK_TIME : BREAK_TIME;
+      const depth = Math.round(drillProgress * 2600);
+      document.getElementById('depth-display').textContent = `DEPTH: ${depth} FT`;
+      document.getElementById('mode-label').textContent = mode === 'work' ? 'WORK SESSION' : '>> BREAK TIME <<';
+      document.getElementById('session-count').textContent = `SESSIONS: ${sessions}`;
+      if (sparkleMsgTimer > 0) {
+        sparkleMsgTimer--;
+      } else {
+        document.getElementById('sparkle-msg').textContent = '';
+      }
+    }
+
+    function setMessage(msg, ticks=120) {
+      document.getElementById('sparkle-msg').textContent = msg;
+      sparkleMsgTimer = ticks;
+    }
+
+    function tick() {
+      if (timeLeft > 0) {
+        timeLeft--;
+        const totalTime = mode === 'work' ? WORK_TIME : BREAK_TIME;
+        drillProgress = 1 - (timeLeft / totalTime);
+        // Layer crossing messages
+        const tipY = getDrillTipY();
+        for (let i = 0; i < LAYERS.length; i++) {
+          if (Math.abs(tipY - layerY[i]) < 2 && drillProgress > 0.01) {
+            setMessage('>> HIT ' + LAYERS[i].name + ' <<');
+          }
+        }
+        updateUI();
+      } else {
+        // Session complete
+        clearInterval(intervalId);
+        running = false;
+        if (mode === 'work') {
+          sessions++;
+          mode = 'break';
+          timeLeft = BREAK_TIME;
+          drillProgress = 1; // keep drill at bottom during celebration
+          celebrating = true;
+          // burst of oil droplets on strike
+          for (let i = 0; i < 24; i++) spawnOilDroplet();
+          setMessage('>> RESERVOIR REACHED! <<');
+          document.getElementById('btn-start').textContent = 'BREAK';
+        } else {
+          mode = 'work';
+          timeLeft = WORK_TIME;
+          drillProgress = 0;
+          celebrating = false;
+          oilDroplets = [];
+          setMessage('>> BACK TO WORK! <<');
+          document.getElementById('btn-start').textContent = 'START';
+        }
+        syncInputState();
+        updateUI();
+        // Flash effect
+        flashCanvas();
+      }
+    }
+
+    function flashCanvas() {
+      let flashes = 0;
+      const fi = setInterval(() => {
+        canvas.style.opacity = flashes % 2 === 0 ? '0.3' : '1';
+        if (++flashes > 6) { canvas.style.opacity = '1'; clearInterval(fi); }
+      }, 120);
+    }
+
+    // ─── Controls ──────────────────────────────────────────────
+    document.getElementById('btn-start').addEventListener('click', () => {
+      if (!running) {
+        celebrating = false;
+        if (drillProgress === 0) {
+          // Fresh start — pick up any changes the user made to the inputs
+          applyDurations();
+          timeLeft = mode === 'work' ? WORK_TIME : BREAK_TIME;
+          updateUI();
+        }
+        running = true;
+        intervalId = setInterval(tick, 1000);
+        document.getElementById('btn-start').textContent = 'PAUSE';
+      } else {
+        running = false;
+        clearInterval(intervalId);
+        document.getElementById('btn-start').textContent = 'RESUME';
+      }
+      syncInputState();
+    });
+
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      running = false;
+      clearInterval(intervalId);
+      applyDurations();
+      mode = 'work';
+      timeLeft = WORK_TIME;
+      drillProgress = 0;
+      smokeParticles = [];
+      sparkParticles = [];
+      oilDroplets = [];
+      mudAnimOffset = 0;
+      celebrating = false;
+      document.getElementById('btn-start').textContent = 'START';
+      syncInputState();
+      updateUI();
+    });
+
+    // ─── Animation loop ────────────────────────────────────────
+    let blinkTimer = 0;
+    function loop() {
+      blinkTimer++;
+      if (blinkTimer % 30 === 0) blink = !blink;
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    updateUI();
+    loop();
+  })();
+  </script>
+</body>
+</html>

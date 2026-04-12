@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DERRICK — Your Drilling Engineer Toolkit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Homepage-only overrides ─────────────────────────────────── */
+    body {
+      justify-content: flex-start;
+      align-items: center;
+      padding: 32px 20px 64px;
+      overflow-x: hidden;
+    }
+
+    .home-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+      width: 100%;
+      max-width: 680px;
+    }
+
+    /* ── Site title ──────────────────────────────────────────────── */
+    .site-title {
+      font-family: var(--font-pixel);
+      font-size: 42px;
+      color: var(--orange);
+      text-shadow:
+        4px 4px 0 var(--orange-shadow),
+        8px 8px 0 #3a1800,
+        -1px -1px 0 var(--gold);
+      letter-spacing: 6px;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    .site-subtitle {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--gold);
+      letter-spacing: 3px;
+      text-align: center;
+      margin-top: 12px;
+      text-shadow: 1px 1px 0 var(--gold-shadow);
+    }
+
+    @media (max-width: 480px) {
+      .site-title { font-size: 26px; letter-spacing: 3px; }
+    }
+
+    /* ── Pixel rig canvas ────────────────────────────────────────── */
+    #rig-wrap {
+      position: relative;
+      image-rendering: pixelated;
+    }
+
+    #rig-canvas {
+      display: block;
+      image-rendering: pixelated;
+    }
+
+    /* ── Arcade menu ─────────────────────────────────────────────── */
+    .arcade-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .arcade-btn {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: var(--bg-card);
+      border: 3px solid var(--gold);
+      box-shadow: 4px 4px 0 var(--gold-shadow);
+      text-decoration: none;
+      cursor: pointer;
+      overflow: hidden;
+      transition: background 0.08s, box-shadow 0.08s, transform 0.08s;
+    }
+
+    .arcade-btn:hover {
+      background: var(--gold);
+      box-shadow: 2px 2px 0 var(--gold-shadow);
+      transform: translate(2px, 2px);
+    }
+
+    .arcade-btn:hover .arcade-btn__label,
+    .arcade-btn:hover .arcade-btn__arrow {
+      color: var(--bg-page);
+      text-shadow: none;
+    }
+
+    /* Scanline overlay on each button */
+    .arcade-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px, transparent 3px,
+        rgba(0,0,0,0.12) 3px, rgba(0,0,0,0.12) 4px
+      );
+      pointer-events: none;
+    }
+
+    .arcade-btn__index {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--gold-shadow);
+      letter-spacing: 1px;
+      padding: 18px 14px 18px 18px;
+      min-width: 44px;
+      text-align: center;
+      border-right: 2px solid var(--border-dim);
+      flex-shrink: 0;
+    }
+
+    .arcade-btn:hover .arcade-btn__index {
+      color: var(--bg-page);
+      border-right-color: var(--bg-page);
+    }
+
+    .arcade-btn__label {
+      font-family: var(--font-pixel);
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: 2px;
+      text-shadow: 2px 2px 0 var(--gold-shadow);
+      padding: 18px 16px;
+      flex: 1;
+    }
+
+    .arcade-btn__arrow {
+      font-family: var(--font-pixel);
+      font-size: 10px;
+      color: var(--orange);
+      padding: 18px 18px 18px 0;
+      flex-shrink: 0;
+    }
+
+    /* Orange accent variant for ASK DERRICK */
+    .arcade-btn--orange {
+      border-color: var(--orange);
+      box-shadow: 4px 4px 0 var(--orange-shadow);
+    }
+
+    .arcade-btn--orange .arcade-btn__label {
+      color: var(--orange);
+      text-shadow: 2px 2px 0 var(--orange-shadow);
+    }
+
+    .arcade-btn--orange .arcade-btn__index {
+      border-right-color: var(--orange-shadow);
+      color: var(--orange-shadow);
+    }
+
+    .arcade-btn--orange:hover {
+      background: var(--orange);
+      box-shadow: 2px 2px 0 var(--orange-shadow);
+    }
+
+    .arcade-btn--orange:hover .arcade-btn__label,
+    .arcade-btn--orange:hover .arcade-btn__arrow,
+    .arcade-btn--orange:hover .arcade-btn__index {
+      color: var(--bg-page);
+      text-shadow: none;
+      border-right-color: var(--bg-page);
+    }
+
+    /* ── SEO content section ─────────────────────────────────────── */
+    .seo-section {
+      width: 100%;
+      border: 3px solid var(--border-dim);
+      background: var(--bg-card);
+    }
+
+    .seo-section__inner {
+      padding: 36px 32px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .seo-section__heading {
+      font-family: var(--font-pixel);
+      font-size: 9px;
+      color: var(--orange);
+      text-shadow: 1px 1px 0 var(--orange-shadow);
+      letter-spacing: 2px;
+      line-height: 1.9;
+    }
+
+    .seo-section__intro {
+      font-family: var(--font-prose);
+      font-size: 14px;
+      color: #b8b8cc;
+      line-height: 1.85;
+      border-left: 3px solid var(--gold-shadow);
+      padding-left: 16px;
+    }
+
+    .seo-section__divider {
+      height: 1px;
+      background: linear-gradient(to right, var(--border-dim), transparent);
+    }
+
+    .seo-tool-list {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .seo-tool-list li {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--row-divider);
+    }
+
+    .seo-tool-list li:last-child {
+      border-bottom: none;
+    }
+
+    .seo-tool-list__emoji {
+      font-size: 14px;
+      flex-shrink: 0;
+      line-height: 1;
+      margin-top: 2px;
+    }
+
+    .seo-tool-list__name {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--gold);
+      letter-spacing: 1px;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    .seo-tool-list__sep {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--border-dim);
+      flex-shrink: 0;
+    }
+
+    .seo-tool-list__desc {
+      font-family: var(--font-prose);
+      font-size: 13px;
+      color: #9090aa;
+      line-height: 1.6;
+    }
+
+    .seo-tool-list__desc em {
+      font-style: normal;
+      color: var(--muted);
+    }
+
+    .seo-section__closing {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      line-height: 2.2;
+      text-align: center;
+      padding-top: 4px;
+    }
+
+    @media (max-width: 480px) {
+      .seo-section__inner { padding: 28px 20px 32px; }
+      .seo-section__heading { font-size: 8px; }
+      .seo-tool-list li { flex-wrap: wrap; gap: 6px; }
+      .seo-tool-list__sep { display: none; }
+      .seo-tool-list__desc { width: 100%; padding-left: 26px; }
+    }
+
+    /* ── Support bar ─────────────────────────────────────────────── */
+    .support-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    #bmc-btn {
+      display: block;
+      opacity: 0.45;
+      transition: opacity 0.2s;
+      image-rendering: auto;
+    }
+    #bmc-btn:hover { opacity: 1; }
+    #bmc-btn img {
+      height: 32px;
+      width: auto;
+      border: 2px solid var(--border-dim);
+      image-rendering: auto;
+    }
+
+    .linkedin-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.45;
+      transition: opacity 0.2s;
+      color: var(--gold);
+      text-decoration: none;
+    }
+    .linkedin-btn:hover { opacity: 1; }
+    .linkedin-btn svg {
+      width: 32px;
+      height: 32px;
+      border: 2px solid var(--border-dim);
+      fill: var(--gold);
+    }
+  </style>
+</head>
+<body>
+  <div class="home-wrap">
+
+    <nav class="site-nav" aria-label="Site navigation">
+      <a href="index.html" aria-current="page">&#9654; HOME</a>
+      <a href="timer.html">&#9654; TIMER</a>
+      <a href="converter.html">&#9654; CONVERTER</a>
+      <a href="calculator.html">&#9654; CALCULATOR</a>
+      <a href="acronyms.html">&#9654; ACRONYMS</a>
+      <a href="derrick.html">&#9654; ASK DERRICK</a>
+      <a href="wellcontrol.html">&#9654; WELL CONTROL</a>
+    </nav>
+
+    <div>
+      <div class="site-title">DERRICK</div>
+      <div class="site-subtitle">YOUR DRILLING ENGINEER TOOLKIT</div>
+    </div>
+
+    <!-- Pixel-art jack-up rig scene -->
+    <div id="rig-wrap">
+      <canvas id="rig-canvas" width="320" height="360"
+              style="width:320px;height:360px;" aria-label="Pixel art jack-up rig at night with perspective grid floor"></canvas>
+    </div>
+
+    <!-- Arcade menu -->
+    <nav class="arcade-menu" aria-label="Tools">
+      <a href="timer.html" class="arcade-btn">
+        <span class="arcade-btn__index">01</span>
+        <span class="arcade-btn__label">DRILL-O-DORO</span>
+        <span class="arcade-btn__arrow">&#9654;</span>
+      </a>
+      <a href="converter.html" class="arcade-btn">
+        <span class="arcade-btn__index">02</span>
+        <span class="arcade-btn__label">CONVERTER</span>
+        <span class="arcade-btn__arrow">&#9654;</span>
+      </a>
+      <a href="calculator.html" class="arcade-btn">
+        <span class="arcade-btn__index">03</span>
+        <span class="arcade-btn__label">CALCULATOR</span>
+        <span class="arcade-btn__arrow">&#9654;</span>
+      </a>
+      <a href="acronyms.html" class="arcade-btn">
+        <span class="arcade-btn__index">04</span>
+        <span class="arcade-btn__label">ACRONYMS</span>
+        <span class="arcade-btn__arrow">&#9654;</span>
+      </a>
+      <a href="derrick.html" class="arcade-btn arcade-btn--orange">
+        <span class="arcade-btn__index">05</span>
+        <span class="arcade-btn__label">ASK DERRICK</span>
+        <span class="arcade-btn__arrow">&#9654;</span>
+      </a>
+    </nav>
+
+    <!-- SEO content section -->
+    <section class="seo-section" aria-label="About Derrick">
+      <div class="seo-section__inner">
+
+        <h2 class="seo-section__heading">Derrick &mdash; The Free Toolkit for Drilling Engineers</h2>
+
+        <p class="seo-section__intro">
+          Derrick is a collection of free tools built by a drilling engineer, for drilling engineers.
+          From a retro Pomodoro timer to unit converters, pressure calculators and an AI assistant
+          &mdash; everything you need in one place.
+        </p>
+
+        <div class="seo-section__divider"></div>
+
+        <ul class="seo-tool-list">
+          <li>
+            <span class="seo-tool-list__emoji">⏱</span>
+            <span class="seo-tool-list__name">DRILL-O-DORO</span>
+            <span class="seo-tool-list__sep">&mdash;</span>
+            <span class="seo-tool-list__desc">A Pomodoro productivity timer where you drill a well while you focus.</span>
+          </li>
+          <li>
+            <span class="seo-tool-list__emoji">⚖</span>
+            <span class="seo-tool-list__name">UNIT CONVERTER</span>
+            <span class="seo-tool-list__sep">&mdash;</span>
+            <span class="seo-tool-list__desc">Instantly convert between ppg, sg, psi, bar, metres, feet and more.</span>
+          </li>
+          <li>
+            <span class="seo-tool-list__emoji">🔢</span>
+            <span class="seo-tool-list__name">PRESSURE CALCULATOR</span>
+            <span class="seo-tool-list__sep">&mdash;</span>
+            <span class="seo-tool-list__desc">Hydrostatic pressure, kill mud weight, MAASP and equivalent mud weight.</span>
+          </li>
+          <li>
+            <span class="seo-tool-list__emoji">📖</span>
+            <span class="seo-tool-list__name">ACRONYM DECODER</span>
+            <span class="seo-tool-list__sep">&mdash;</span>
+            <span class="seo-tool-list__desc">Search 150+ oil and gas acronyms with plain English explanations.</span>
+          </li>
+          <li>
+            <span class="seo-tool-list__emoji">🤖</span>
+            <span class="seo-tool-list__name">ASK DERRICK</span>
+            <span class="seo-tool-list__sep">&mdash;</span>
+            <span class="seo-tool-list__desc">AI drilling assistant trained on well control and IWCF procedures.</span>
+          </li>
+        </ul>
+
+        <div class="seo-section__divider"></div>
+
+        <p class="seo-section__closing">
+          Built for trainee drilling engineers, company men,<br>
+          toolpushers and everyone in between.
+        </p>
+
+      </div>
+    </section>
+
+    <div class="support-bar">
+      <a href="https://www.buymeacoffee.com/rgibbon97o" target="_blank" id="bmc-btn" title="Buy Me a Coffee">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee">
+      </a>
+      <a href="https://www.linkedin.com/in/ross-gibbon-506a2316a/" target="_blank" class="linkedin-btn" title="LinkedIn">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-label="LinkedIn">
+          <path d="M20.447 20.452H17.01v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.583V9h3.296v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a1.914 1.914 0 1 1 0-3.828 1.914 1.914 0 0 1 0 3.828zm1.658 13.019H3.68V9h3.315v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+        </svg>
+      </a>
+    </div>
+
+    <footer class="site-footer">
+      DRILLODORO.COM &nbsp;·&nbsp; OFFSHORE TOOLS FOR OFFSHORE PEOPLE
+    </footer>
+
+  </div>
+
+  <script>
+    /* ── Pixel-art jack-up rig renderer ──────────────────────────── */
+    (function () {
+      const canvas = document.getElementById('rig-canvas');
+      const ctx    = canvas.getContext('2d');
+      const W = 320, H = 360;
+
+      const C = {
+        sky:        '#060614',
+        skyMid:     '#0a0a22',
+        ocean:      '#0a1428',
+        oceanDeep:  '#060e1e',
+        wave1:      '#0d1f3c',
+        wave2:      '#112240',
+        wave3:      '#152a50',
+        waveHighlt: '#1a3a6a',
+        steel:      '#2a3040',
+        steelLt:    '#3a4255',
+        steelDk:    '#1a2030',
+        derrick:    '#2e3848',
+        derrickLt:  '#3a4a5c',
+        deck:       '#1e2535',
+        deckLt:     '#2a3345',
+        leg:        '#222c3a',
+        legLt:      '#2e3a4a',
+        legShadow:  '#141c28',
+        lightOr:    '#ff8c30',
+        lightOrGlw: '#ff6b1a',
+        lightYel:   '#ffe080',
+        lightYelGlw:'#ffd040',
+        lightRed:   '#ff3a3a',
+        lightGreen: '#3aff8a',
+        star:       '#ffffff',
+        starDim:    '#8899bb',
+        starMid:    '#aabbdd',
+        moon:       '#e8dfc0',
+        moonShadow: '#b8aa80',
+        flare:      'rgba(255,140,48,0.18)',
+        smoke:      'rgba(180,190,210,0.07)',
+        fogBase:    'rgba(10,20,40,0.55)',
+      };
+
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, H * 0.55);
+      skyGrad.addColorStop(0,   '#02020d');
+      skyGrad.addColorStop(0.4, '#07071a');
+      skyGrad.addColorStop(1,   '#0d1430');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      const stars = [
+        [12,8],[28,4],[45,14],[60,6],[80,18],[95,3],[115,11],[130,7],
+        [148,15],[165,5],[182,9],[200,19],[215,4],[232,12],[250,7],
+        [268,16],[283,3],[300,10],[315,8],[8,28],[35,22],[70,30],
+        [105,25],[140,32],[175,20],[210,28],[245,22],[278,30],[310,24],
+        [22,38],[58,42],[92,36],[126,44],[160,38],[194,46],[228,40],
+        [262,34],[296,42],[50,52],[118,50],[186,56],[254,48],[40,60],
+        [155,62],[270,58],[100,70],[220,68],
+      ];
+      stars.forEach(([x,y], i) => {
+        const size  = i % 5 === 0 ? 2 : 1;
+        const color = i % 7 === 0 ? C.star : (i % 3 === 0 ? C.starMid : C.starDim);
+        ctx.fillStyle = color;
+        ctx.fillRect(x, y, size, size);
+      });
+
+      ctx.fillStyle = C.moon;
+      ctx.beginPath();
+      ctx.arc(268, 28, 12, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#03030f';
+      ctx.beginPath();
+      ctx.arc(272, 26, 10, 0, Math.PI * 2);
+      ctx.fill();
+
+      const seaY = 182;
+      const oceanGrad = ctx.createLinearGradient(0, seaY, 0, H);
+      oceanGrad.addColorStop(0,   C.wave3);
+      oceanGrad.addColorStop(0.3, C.wave2);
+      oceanGrad.addColorStop(1,   C.oceanDeep);
+      ctx.fillStyle = oceanGrad;
+      ctx.fillRect(0, seaY, W, H - seaY);
+
+      function drawWaveRow(y, color, amp, period, phase) {
+        ctx.fillStyle = color;
+        for (let x = 0; x < W; x += 2) {
+          const h = Math.round(amp * Math.sin((x / period) + phase));
+          ctx.fillRect(x, y + h, 2, 2);
+        }
+      }
+      drawWaveRow(seaY,      C.waveHighlt, 2.5, 22, 0.0);
+      drawWaveRow(seaY + 5,  C.wave3,      2.0, 18, 1.1);
+      drawWaveRow(seaY + 12, C.wave2,      1.5, 24, 0.7);
+      drawWaveRow(seaY + 20, C.waveHighlt, 1.5, 20, 2.2);
+      drawWaveRow(seaY + 30, C.wave3,      1.0, 16, 1.5);
+      drawWaveRow(seaY + 42, C.wave2,      1.0, 28, 0.4);
+
+      const legTops  = [90, 85, 90];
+      const legXs    = [84, 160, 236];
+      legXs.forEach((lx, i) => {
+        const top = legTops[i];
+        ctx.fillStyle = C.leg;
+        ctx.fillRect(lx - 5, top, 10, seaY + 20 - top);
+        ctx.fillStyle = C.legLt;
+        ctx.fillRect(lx - 5, top, 2, seaY + 20 - top);
+        ctx.fillStyle = C.legShadow;
+        ctx.fillRect(lx + 3, top, 2, seaY + 20 - top);
+        ctx.fillStyle = C.steelDk;
+        for (let y = top + 4; y < seaY + 18; y += 8) {
+          ctx.fillRect(lx - 7, y, 2, 4);
+          ctx.fillRect(lx + 5, y, 2, 4);
+        }
+        ctx.fillStyle = C.steelDk;
+        ctx.fillRect(lx - 9, seaY + 14, 18, 12);
+        ctx.fillStyle = C.legLt;
+        ctx.fillRect(lx - 9, seaY + 14, 18, 2);
+      });
+
+      ctx.strokeStyle = C.steelDk;
+      ctx.lineWidth   = 1;
+      for (let y = 120; y < seaY; y += 30) {
+        ctx.beginPath(); ctx.moveTo(legXs[0], y); ctx.lineTo(legXs[1], y + 15); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(legXs[1], y); ctx.lineTo(legXs[0], y + 15); ctx.stroke();
+      }
+      for (let y = 120; y < seaY; y += 30) {
+        ctx.beginPath(); ctx.moveTo(legXs[1], y); ctx.lineTo(legXs[2], y + 15); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(legXs[2], y); ctx.lineTo(legXs[1], y + 15); ctx.stroke();
+      }
+
+      const deckY = 125;
+      const deckH = 30;
+      ctx.fillStyle = C.deck;
+      ctx.fillRect(62, deckY, 196, deckH);
+      ctx.fillStyle = C.deckLt;
+      ctx.fillRect(62, deckY, 196, 3);
+      ctx.fillStyle = C.steelDk;
+      ctx.fillRect(62, deckY + deckH, 196, 5);
+      ctx.fillStyle = C.steelLt;
+      ctx.fillRect(62, deckY, 3, deckH);
+      ctx.fillRect(255, deckY, 3, deckH);
+
+      ctx.fillStyle = C.steelDk;
+      ctx.fillRect(68, deckY - 28, 72, 28);
+      ctx.fillStyle = C.steel;
+      ctx.fillRect(68, deckY - 28, 70, 26);
+      const winY = deckY - 22;
+      [78, 92, 106, 120].forEach(wx => {
+        ctx.fillStyle = '#2a2010';
+        ctx.fillRect(wx, winY, 8, 6);
+        ctx.fillStyle = C.lightYel;
+        ctx.fillRect(wx + 1, winY + 1, 6, 4);
+      });
+      [78, 92, 106, 120].forEach(wx => {
+        ctx.fillStyle = C.lightOrGlw;
+        ctx.fillRect(wx, winY + 12, 6, 4);
+      });
+
+      ctx.fillStyle = C.steelDk;
+      ctx.fillRect(210, deckY - 18, 44, 18);
+      ctx.fillStyle = C.steel;
+      ctx.fillRect(210, deckY - 18, 42, 16);
+      [218, 230, 242].forEach(wx => {
+        ctx.fillStyle = C.lightYel;
+        ctx.fillRect(wx, deckY - 12, 6, 4);
+      });
+
+      const dkCx = 160;
+      const dkBase = deckY;
+      const dkTop  = 14;
+
+      function drawDerrick(cx, baseY, topY) {
+        const bHalf = 15, tHalf = 4;
+        const h = baseY - topY;
+        ctx.fillStyle = C.derrick;
+        ctx.beginPath();
+        ctx.moveTo(cx - bHalf, baseY);
+        ctx.lineTo(cx - tHalf, topY);
+        ctx.lineTo(cx - tHalf + 4, topY);
+        ctx.lineTo(cx - bHalf + 5, baseY);
+        ctx.fill();
+        ctx.fillStyle = C.derrickLt;
+        ctx.beginPath();
+        ctx.moveTo(cx - bHalf, baseY);
+        ctx.lineTo(cx - tHalf, topY);
+        ctx.lineTo(cx - tHalf + 1, topY);
+        ctx.lineTo(cx - bHalf + 1, baseY);
+        ctx.fill();
+        ctx.fillStyle = C.derrick;
+        ctx.beginPath();
+        ctx.moveTo(cx + bHalf, baseY);
+        ctx.lineTo(cx + tHalf, topY);
+        ctx.lineTo(cx + tHalf - 4, topY);
+        ctx.lineTo(cx + bHalf - 5, baseY);
+        ctx.fill();
+        ctx.fillStyle = C.steelDk;
+        ctx.beginPath();
+        ctx.moveTo(cx + bHalf - 1, baseY);
+        ctx.lineTo(cx + tHalf - 1, topY);
+        ctx.lineTo(cx + tHalf, topY);
+        ctx.lineTo(cx + bHalf, baseY);
+        ctx.fill();
+        ctx.strokeStyle = C.derrickLt;
+        ctx.lineWidth = 1;
+        const levels = 8;
+        for (let i = 0; i < levels; i++) {
+          const t0 = i / levels;
+          const t1 = (i + 1) / levels;
+          const y0 = baseY - t0 * h;
+          const y1 = baseY - t1 * h;
+          const x0L = cx - bHalf + t0 * (bHalf - tHalf);
+          const x0R = cx + bHalf - t0 * (bHalf - tHalf);
+          const x1L = cx - bHalf + t1 * (bHalf - tHalf);
+          const x1R = cx + bHalf - t1 * (bHalf - tHalf);
+          ctx.beginPath(); ctx.moveTo(x0L, y0); ctx.lineTo(x1R, y1); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(x0R, y0); ctx.lineTo(x1L, y1); ctx.stroke();
+        }
+        ctx.strokeStyle = C.steelDk;
+        ctx.lineWidth = 1;
+        for (let i = 1; i < levels; i++) {
+          const t  = i / levels;
+          const y  = baseY - t * h;
+          const xL = cx - bHalf + t * (bHalf - tHalf);
+          const xR = cx + bHalf - t * (bHalf - tHalf);
+          ctx.beginPath(); ctx.moveTo(xL, y); ctx.lineTo(xR, y); ctx.stroke();
+        }
+        ctx.fillStyle = C.steel;
+        ctx.fillRect(cx - tHalf - 2, topY - 4, (tHalf + 2) * 2, 5);
+        ctx.fillStyle = C.steelLt;
+        ctx.fillRect(cx - tHalf - 2, topY - 4, (tHalf + 2) * 2, 1);
+        const hookY = baseY - h * 0.45;
+        ctx.fillStyle = C.derrick;
+        ctx.fillRect(cx - 3, hookY, 6, 8);
+        ctx.fillStyle = C.steelLt;
+        ctx.fillRect(cx - 3, hookY, 6, 1);
+        ctx.strokeStyle = C.derrickLt;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(cx, topY);
+        ctx.lineTo(cx, hookY);
+        ctx.stroke();
+      }
+
+      drawDerrick(dkCx, dkBase, dkTop);
+
+      ctx.fillStyle = C.steelDk;
+      ctx.fillRect(143, deckY - 6, 34, 6);
+      ctx.fillStyle = C.derrickLt;
+      ctx.fillRect(143, deckY - 6, 34, 1);
+      ctx.fillStyle = C.steelLt;
+      ctx.fillRect(dkCx - 1, deckY - 6, 3, 6);
+
+      ctx.fillStyle = C.steelDk;
+      ctx.fillRect(150, deckY, 20, 8);
+      ctx.fillStyle = '#111820';
+      ctx.fillRect(152, deckY + 1, 16, 6);
+
+      const craneX = 242;
+      const craneBaseY = deckY;
+      ctx.fillStyle = C.steelDk;
+      ctx.fillRect(craneX, craneBaseY - 22, 6, 22);
+      ctx.fillStyle = C.steelLt;
+      ctx.fillRect(craneX, craneBaseY - 22, 1, 22);
+      ctx.strokeStyle = C.steelDk;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(craneX + 3, craneBaseY - 20);
+      ctx.lineTo(craneX + 28, craneBaseY - 38);
+      ctx.stroke();
+      ctx.strokeStyle = C.steelLt;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(craneX + 3, craneBaseY - 20);
+      ctx.lineTo(craneX + 28, craneBaseY - 38);
+      ctx.stroke();
+      ctx.strokeStyle = C.derrickLt;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(craneX + 3, craneBaseY - 22);
+      ctx.lineTo(craneX + 28, craneBaseY - 38);
+      ctx.lineTo(craneX + 30, craneBaseY - 26);
+      ctx.stroke();
+
+      const flareX = 72;
+      const flareBaseY = deckY;
+      ctx.fillStyle = C.steelDk;
+      ctx.fillRect(flareX - 2, flareBaseY - 40, 4, 40);
+      ctx.fillStyle = C.steelLt;
+      ctx.fillRect(flareX - 2, flareBaseY - 40, 1, 40);
+      const fTop = flareBaseY - 44;
+      [
+        [flareX - 1, fTop + 2, C.lightOrGlw],
+        [flareX,     fTop,     C.lightYelGlw],
+        [flareX + 1, fTop + 1, C.lightOrGlw],
+        [flareX - 2, fTop + 4, C.lightOr],
+        [flareX + 2, fTop + 3, C.lightOr],
+        [flareX,     fTop - 2, C.lightYelGlw],
+        [flareX - 1, fTop - 1, C.lightYel],
+      ].forEach(([fx, fy, fc]) => {
+        ctx.fillStyle = fc;
+        ctx.fillRect(fx, fy, 2, 2);
+      });
+      const flareGrad = ctx.createRadialGradient(flareX, fTop, 0, flareX, fTop, 14);
+      flareGrad.addColorStop(0,   'rgba(255,160,40,0.28)');
+      flareGrad.addColorStop(0.5, 'rgba(255,120,20,0.10)');
+      flareGrad.addColorStop(1,   'rgba(0,0,0,0)');
+      ctx.fillStyle = flareGrad;
+      ctx.fillRect(flareX - 14, fTop - 14, 28, 28);
+
+      ctx.fillStyle = C.lightRed;
+      ctx.fillRect(dkCx - 1, dkTop - 5, 3, 3);
+      const topGlow = ctx.createRadialGradient(dkCx, dkTop - 4, 0, dkCx, dkTop - 4, 8);
+      topGlow.addColorStop(0, 'rgba(255,60,60,0.5)');
+      topGlow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = topGlow;
+      ctx.fillRect(dkCx - 8, dkTop - 12, 16, 16);
+
+      const deckLights = [74, 104, 134, 186, 216, 246];
+      deckLights.forEach(lx => {
+        ctx.fillStyle = C.lightOr;
+        ctx.fillRect(lx, deckY - 2, 4, 4);
+        const lg = ctx.createRadialGradient(lx + 2, deckY, 0, lx + 2, deckY, 12);
+        lg.addColorStop(0, 'rgba(255,140,48,0.35)');
+        lg.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = lg;
+        ctx.fillRect(lx - 10, deckY - 12, 24, 24);
+      });
+
+      ctx.fillStyle = C.lightGreen;
+      ctx.fillRect(legXs[2] + 6, 160, 4, 4);
+      const greenGlow = ctx.createRadialGradient(legXs[2]+8, 162, 0, legXs[2]+8, 162, 10);
+      greenGlow.addColorStop(0, 'rgba(58,255,138,0.45)');
+      greenGlow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = greenGlow;
+      ctx.fillRect(legXs[2]+8-10, 152, 20, 20);
+
+      ctx.fillStyle = C.steelDk;
+      ctx.fillRect(62, deckY - 45, 38, 17);
+      ctx.fillStyle = C.deck;
+      ctx.fillRect(62, deckY - 44, 38, 15);
+      ctx.fillStyle = C.steelLt;
+      ctx.fillRect(73, deckY - 42, 2, 10);
+      ctx.fillRect(86, deckY - 42, 2, 10);
+      ctx.fillRect(73, deckY - 38, 15, 2);
+      ctx.strokeStyle = C.steelLt;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(81, deckY - 37, 9, 0, Math.PI * 2);
+      ctx.stroke();
+
+      const reflGrad = ctx.createLinearGradient(0, seaY, 0, seaY + 40);
+      reflGrad.addColorStop(0, 'rgba(255,120,30,0.12)');
+      reflGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = reflGrad;
+      ctx.fillRect(100, seaY, 120, 40);
+
+      const moonRefl = ctx.createLinearGradient(0, seaY, 0, seaY + 60);
+      moonRefl.addColorStop(0, 'rgba(200,210,240,0.10)');
+      moonRefl.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = moonRefl;
+      ctx.fillRect(240, seaY, 50, 60);
+
+      const fogGrad = ctx.createLinearGradient(0, seaY - 12, 0, seaY + 6);
+      fogGrad.addColorStop(0, 'rgba(10,20,40,0)');
+      fogGrad.addColorStop(0.5, 'rgba(20,35,65,0.28)');
+      fogGrad.addColorStop(1, 'rgba(10,20,40,0)');
+      ctx.fillStyle = fogGrad;
+      ctx.fillRect(0, seaY - 12, W, 18);
+
+      const gridTop    = seaY + 2;
+      const gridBottom = H;
+      const vpX        = W / 2;
+      const vpY        = gridTop;
+
+      const floorGrad = ctx.createLinearGradient(0, gridTop, 0, gridBottom);
+      floorGrad.addColorStop(0,    '#001c1c');
+      floorGrad.addColorStop(0.18, '#001212');
+      floorGrad.addColorStop(1,    '#000808');
+      ctx.fillStyle = floorGrad;
+      ctx.fillRect(0, gridTop, W, gridBottom - gridTop);
+
+      const horizGlow = ctx.createLinearGradient(0, gridTop, 0, gridTop + 30);
+      horizGlow.addColorStop(0, 'rgba(0,200,180,0.18)');
+      horizGlow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = horizGlow;
+      ctx.fillRect(0, gridTop, W, 30);
+
+      const numVLines = 16;
+      for (let i = 0; i <= numVLines; i++) {
+        const t  = i / numVLines;
+        const bx = t * W;
+        const dist  = Math.abs(t - 0.5) * 2;
+        const alpha = 0.12 + dist * 0.30;
+        ctx.strokeStyle = `rgba(0,210,190,${alpha.toFixed(2)})`;
+        ctx.lineWidth   = dist > 0.7 ? 1.5 : 1;
+        ctx.beginPath();
+        ctx.moveTo(vpX, vpY);
+        ctx.lineTo(bx, gridBottom);
+        ctx.stroke();
+      }
+
+      const numHLines = 14;
+      for (let i = 1; i <= numHLines; i++) {
+        const t  = Math.pow(i / numHLines, 2.2);
+        const y  = vpY + t * (gridBottom - vpY);
+        const p  = (y - vpY) / (gridBottom - vpY);
+        const x0 = vpX - p * vpX;
+        const x1 = vpX + p * (W - vpX);
+        const alpha = 0.15 + p * 0.55;
+        const width = p > 0.7 ? 1.5 : 1;
+        ctx.strokeStyle = `rgba(232,212,77,${alpha.toFixed(2)})`;
+        ctx.lineWidth   = width;
+        ctx.beginPath();
+        ctx.moveTo(x0, y);
+        ctx.lineTo(x1, y);
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = 'rgba(232,212,77,0.55)';
+      ctx.lineWidth   = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, gridTop);
+      ctx.lineTo(W, gridTop);
+      ctx.stroke();
+
+      ctx.strokeStyle = 'rgba(0,230,200,0.35)';
+      ctx.lineWidth   = 1;
+      ctx.beginPath();
+      ctx.moveTo(vpX, vpY);
+      ctx.lineTo(vpX, gridBottom);
+      ctx.stroke();
+
+    })();
+  </script>
+</body>
+</html>

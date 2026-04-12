@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ask Derrick — AI Drilling Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Page layout ─────────────────────────────────────────────── */
+    body {
+      justify-content: flex-start;
+      align-items: center;
+      padding: 0 20px 80px;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* ── Background rig ──────────────────────────────────────────── */
+    #rig-bg {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.10;
+      pointer-events: none;
+      z-index: 0;
+      image-rendering: pixelated;
+    }
+
+    /* ── Foreground shell ────────────────────────────────────────── */
+    .page-shell {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 720px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── Disclaimer banner ───────────────────────────────────────── */
+    .disclaimer-banner {
+      width: 100%;
+      background: #1a0d00;
+      border: 2px solid #ff8c00;
+      box-shadow: 0 0 0 2px #3a1800, 0 0 16px rgba(255,140,0,0.25);
+      padding: 14px 18px;
+      margin: 20px 0 0;
+      box-sizing: border-box;
+    }
+
+    .disclaimer-banner p {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: #ffaa33;
+      text-shadow: 1px 1px 0 #3a1800;
+      letter-spacing: 1px;
+      line-height: 2;
+      text-align: center;
+      margin: 0;
+    }
+
+    .disclaimer-banner__label {
+      display: block;
+      font-size: 8px;
+      color: #ff8c00;
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+    }
+
+    /* ── Top nav ─────────────────────────────────────────────────── */
+    .top-nav {
+      width: 100%;
+      display: flex;
+      gap: 2px;
+      flex-wrap: wrap;
+      padding: 20px 0 24px;
+      border-bottom: 2px solid var(--border-dim);
+    }
+
+    .top-nav a {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 1px;
+      padding: 7px 11px;
+      border: 2px solid transparent;
+      text-transform: uppercase;
+      transition: color 0.1s, border-color 0.1s;
+    }
+
+    .top-nav a:hover {
+      color: var(--gold);
+      border-color: var(--gold);
+    }
+
+    .top-nav a[aria-current="page"] {
+      color: var(--orange);
+      border-color: var(--orange);
+    }
+
+    /* ── Hero ────────────────────────────────────────────────────── */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      padding: 72px 0 48px;
+    }
+
+    .hero__title {
+      font-family: var(--font-pixel);
+      font-size: 52px;
+      color: var(--orange);
+      text-shadow:
+        4px 4px 0 var(--orange-shadow),
+        8px 8px 0 #3a1800,
+        -1px -1px 0 var(--gold);
+      letter-spacing: 6px;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .hero__subtitle {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--gold);
+      letter-spacing: 3px;
+      text-align: center;
+      text-shadow: 1px 1px 0 var(--gold-shadow);
+    }
+
+    /* ── Chat input ──────────────────────────────────────────────── */
+    .chat-wrap {
+      width: 100%;
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .chat-input-row {
+      display: flex;
+      border: 3px solid var(--gold);
+      box-shadow: 0 0 0 3px var(--gold-shadow), 0 0 32px var(--gold-dim);
+      background: var(--bg-input);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .chat-input-row:focus-within {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px var(--orange-shadow), 0 0 40px rgba(255,107,53,0.18);
+    }
+
+    #chat-input {
+      flex: 1;
+      font-family: var(--font-pixel);
+      font-size: 9px;
+      background: transparent;
+      color: var(--gold);
+      border: none;
+      padding: 18px 20px;
+      outline: none;
+      letter-spacing: 1px;
+      line-height: 1.8;
+      resize: none;
+      min-height: 64px;
+    }
+
+    #chat-input::placeholder {
+      color: var(--subtle);
+    }
+
+    #chat-input:focus {
+      color: var(--gold);
+      border: none;
+    }
+
+    .chat-send-btn {
+      font-family: var(--font-pixel);
+      font-size: 9px;
+      background: var(--bg-input);
+      color: var(--orange);
+      border: none;
+      border-left: 3px solid var(--gold);
+      padding: 18px 20px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      align-self: stretch;
+      transition: background 0.1s, color 0.1s, border-color 0.1s;
+    }
+
+    .chat-send-btn:hover {
+      background: var(--orange);
+      color: var(--bg-page);
+      border-left-color: var(--orange);
+    }
+
+    .chat-send-btn:active {
+      transform: none;
+    }
+
+    /* ── Suggestion chips ────────────────────────────────────────── */
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .chip {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--muted);
+      background: var(--bg-card);
+      border: 2px solid var(--border-dim);
+      padding: 10px 14px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      line-height: 1.6;
+      text-align: left;
+      transition: color 0.1s, border-color 0.1s, background 0.1s;
+    }
+
+    .chip:hover {
+      color: var(--gold);
+      border-color: var(--gold);
+      background: var(--bg-input);
+    }
+
+    .chip:active {
+      transform: translateY(1px);
+    }
+
+    /* ── Chat thread ─────────────────────────────────────────────── */
+    .chat-thread {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .chat-msg {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 14px 16px;
+      border: 2px solid var(--border-dim);
+      background: var(--bg-card);
+    }
+
+    .chat-msg--user {
+      border-color: var(--gold-shadow);
+      background: var(--bg-input);
+      align-items: flex-end;
+    }
+
+    .chat-msg--derrick {
+      border-color: var(--orange);
+      box-shadow: 0 0 12px rgba(255,107,53,0.08);
+    }
+
+    .chat-msg__label {
+      font-family: var(--font-pixel);
+      font-size: 6px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .chat-msg--user .chat-msg__label   { color: var(--gold); }
+    .chat-msg--derrick .chat-msg__label { color: var(--orange); }
+
+    .chat-msg__text {
+      font-family: var(--font-pixel);
+      font-size: 8px;
+      line-height: 2;
+      letter-spacing: 0.5px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .chat-msg--user .chat-msg__text    { color: var(--gold); text-align: right; }
+    .chat-msg--derrick .chat-msg__text  { color: var(--fg); }
+
+    .chat-thinking {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 16px;
+      border: 2px solid var(--orange);
+      background: var(--bg-card);
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--orange);
+      letter-spacing: 2px;
+    }
+
+    .chat-thinking__dots span {
+      animation: blink 1.2s infinite;
+    }
+    .chat-thinking__dots span:nth-child(2) { animation-delay: 0.2s; }
+    .chat-thinking__dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    /* ── Responsive ─────────────────────────────────────────────── */
+    @media (max-width: 540px) {
+      .hero { padding: 48px 0 32px; }
+      .hero__title { font-size: 30px; letter-spacing: 3px; }
+      .hero__subtitle { font-size: 6px; }
+      #chat-input { font-size: 8px; padding: 14px; }
+      .chat-send-btn { font-size: 8px; padding: 14px; }
+      .chip { font-size: 6px; padding: 9px 11px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background pixel rig -->
+  <canvas id="rig-bg" width="320" height="360"
+          style="width:320px;height:360px;"
+          aria-hidden="true"></canvas>
+
+  <div class="page-shell">
+
+    <div class="disclaimer-banner" role="note" aria-label="Disclaimer">
+      <p>
+        <span class="disclaimer-banner__label">&#9888; DISCLAIMER &#9888;</span>
+        Derrick is for educational and revision purposes only. Do not use for operational decisions on a live well. Always follow your company procedures and consult a certified well control instructor. No liability is accepted for decisions made based on Derrick's responses.
+      </p>
+    </div>
+
+    <nav class="top-nav" aria-label="Site navigation">
+      <a href="index.html">&#9654; HOME</a>
+      <a href="timer.html">&#9654; TIMER</a>
+      <a href="converter.html">&#9654; CONVERTER</a>
+      <a href="calculator.html">&#9654; CALCULATOR</a>
+      <a href="acronyms.html">&#9654; ACRONYMS</a>
+      <a href="derrick.html" aria-current="page">&#9654; ASK DERRICK</a>
+      <a href="wellcontrol.html">&#9654; WELL CONTROL</a>
+    </nav>
+
+    <section class="hero">
+
+      <div>
+        <div class="hero__title">DERRICK</div>
+        <div class="hero__subtitle">YOUR DRILLING ENGINEER TOOLKIT</div>
+      </div>
+
+      <div class="chat-wrap">
+        <div class="chat-input-row">
+          <textarea id="chat-input"
+                    rows="2"
+                    placeholder="Ask Derrick anything about drilling..."></textarea>
+          <button class="chat-send-btn" type="button" aria-label="Send">
+            SEND &#9654;
+          </button>
+        </div>
+
+        <div class="chips" role="list" aria-label="Suggested questions">
+          <button class="chip" type="button" role="listitem"
+                  data-prompt="Walk me through Driller's Method">
+            Walk me through Driller's Method
+          </button>
+          <button class="chip" type="button" role="listitem"
+                  data-prompt="What does BHA stand for?">
+            What does BHA stand for?
+          </button>
+          <button class="chip" type="button" role="listitem"
+                  data-prompt="Calculate my kill mud weight">
+            Calculate my kill mud weight
+          </button>
+          <button class="chip" type="button" role="listitem"
+                  data-prompt="What are the signs of a kick?">
+            What are the signs of a kick?
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <div class="chat-thread" id="chat-thread" aria-live="polite" aria-label="Conversation"></div>
+
+    <footer class="site-footer">
+      DRILLODORO.COM &nbsp;·&nbsp; OFFSHORE TOOLS FOR OFFSHORE PEOPLE
+    </footer>
+
+  </div>
+
+  <script>
+    /* ── Chat state ──────────────────────────────────────────────── */
+    const history   = [];   // [{role, content}]
+    const thread    = document.getElementById('chat-thread');
+    const inputEl   = document.getElementById('chat-input');
+    const sendBtn   = document.querySelector('.chat-send-btn');
+
+    /* ── Chips populate the input ────────────────────────────────── */
+    document.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        inputEl.value = chip.dataset.prompt;
+        inputEl.focus();
+      });
+    });
+
+    /* ── Render helpers ──────────────────────────────────────────── */
+    function appendMessage(role, text) {
+      const wrap  = document.createElement('div');
+      wrap.className = `chat-msg chat-msg--${role === 'user' ? 'user' : 'derrick'}`;
+
+      const label = document.createElement('div');
+      label.className = 'chat-msg__label';
+      label.textContent = role === 'user' ? 'YOU' : 'DERRICK';
+
+      const body  = document.createElement('div');
+      body.className = 'chat-msg__text';
+      body.textContent = text;
+
+      wrap.appendChild(label);
+      wrap.appendChild(body);
+      thread.appendChild(wrap);
+      wrap.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      return wrap;
+    }
+
+    function showThinking() {
+      const el = document.createElement('div');
+      el.className = 'chat-thinking';
+      el.innerHTML = 'DERRICK IS THINKING<span class="chat-thinking__dots">' +
+        '<span>.</span><span>.</span><span>.</span></span>';
+      thread.appendChild(el);
+      el.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      return el;
+    }
+
+    /* ── Send message ────────────────────────────────────────────── */
+    async function sendMessage() {
+      const text = inputEl.value.trim();
+      if (!text) return;
+
+      inputEl.value = '';
+      inputEl.disabled = true;
+      sendBtn.disabled = true;
+
+      appendMessage('user', text);
+      history.push({ role: 'user', content: text });
+
+      const thinking = showThinking();
+
+      try {
+        const res  = await fetch('/.netlify/functions/derrick', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: history }),
+        });
+
+        const data = await res.json();
+
+        thinking.remove();
+
+        if (!res.ok) {
+          appendMessage('derrick', 'Something went wrong on my end. Try again in a moment.');
+        } else {
+          const reply = data.response || 'No response received.';
+          appendMessage('derrick', reply);
+          history.push({ role: 'assistant', content: reply });
+        }
+      } catch {
+        thinking.remove();
+        appendMessage('derrick', 'Could not reach the server. Check your connection and try again.');
+      }
+
+      inputEl.disabled = false;
+      sendBtn.disabled = false;
+      inputEl.focus();
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    inputEl.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    });
+
+    /* ── Background pixel-art rig renderer ───────────────────────── */
+    (function () {
+      const canvas = document.getElementById('rig-bg');
+      const ctx    = canvas.getContext('2d');
+      const W = 320, H = 360;
+
+      const C = {
+        sky:        '#060614',
+        ocean:      '#0a1428',
+        oceanDeep:  '#060e1e',
+        wave2:      '#112240',
+        wave3:      '#152a50',
+        waveHighlt: '#1a3a6a',
+        steel:      '#2a3040',
+        steelLt:    '#3a4255',
+        steelDk:    '#1a2030',
+        derrick:    '#2e3848',
+        derrickLt:  '#3a4a5c',
+        deck:       '#1e2535',
+        deckLt:     '#2a3345',
+        leg:        '#222c3a',
+        legLt:      '#2e3a4a',
+        legShadow:  '#141c28',
+        lightOr:    '#ff8c30',
+        lightOrGlw: '#ff6b1a',
+        lightYel:   '#ffe080',
+        lightYelGlw:'#ffd040',
+        lightRed:   '#ff3a3a',
+        lightGreen: '#3aff8a',
+        star:       '#ffffff',
+        starDim:    '#8899bb',
+        starMid:    '#aabbdd',
+        moon:       '#e8dfc0',
+      };
+
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, H * 0.55);
+      skyGrad.addColorStop(0,   '#02020d');
+      skyGrad.addColorStop(0.4, '#07071a');
+      skyGrad.addColorStop(1,   '#0d1430');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      const stars = [
+        [12,8],[28,4],[45,14],[60,6],[80,18],[95,3],[115,11],[130,7],
+        [148,15],[165,5],[182,9],[200,19],[215,4],[232,12],[250,7],
+        [268,16],[283,3],[300,10],[315,8],[8,28],[35,22],[70,30],
+        [105,25],[140,32],[175,20],[210,28],[245,22],[278,30],[310,24],
+        [22,38],[58,42],[92,36],[126,44],[160,38],[194,46],[228,40],
+        [262,34],[296,42],[50,52],[118,50],[186,56],[254,48],[40,60],
+        [155,62],[270,58],[100,70],[220,68],
+      ];
+      stars.forEach(([x,y], i) => {
+        const size  = i % 5 === 0 ? 2 : 1;
+        const color = i % 7 === 0 ? C.star : (i % 3 === 0 ? C.starMid : C.starDim);
+        ctx.fillStyle = color;
+        ctx.fillRect(x, y, size, size);
+      });
+
+      ctx.fillStyle = C.moon;
+      ctx.beginPath();
+      ctx.arc(268, 28, 12, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#03030f';
+      ctx.beginPath();
+      ctx.arc(272, 26, 10, 0, Math.PI * 2);
+      ctx.fill();
+
+      const seaY = 182;
+      const oceanGrad = ctx.createLinearGradient(0, seaY, 0, H);
+      oceanGrad.addColorStop(0,   C.wave3);
+      oceanGrad.addColorStop(0.3, C.wave2);
+      oceanGrad.addColorStop(1,   C.oceanDeep);
+      ctx.fillStyle = oceanGrad;
+      ctx.fillRect(0, seaY, W, H - seaY);
+
+      function drawWaveRow(y, color, amp, period, phase) {
+        ctx.fillStyle = color;
+        for (let x = 0; x < W; x += 2) {
+          const h = Math.round(amp * Math.sin((x / period) + phase));
+          ctx.fillRect(x, y + h, 2, 2);
+        }
+      }
+      drawWaveRow(seaY,      C.waveHighlt, 2.5, 22, 0.0);
+      drawWaveRow(seaY + 5,  C.wave3,      2.0, 18, 1.1);
+      drawWaveRow(seaY + 12, C.wave2,      1.5, 24, 0.7);
+      drawWaveRow(seaY + 20, C.waveHighlt, 1.5, 20, 2.2);
+      drawWaveRow(seaY + 30, C.wave3,      1.0, 16, 1.5);
+      drawWaveRow(seaY + 42, C.wave2,      1.0, 28, 0.4);
+
+      const legTops  = [90, 85, 90];
+      const legXs    = [84, 160, 236];
+      legXs.forEach((lx, i) => {
+        const top = legTops[i];
+        ctx.fillStyle = C.leg;
+        ctx.fillRect(lx - 5, top, 10, seaY + 20 - top);
+        ctx.fillStyle = C.legLt;
+        ctx.fillRect(lx - 5, top, 2, seaY + 20 - top);
+        ctx.fillStyle = C.legShadow;
+        ctx.fillRect(lx + 3, top, 2, seaY + 20 - top);
+        ctx.fillStyle = C.steelDk;
+        for (let y = top + 4; y < seaY + 18; y += 8) {
+          ctx.fillRect(lx - 7, y, 2, 4);
+          ctx.fillRect(lx + 5, y, 2, 4);
+        }
+        ctx.fillStyle = C.steelDk;
+        ctx.fillRect(lx - 9, seaY + 14, 18, 12);
+        ctx.fillStyle = C.legLt;
+        ctx.fillRect(lx - 9, seaY + 14, 18, 2);
+      });
+
+      ctx.strokeStyle = C.steelDk;
+      ctx.lineWidth   = 1;
+      for (let y = 120; y < seaY; y += 30) {
+        ctx.beginPath(); ctx.moveTo(legXs[0], y); ctx.lineTo(legXs[1], y + 15); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(legXs[1], y); ctx.lineTo(legXs[0], y + 15); ctx.stroke();
+      }
+      for (let y = 120; y < seaY; y += 30) {
+        ctx.beginPath(); ctx.moveTo(legXs[1], y); ctx.lineTo(legXs[2], y + 15); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(legXs[2], y); ctx.lineTo(legXs[1], y + 15); ctx.stroke();
+      }
+
+      const deckY = 125;
+      const deckH = 30;
+      ctx.fillStyle = C.deck;
+      ctx.fillRect(62, deckY, 196, deckH);
+      ctx.fillStyle = C.deckLt;
+      ctx.fillRect(62, deckY, 196, 3);
+      ctx.fillStyle = C.steelDk;
+      ctx.fillRect(62, deckY + deckH, 196, 5);
+      ctx.fillStyle = C.steelLt;
+      ctx.fillRect(62, deckY, 3, deckH);
+      ctx.fillRect(255, deckY, 3, deckH);
+
+      ctx.fillStyle = C.steelDk;
+      ctx.fillRect(68, deckY - 28, 72, 28);
+      ctx.fillStyle = C.steel;
+      ctx.fillRect(68, deckY - 28, 70, 26);
+      const winY = deckY - 22;
+      [78, 92, 106, 120].forEach(wx => {
+        ctx.fillStyle = '#2a2010';
+        ctx.fillRect(wx, winY, 8, 6);
+        ctx.fillStyle = C.lightYel;
+        ctx.fillRect(wx + 1, winY + 1, 6, 4);
+      });
+      [78, 92, 106, 120].forEach(wx => {
+        ctx.fillStyle = C.lightOrGlw;
+        ctx.fillRect(wx, winY + 12, 6, 4);
+      });
+
+      ctx.fillStyle = C.steelDk;
+      ctx.fillRect(210, deckY - 18, 44, 18);
+      ctx.fillStyle = C.steel;
+      ctx.fillRect(210, deckY - 18, 42, 16);
+      [218, 230, 242].forEach(wx => {
+        ctx.fillStyle = C.lightYel;
+        ctx.fillRect(wx, deckY - 12, 6, 4);
+      });
+
+      const dkCx = 160;
+      const dkBase = deckY;
+      const dkTop  = 14;
+
+      function drawDerrick(cx, baseY, topY) {
+        const bHalf = 15, tHalf = 4;
+        const h = baseY - topY;
+        ctx.fillStyle = C.derrick;
+        ctx.beginPath();
+        ctx.moveTo(cx - bHalf, baseY); ctx.lineTo(cx - tHalf, topY);
+        ctx.lineTo(cx - tHalf + 4, topY); ctx.lineTo(cx - bHalf + 5, baseY);
+        ctx.fill();
+        ctx.fillStyle = C.derrickLt;
+        ctx.beginPath();
+        ctx.moveTo(cx - bHalf, baseY); ctx.lineTo(cx - tHalf, topY);
+        ctx.lineTo(cx - tHalf + 1, topY); ctx.lineTo(cx - bHalf + 1, baseY);
+        ctx.fill();
+        ctx.fillStyle = C.derrick;
+        ctx.beginPath();
+        ctx.moveTo(cx + bHalf, baseY); ctx.lineTo(cx + tHalf, topY);
+        ctx.lineTo(cx + tHalf - 4, topY); ctx.lineTo(cx + bHalf - 5, baseY);
+        ctx.fill();
+        ctx.fillStyle = C.steelDk;
+        ctx.beginPath();
+        ctx.moveTo(cx + bHalf - 1, baseY); ctx.lineTo(cx + tHalf - 1, topY);
+        ctx.lineTo(cx + tHalf, topY); ctx.lineTo(cx + bHalf, baseY);
+        ctx.fill();
+        ctx.strokeStyle = C.derrickLt;
+        ctx.lineWidth = 1;
+        const levels = 8;
+        for (let i = 0; i < levels; i++) {
+          const t0 = i / levels, t1 = (i + 1) / levels;
+          const y0 = baseY - t0 * h, y1 = baseY - t1 * h;
+          const x0L = cx - bHalf + t0 * (bHalf - tHalf);
+          const x0R = cx + bHalf - t0 * (bHalf - tHalf);
+          const x1L = cx - bHalf + t1 * (bHalf - tHalf);
+          const x1R = cx + bHalf - t1 * (bHalf - tHalf);
+          ctx.beginPath(); ctx.moveTo(x0L, y0); ctx.lineTo(x1R, y1); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(x0R, y0); ctx.lineTo(x1L, y1); ctx.stroke();
+        }
+        ctx.strokeStyle = C.steelDk;
+        for (let i = 1; i < levels; i++) {
+          const t = i / levels;
+          const y = baseY - t * h;
+          const xL = cx - bHalf + t * (bHalf - tHalf);
+          const xR = cx + bHalf - t * (bHalf - tHalf);
+          ctx.beginPath(); ctx.moveTo(xL, y); ctx.lineTo(xR, y); ctx.stroke();
+        }
+        ctx.fillStyle = C.steel;
+        ctx.fillRect(cx - tHalf - 2, topY - 4, (tHalf + 2) * 2, 5);
+        ctx.fillStyle = C.steelLt;
+        ctx.fillRect(cx - tHalf - 2, topY - 4, (tHalf + 2) * 2, 1);
+        const hookY = baseY - h * 0.45;
+        ctx.fillStyle = C.derrick;
+        ctx.fillRect(cx - 3, hookY, 6, 8);
+        ctx.fillStyle = C.steelLt;
+        ctx.fillRect(cx - 3, hookY, 6, 1);
+        ctx.strokeStyle = C.derrickLt;
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(cx, topY); ctx.lineTo(cx, hookY); ctx.stroke();
+      }
+
+      drawDerrick(dkCx, dkBase, dkTop);
+
+      ctx.fillStyle = C.steelDk;
+      ctx.fillRect(143, deckY - 6, 34, 6);
+      ctx.fillStyle = C.derrickLt;
+      ctx.fillRect(143, deckY - 6, 34, 1);
+      ctx.fillStyle = C.steelLt;
+      ctx.fillRect(dkCx - 1, deckY - 6, 3, 6);
+
+      ctx.fillStyle = C.steelDk;
+      ctx.fillRect(150, deckY, 20, 8);
+      ctx.fillStyle = '#111820';
+      ctx.fillRect(152, deckY + 1, 16, 6);
+
+      const craneX = 242, craneBaseY = deckY;
+      ctx.fillStyle = C.steelDk;
+      ctx.fillRect(craneX, craneBaseY - 22, 6, 22);
+      ctx.fillStyle = C.steelLt;
+      ctx.fillRect(craneX, craneBaseY - 22, 1, 22);
+      ctx.strokeStyle = C.steelDk;
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(craneX+3, craneBaseY-20); ctx.lineTo(craneX+28, craneBaseY-38); ctx.stroke();
+      ctx.strokeStyle = C.steelLt;
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(craneX+3, craneBaseY-20); ctx.lineTo(craneX+28, craneBaseY-38); ctx.stroke();
+      ctx.strokeStyle = C.derrickLt;
+      ctx.beginPath(); ctx.moveTo(craneX+3, craneBaseY-22); ctx.lineTo(craneX+28, craneBaseY-38); ctx.lineTo(craneX+30, craneBaseY-26); ctx.stroke();
+
+      const flareX = 72, flareBaseY = deckY;
+      ctx.fillStyle = C.steelDk;
+      ctx.fillRect(flareX - 2, flareBaseY - 40, 4, 40);
+      ctx.fillStyle = C.steelLt;
+      ctx.fillRect(flareX - 2, flareBaseY - 40, 1, 40);
+      const fTop = flareBaseY - 44;
+      [[flareX-1,fTop+2,C.lightOrGlw],[flareX,fTop,C.lightYelGlw],[flareX+1,fTop+1,C.lightOrGlw],
+       [flareX-2,fTop+4,C.lightOr],[flareX+2,fTop+3,C.lightOr],[flareX,fTop-2,C.lightYelGlw],[flareX-1,fTop-1,C.lightYel]
+      ].forEach(([fx,fy,fc]) => { ctx.fillStyle = fc; ctx.fillRect(fx, fy, 2, 2); });
+      const flareGrad = ctx.createRadialGradient(flareX, fTop, 0, flareX, fTop, 14);
+      flareGrad.addColorStop(0, 'rgba(255,160,40,0.28)');
+      flareGrad.addColorStop(0.5, 'rgba(255,120,20,0.10)');
+      flareGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = flareGrad;
+      ctx.fillRect(flareX - 14, fTop - 14, 28, 28);
+
+      ctx.fillStyle = C.lightRed;
+      ctx.fillRect(dkCx - 1, dkTop - 5, 3, 3);
+      const topGlow = ctx.createRadialGradient(dkCx, dkTop-4, 0, dkCx, dkTop-4, 8);
+      topGlow.addColorStop(0, 'rgba(255,60,60,0.5)');
+      topGlow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = topGlow;
+      ctx.fillRect(dkCx - 8, dkTop - 12, 16, 16);
+
+      [74,104,134,186,216,246].forEach(lx => {
+        ctx.fillStyle = C.lightOr;
+        ctx.fillRect(lx, deckY - 2, 4, 4);
+        const lg = ctx.createRadialGradient(lx+2, deckY, 0, lx+2, deckY, 12);
+        lg.addColorStop(0, 'rgba(255,140,48,0.35)');
+        lg.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = lg;
+        ctx.fillRect(lx - 10, deckY - 12, 24, 24);
+      });
+
+      ctx.fillStyle = C.lightGreen;
+      ctx.fillRect(legXs[2] + 6, 160, 4, 4);
+      const greenGlow = ctx.createRadialGradient(legXs[2]+8, 162, 0, legXs[2]+8, 162, 10);
+      greenGlow.addColorStop(0, 'rgba(58,255,138,0.45)');
+      greenGlow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = greenGlow;
+      ctx.fillRect(legXs[2]-2, 152, 20, 20);
+
+      ctx.fillStyle = C.steelDk;
+      ctx.fillRect(62, deckY - 45, 38, 17);
+      ctx.fillStyle = C.deck;
+      ctx.fillRect(62, deckY - 44, 38, 15);
+      ctx.fillStyle = C.steelLt;
+      ctx.fillRect(73, deckY - 42, 2, 10);
+      ctx.fillRect(86, deckY - 42, 2, 10);
+      ctx.fillRect(73, deckY - 38, 15, 2);
+      ctx.strokeStyle = C.steelLt;
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(81, deckY - 37, 9, 0, Math.PI * 2); ctx.stroke();
+
+      const reflGrad = ctx.createLinearGradient(0, seaY, 0, seaY + 40);
+      reflGrad.addColorStop(0, 'rgba(255,120,30,0.12)');
+      reflGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = reflGrad;
+      ctx.fillRect(100, seaY, 120, 40);
+
+      const fogGrad = ctx.createLinearGradient(0, seaY - 12, 0, seaY + 6);
+      fogGrad.addColorStop(0, 'rgba(10,20,40,0)');
+      fogGrad.addColorStop(0.5, 'rgba(20,35,65,0.28)');
+      fogGrad.addColorStop(1, 'rgba(10,20,40,0)');
+      ctx.fillStyle = fogGrad;
+      ctx.fillRect(0, seaY - 12, W, 18);
+
+      const gridTop = seaY + 2, gridBottom = H, vpX = W / 2, vpY = gridTop;
+      const floorGrad = ctx.createLinearGradient(0, gridTop, 0, gridBottom);
+      floorGrad.addColorStop(0,    '#001c1c');
+      floorGrad.addColorStop(0.18, '#001212');
+      floorGrad.addColorStop(1,    '#000808');
+      ctx.fillStyle = floorGrad;
+      ctx.fillRect(0, gridTop, W, gridBottom - gridTop);
+
+      const horizGlow = ctx.createLinearGradient(0, gridTop, 0, gridTop + 30);
+      horizGlow.addColorStop(0, 'rgba(0,200,180,0.18)');
+      horizGlow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = horizGlow;
+      ctx.fillRect(0, gridTop, W, 30);
+
+      for (let i = 0; i <= 16; i++) {
+        const t = i / 16, bx = t * W;
+        const dist = Math.abs(t - 0.5) * 2;
+        const alpha = 0.12 + dist * 0.30;
+        ctx.strokeStyle = `rgba(0,210,190,${alpha.toFixed(2)})`;
+        ctx.lineWidth = dist > 0.7 ? 1.5 : 1;
+        ctx.beginPath(); ctx.moveTo(vpX, vpY); ctx.lineTo(bx, gridBottom); ctx.stroke();
+      }
+
+      for (let i = 1; i <= 14; i++) {
+        const t = Math.pow(i / 14, 2.2);
+        const y = vpY + t * (gridBottom - vpY);
+        const p = (y - vpY) / (gridBottom - vpY);
+        const x0 = vpX - p * vpX, x1 = vpX + p * (W - vpX);
+        const alpha = 0.15 + p * 0.55;
+        ctx.strokeStyle = `rgba(232,212,77,${alpha.toFixed(2)})`;
+        ctx.lineWidth = p > 0.7 ? 1.5 : 1;
+        ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke();
+      }
+
+      ctx.strokeStyle = 'rgba(232,212,77,0.55)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0, gridTop); ctx.lineTo(W, gridTop); ctx.stroke();
+      ctx.strokeStyle = 'rgba(0,230,200,0.35)';
+      ctx.beginPath(); ctx.moveTo(vpX, vpY); ctx.lineTo(vpX, gridBottom); ctx.stroke();
+
+    })();
+  </script>
+</body>
+</html>
