@@ -22,13 +22,13 @@
 
     /* ── Background rig ─────────────────────────────────────────── */
     #rig-bg {
-      position: fixed;
+      position: absolute;
       top: 0;
       left: 50%;
       transform: translateX(-50%);
       width: 100%;
       max-width: 900px;
-      opacity: 0.17;
+      opacity: 0.09;
       image-rendering: pixelated;
       pointer-events: none;
       z-index: 0;
@@ -901,45 +901,6 @@
       ctx.fillStyle = fogGrad;
       ctx.fillRect(0, seaY - 12, W, 18);
 
-      const gridTop = seaY + 2, gridBottom = H, vpX = W / 2, vpY = gridTop;
-      const floorGrad = ctx.createLinearGradient(0, gridTop, 0, gridBottom);
-      floorGrad.addColorStop(0,    '#001c1c');
-      floorGrad.addColorStop(0.18, '#001212');
-      floorGrad.addColorStop(1,    '#000808');
-      ctx.fillStyle = floorGrad;
-      ctx.fillRect(0, gridTop, W, gridBottom - gridTop);
-
-      const horizGlow = ctx.createLinearGradient(0, gridTop, 0, gridTop + 30);
-      horizGlow.addColorStop(0, 'rgba(0,200,180,0.18)');
-      horizGlow.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = horizGlow;
-      ctx.fillRect(0, gridTop, W, 30);
-
-      for (let i = 0; i <= 16; i++) {
-        const t = i / 16, bx = t * W;
-        const dist = Math.abs(t - 0.5) * 2;
-        const alpha = 0.12 + dist * 0.30;
-        ctx.strokeStyle = `rgba(0,210,190,${alpha.toFixed(2)})`;
-        ctx.lineWidth = dist > 0.7 ? 1.5 : 1;
-        ctx.beginPath(); ctx.moveTo(vpX, vpY); ctx.lineTo(bx, gridBottom); ctx.stroke();
-      }
-
-      for (let i = 1; i <= 14; i++) {
-        const t = Math.pow(i / 14, 2.2);
-        const y = vpY + t * (gridBottom - vpY);
-        const p = (y - vpY) / (gridBottom - vpY);
-        const x0 = vpX - p * vpX, x1 = vpX + p * (W - vpX);
-        const alpha = 0.15 + p * 0.55;
-        ctx.strokeStyle = `rgba(232,212,77,${alpha.toFixed(2)})`;
-        ctx.lineWidth = p > 0.7 ? 1.5 : 1;
-        ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke();
-      }
-
-      ctx.strokeStyle = 'rgba(232,212,77,0.55)';
-      ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(0, gridTop); ctx.lineTo(W, gridTop); ctx.stroke();
-      ctx.strokeStyle = 'rgba(0,230,200,0.35)';
-      ctx.beginPath(); ctx.moveTo(vpX, vpY); ctx.lineTo(vpX, gridBottom); ctx.stroke();
 
     })();
   </script>
