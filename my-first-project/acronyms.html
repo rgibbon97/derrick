@@ -1,556 +1,2299 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Drilling Acronym Decoder — DRILL-O-DORO</title>
-  <meta name="description" content="Comprehensive drilling and oil &amp; gas acronym decoder. Instant search through 150+ acronyms covering MWD/LWD, well control, completions, HSE, production and more.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
-  <link rel="stylesheet" href="style.css">
-  <style>
-    .page-wrap {
-      width: 100%;
-      max-width: 900px;
-    }
-
-    .page-subtitle {
-      font-family: var(--font-pixel);
-      font-size: 7px;
-      color: var(--muted);
-      letter-spacing: 2px;
-      text-align: center;
-      margin-top: 10px;
-      margin-bottom: 36px;
-    }
-
-    /* ── Search box ─────────────────────────────────────────────── */
-    .search-wrap {
-      position: relative;
-      margin-bottom: 28px;
-    }
-
-    .search-wrap::before {
-      content: '▸';
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-family: var(--font-pixel);
-      font-size: 10px;
-      color: var(--orange);
-      pointer-events: none;
-    }
-
-    #search {
-      padding-left: 32px;
-      font-size: 11px;
-      height: 44px;
-    }
-
-    .search-count {
-      font-family: var(--font-pixel);
-      font-size: 7px;
-      color: var(--muted);
-      letter-spacing: 1px;
-      margin-top: 10px;
-      text-align: right;
-    }
-
-    .search-count span {
-      color: var(--green-glow);
-      text-shadow: 0 0 8px var(--green-glow);
-    }
-
-    /* ── Category filter pills ──────────────────────────────────── */
-    .filter-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 24px;
-    }
-
-    .filter-btn {
-      font-family: var(--font-pixel);
-      font-size: 7px;
-      background: var(--bg-input);
-      color: var(--muted);
-      border: 2px solid var(--border-dim);
-      padding: 6px 10px;
-      cursor: pointer;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      transition: color 0.1s, border-color 0.1s, background 0.1s;
-    }
-
-    .filter-btn:hover,
-    .filter-btn.active {
-      background: var(--bg-input);
-      color: var(--orange);
-      border-color: var(--orange);
-    }
-
-    /* ── Acronym table ──────────────────────────────────────────── */
-    .acro-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .acro-table thead th {
-      font-family: var(--font-pixel);
-      font-size: 7px;
-      color: var(--muted);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      text-align: left;
-      padding: 8px 12px 12px;
-      border-bottom: 2px solid var(--border-dim);
-    }
-
-    .acro-table thead th:first-child {
-      width: 90px;
-    }
-
-    .acro-table thead th:nth-child(2) {
-      width: 220px;
-    }
-
-    .acro-table tbody tr {
-      border-bottom: 1px solid var(--row-divider);
-      transition: background 0.08s;
-    }
-
-    .acro-table tbody tr:hover {
-      background: #12122a;
-    }
-
-    .acro-table tbody tr.hidden {
-      display: none;
-    }
-
-    .acro-table td {
-      padding: 11px 12px;
-      vertical-align: top;
-    }
-
-    .acro-abbr {
-      font-family: var(--font-pixel);
-      font-size: 9px;
-      color: var(--orange);
-      text-shadow: 1px 1px 0 var(--orange-shadow);
-      letter-spacing: 1px;
-      white-space: nowrap;
-    }
-
-    .acro-full {
-      font-family: var(--font-pixel);
-      font-size: 7px;
-      color: var(--gold);
-      letter-spacing: 1px;
-      line-height: 1.7;
-    }
-
-    .acro-desc {
-      font-family: Georgia, serif;
-      font-size: 13px;
-      color: #b8b8cc;
-      line-height: 1.7;
-    }
-
-    .acro-cat {
-      font-family: var(--font-pixel);
-      font-size: 6px;
-      color: var(--muted);
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-
-    /* ── No results ─────────────────────────────────────────────── */
-    #no-results {
-      display: none;
-      text-align: center;
-      padding: 60px 20px;
-      font-family: var(--font-pixel);
-      font-size: 9px;
-      color: var(--muted);
-      letter-spacing: 2px;
-    }
-
-    /* ── Highlight matched text ──────────────────────────────────── */
-    mark {
-      background: transparent;
-      color: var(--green-glow);
-      text-shadow: 0 0 8px var(--green-glow);
-    }
-
-    /* ── SEO card ───────────────────────────────────────────────── */
-    .seo-section {
-      margin-top: 64px;
-    }
-
-    /* ── Mobile ─────────────────────────────────────────────────── */
-    @media (max-width: 620px) {
-      .page-wrap { padding: 24px 16px; }
-
-      .acro-table thead th:nth-child(2),
-      .acro-table td:nth-child(2) {
-        display: none;
-      }
-
-      .acro-cat { display: none; }
-
-      .acro-table thead th:first-child { width: 80px; }
-      .acro-abbr { font-size: 8px; }
-      .acro-full { font-size: 6px; }
-      .acro-desc { font-size: 12px; }
-    }
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="Description" content="Comprehensive drilling and oil &amp; gas acronym decoder. Instant search through 150+ acronyms covering MWD/LWD, well control, completions, HSE, production and more.">
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.4">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; color: #0000e9; -webkit-text-stroke: #0000e9}
+    p.p3 {margin: 0.0px 0.0px 36.0px 0.0px; text-align: center; font: 7.0px Times; -webkit-text-stroke: #000000}
+    p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000; min-height: 14.0px}
+    p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; text-align: right; font: 7.0px Times; -webkit-text-stroke: #000000}
+    p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; text-align: center; font: 7.0px Times; -webkit-text-stroke: #000000}
+    p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; font: 7.0px Times; -webkit-text-stroke: #000000}
+    p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; font: 9.0px Times; -webkit-text-stroke: #000000}
+    p.p9 {margin: 0.0px 0.0px 0.0px 0.0px; font: 13.0px Georgia; color: #a9a9c1; -webkit-text-stroke: #a9a9c1}
+    p.p10 {margin: 0.0px 0.0px 0.0px 0.0px; font: 6.0px Times; -webkit-text-stroke: #000000}
+    p.p13 {margin: 0.0px 0.0px 12.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000}
+    span.s1 {text-decoration: underline ; font-kerning: none}
+    span.s2 {font: 12.0px 'Lucida Grande'; text-decoration: underline ; font-kerning: none}
+    span.s3 {font: 12.0px Times; text-decoration: underline ; font-kerning: none}
+    span.s4 {font-kerning: none; color: #000000; -webkit-text-stroke: 0px #000000}
+    span.s5 {font: 12.0px 'Lucida Grande'; text-decoration: underline ; font-kerning: none; -webkit-text-stroke: 0px #0000e9}
+    span.s6 {text-decoration: underline ; font-kerning: none; -webkit-text-stroke: 0px #0000e9}
+    span.s7 {font-kerning: none}
+    span.s8 {font: 12.0px Times; font-kerning: none; -webkit-text-stroke: 0px #0000e9}
+    table.t1 {border-collapse: collapse}
+    td.td1 {width: 90.0px; padding: 8.0px 12.0px 12.0px 12.0px}
+    td.td2 {width: 220.0px; padding: 8.0px 12.0px 12.0px 12.0px}
+    td.td3 {width: 305.7px; padding: 8.0px 12.0px 12.0px 12.0px}
+    td.td4 {width: 58.3px; padding: 8.0px 12.0px 12.0px 12.0px}
+    td.td5 {width: 90.0px; padding: 11.0px 12.0px 11.0px 12.0px}
+    td.td6 {width: 220.0px; padding: 11.0px 12.0px 11.0px 12.0px}
+    td.td7 {width: 305.7px; padding: 11.0px 12.0px 11.0px 12.0px}
+    td.td8 {width: 58.3px; padding: 11.0px 12.0px 11.0px 12.0px}
   </style>
 </head>
 <body>
-  <div class="page-wrap">
-
-    <a class="site-brand" href="index.html">DERRICK</a>
-    <nav class="site-nav">
-      <a href="index.html">&#9654; HOME</a>
-      <a href="timer.html">&#9654; DRILL-O-DORO</a>
-      <a href="converter.html">&#9654; CONVERTER</a>
-      <a href="calculator.html">&#9654; CALCULATOR</a>
-      <a href="acronyms.html" aria-current="page">&#9654; ACRONYMS</a>
-      <a href="wellcontrol.html">&#9654; WELL CONTROL</a>
-    </nav>
-
-    <h1>DRILLING ACRONYM DECODER</h1>
-    <p class="page-subtitle">150+ OIL &amp; GAS TERMS — INSTANT SEARCH</p>
-
-    <!-- Search -->
-    <div class="search-wrap">
-      <input type="search" id="search" placeholder="TYPE TO SEARCH ACRONYMS..." autocomplete="off" spellcheck="false">
-    </div>
-    <div class="search-count">SHOWING <span id="count">155</span> OF 155 TERMS</div>
-
-    <!-- Category filters -->
-    <div class="filter-row">
-      <button class="filter-btn active" data-cat="ALL">ALL</button>
-      <button class="filter-btn" data-cat="DRILLING">DRILLING</button>
-      <button class="filter-btn" data-cat="WELL CONTROL">WELL CONTROL</button>
-      <button class="filter-btn" data-cat="MWD/LWD">MWD/LWD</button>
-      <button class="filter-btn" data-cat="COMPLETIONS">COMPLETIONS</button>
-      <button class="filter-btn" data-cat="PRODUCTION">PRODUCTION</button>
-      <button class="filter-btn" data-cat="HSE">HSE</button>
-      <button class="filter-btn" data-cat="GENERAL">GENERAL</button>
-    </div>
-
-    <!-- Table -->
-    <table class="acro-table" id="acroTable">
-      <thead>
-        <tr>
-          <th>ACRONYM</th>
-          <th>FULL NAME</th>
-          <th>PLAIN ENGLISH</th>
-          <th>CAT</th>
-        </tr>
-      </thead>
-      <tbody id="acroBody">
-
-        <!-- ── DRILLING ───────────────────────────────────────────── -->
-        <tr data-cat="DRILLING"><td class="acro-abbr">BHA</td><td class="acro-full">Bottom Hole Assembly</td><td class="acro-desc">The collection of drill collars, stabilisers, and tools attached to the bottom of the drill string, directly above the bit.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">BHP</td><td class="acro-full">Bottom Hole Pressure</td><td class="acro-desc">The total pressure acting at the bottom of the well; must stay above pore pressure and below fracture pressure.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">BHT</td><td class="acro-full">Bottom Hole Temperature</td><td class="acro-desc">The temperature measured at total depth; governs elastomer selection and mud stability.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">BIT</td><td class="acro-full">Bit — Drill Bit</td><td class="acro-desc">The rotating cutting tool at the end of the drill string that actually grinds through rock.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">DC</td><td class="acro-full">Drill Collar</td><td class="acro-desc">Heavy, thick-walled pipe near the bit that provides weight-on-bit and stiffens the BHA.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">DD</td><td class="acro-full">Directional Driller</td><td class="acro-desc">The specialist on the rig floor who steers the wellbore to hit the target reservoir.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">DP</td><td class="acro-full">Drill Pipe</td><td class="acro-desc">The long, lightweight pipe that connects the surface to the BHA and transmits rotation and fluid.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">ECD</td><td class="acro-full">Equivalent Circulating Density</td><td class="acro-desc">The effective mud weight seen at the bit when mud is being pumped; always higher than static mud weight due to friction.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">EMW</td><td class="acro-full">Equivalent Mud Weight</td><td class="acro-desc">Any downhole pressure expressed as a mud density in ppg or sg for easy comparison to the mud window.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">FIT</td><td class="acro-full">Formation Integrity Test</td><td class="acro-desc">A pressure test applied to a new formation after setting casing to confirm it can hold the expected maximum wellbore pressure.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">LOT</td><td class="acro-full">Leak-Off Test</td><td class="acro-desc">A test pumped until the formation begins to fracture, establishing the upper pressure limit for that hole section.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">WOB</td><td class="acro-full">Weight on Bit</td><td class="acro-desc">The downward force applied to the drill bit, measured in thousands of pounds, that drives penetration rate.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">RPM</td><td class="acro-full">Rotations Per Minute</td><td class="acro-desc">How fast the drill string or bit is spinning; too fast or slow can damage the bit or cause vibration.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">ROP</td><td class="acro-full">Rate of Penetration</td><td class="acro-desc">How fast the bit drills through rock, measured in feet or metres per hour; the primary drilling efficiency metric.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">SPM</td><td class="acro-full">Strokes Per Minute</td><td class="acro-desc">The speed of the mud pump pistons; used to calculate flow rate and detect kicks by monitoring stroke count.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">GPM</td><td class="acro-full">Gallons Per Minute</td><td class="acro-desc">Flow rate unit for mud pumps; determines annular velocity and hole cleaning efficiency.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">TFA</td><td class="acro-full">Total Flow Area</td><td class="acro-desc">The combined nozzle area of the drill bit; determines jet velocity and hydraulic horsepower at the bit.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">HSI</td><td class="acro-full">Hydraulic Horsepower per Square Inch</td><td class="acro-desc">A measure of the cleaning energy delivered at the bit face; typically optimised between 1.0–1.5 HSI.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">PDC</td><td class="acro-full">Polycrystalline Diamond Compact</td><td class="acro-desc">A modern drill bit type using synthetic diamond cutters; faster and longer-lasting than roller-cone bits in many formations.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">TIH</td><td class="acro-full">Trip In Hole</td><td class="acro-desc">Running the drill string back down the wellbore after it was pulled for bit change or BHA maintenance.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">POOH</td><td class="acro-full">Pull Out Of Hole</td><td class="acro-desc">Pulling the drill string (or wireline tool) out of the well; often done to change the bit or run casing.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">TD</td><td class="acro-full">Total Depth</td><td class="acro-desc">The deepest point reached in a wellbore; declaring TD means drilling has stopped and logging or casing can begin.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">KOP</td><td class="acro-full">Kick-Off Point</td><td class="acro-desc">The depth at which a directional well begins to deviate from vertical; set by the wellbore design.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">DLS</td><td class="acro-full">Dog-Leg Severity</td><td class="acro-desc">The rate of change of wellbore direction, measured in degrees per 100 ft; high DLS risks pipe fatigue and stuck pipe.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">TVD</td><td class="acro-full">True Vertical Depth</td><td class="acro-desc">The straight-line vertical distance from surface to the point of interest; used for pressure calculations.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">MD</td><td class="acro-full">Measured Depth</td><td class="acro-desc">The actual length of wellbore along the borehole path; always ≥ TVD in a deviated well.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">MW</td><td class="acro-full">Mud Weight</td><td class="acro-desc">The density of drilling fluid, commonly in ppg or sg; the primary tool for controlling downhole pressure.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">OBM</td><td class="acro-full">Oil-Based Mud</td><td class="acro-desc">Drilling fluid with oil as the continuous phase; superior shale inhibition and lubricating properties but stricter disposal rules.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">WBM</td><td class="acro-full">Water-Based Mud</td><td class="acro-desc">Drilling fluid with water as the continuous phase; cheaper and easier to dispose of but less inhibitive than OBM.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">SBM</td><td class="acro-full">Synthetic-Based Mud</td><td class="acro-desc">Drilling fluid using synthetic (non-petroleum) base oil; performs like OBM but with lower environmental toxicity.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">LCM</td><td class="acro-full">Lost Circulation Material</td><td class="acro-desc">Fibres, flakes, or granules mixed into mud to plug thief zones and stop drilling fluid being lost into the formation.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">MWD</td><td class="acro-full">Measurement While Drilling</td><td class="acro-desc">Downhole tools that send wellbore direction, inclination, and pressure data to surface in real time via mud pulse.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">RSS</td><td class="acro-full">Rotary Steerable System</td><td class="acro-desc">An automated directional drilling tool that steers the bit while the entire drill string rotates, giving faster and smoother wellbores.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">PDM</td><td class="acro-full">Positive Displacement Motor</td><td class="acro-desc">A downhole mud motor powered by drilling fluid flow; used to rotate the bit independently of the surface drive.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">JAR</td><td class="acro-full">Drilling Jar</td><td class="acro-desc">A downhole tool that releases a sudden impact force to free a stuck drill string; either hydraulic or mechanical.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">HWDP</td><td class="acro-full">Heavy Weight Drill Pipe</td><td class="acro-desc">Intermediate-weight pipe between drill collars and standard drill pipe; reduces fatigue failures in the transition zone.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">SCR</td><td class="acro-full">Slow Circulating Rate</td><td class="acro-desc">The pump pressure recorded at a reduced, fixed stroke rate; a baseline used when displacing a kick or spotting pills.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">SICP</td><td class="acro-full">Shut-In Casing Pressure</td><td class="acro-desc">The pressure reading on the annulus side after shutting in on a kick; indicates the degree of underbalance.</td><td class="acro-cat">DRILLING</td></tr>
-        <tr data-cat="DRILLING"><td class="acro-abbr">SIDPP</td><td class="acro-full">Shut-In Drill Pipe Pressure</td><td class="acro-desc">The pressure at the drill pipe after shutting in on a kick; used to calculate the kill mud weight needed.</td><td class="acro-cat">DRILLING</td></tr>
-
-        <!-- ── WELL CONTROL ───────────────────────────────────────── -->
-        <tr data-cat="WELL CONTROL"><td class="acro-abbr">BOP</td><td class="acro-full">Blowout Preventer</td><td class="acro-desc">The pressure-rated valve assembly at the wellhead that can seal around or shear the drill string to prevent a blowout.</td><td class="acro-cat">WELL CONTROL</td></tr>
-        <tr data-cat="WELL CONTROL"><td class="acro-abbr">BOPE</td><td class="acro-full">Blowout Preventer Equipment</td><td class="acro-desc">The full stack of BOP components including annular preventers, rams, choke manifold, and kill lines.</td><td class="acro-cat">WELL CONTROL</td></tr>
-        <tr data-cat="WELL CONTROL"><td class="acro-abbr">MAASP</td><td class="acro-full">Maximum Allowable Annular Surface Pressure</td><td class="acro-desc">The highest surface casing pressure permitted before the weakest downhole formation would fracture; a hard kill-weight ceiling.</td><td class="acro-cat">WELL CONTROL</td></tr>
-        <tr data-cat="WELL CONTROL"><td class="acro-abbr">KMW</td><td class="acro-full">Kill Mud Weight</td><td class="acro-desc">The increased mud density required to balance reservoir pressure and stop influx; calculated from SIDPP.</td><td class="acro-cat">WELL CONTROL</td></tr>
-        <tr data-cat="WELL CONTROL"><td class="acro-abbr">ICP</td><td class="acro-full">Initial Circulating Pressure</td><td class="acro-desc">The pump pressure at SCR at the start of a well kill; kept constant while heavy mud reaches the bit (Driller's method).</td><td class="acro-cat">WELL CONTROL</td></tr>
-        <tr data-cat="WELL CONTROL"><td class="acro-abbr">FCP</td><td class="acro-full">Final Circulating Pressure</td><td class="acro-desc">The pump pressure at SCR when kill-weight mud fills the drill string; the target pressure for the second circulation.</td><td class="acro-cat">WELL CONTROL</td></tr>
-        <tr data-cat="WELL CONTROL"><td class="acro-abbr">WC</td><td class="acro-full">Well Control</td><td class="acro-desc">The discipline and procedures used to detect, manage, and stop unplanned influxes of formation fluid into the wellbore.</td><td class="acro-cat">WELL CONTROL</td></tr>
-        <tr data-cat="WELL CONTROL"><td class="acro-abbr">IADC</td><td class="acro-full">International Association of Drilling Contractors</td><td class="acro-desc">The global trade body that sets well control standards, rig classifications, and training certifications for the drilling industry.</td><td class="acro-cat">WELL CONTROL</td></tr>
-        <tr data-cat="WELL CONTROL"><td class="acro-abbr">IWCF</td><td class="acro-full">International Well Control Forum</td><td class="acro-desc">The body that manages the global well control certification exam taken by drillers, toolpushers, and company men.</td><td class="acro-cat">WELL CONTROL</td></tr>
-        <tr data-cat="WELL CONTROL"><td class="acro-abbr">PIW</td><td class="acro-full">Pit Gain / Influx Volume</td><td class="acro-desc">The volume of formation fluid that has entered the wellbore, monitored via the pit volume totaliser on surface.</td><td class="acro-cat">WELL CONTROL</td></tr>
-        <tr data-cat="WELL CONTROL"><td class="acro-abbr">PVT</td><td class="acro-full">Pit Volume Totaliser</td><td class="acro-desc">Instruments that continuously monitor active pit volumes; a sudden gain is the primary kick indicator.</td><td class="acro-cat">WELL CONTROL</td></tr>
-        <tr data-cat="WELL CONTROL"><td class="acro-abbr">MPD</td><td class="acro-full">Managed Pressure Drilling</td><td class="acro-desc">A closed-loop drilling technique that precisely controls annular pressure to stay within a tight pore-to-frac margin.</td><td class="acro-cat">WELL CONTROL</td></tr>
-        <tr data-cat="WELL CONTROL"><td class="acro-abbr">UBD</td><td class="acro-full">Underbalanced Drilling</td><td class="acro-desc">Drilling with wellbore pressure intentionally below reservoir pressure to improve ROP and reduce formation damage.</td><td class="acro-cat">WELL CONTROL</td></tr>
-        <tr data-cat="WELL CONTROL"><td class="acro-abbr">H2S</td><td class="acro-full">Hydrogen Sulphide</td><td class="acro-desc">A toxic, flammable gas encountered in sour wells; detectable by smell at low levels but immediately dangerous at high concentrations.</td><td class="acro-cat">WELL CONTROL</td></tr>
-
-        <!-- ── MWD / LWD ──────────────────────────────────────────── -->
-        <tr data-cat="MWD/LWD"><td class="acro-abbr">LWD</td><td class="acro-full">Logging While Drilling</td><td class="acro-desc">Sensors in the BHA that measure formation properties (resistivity, gamma ray, porosity) in real time as the well is drilled.</td><td class="acro-cat">MWD/LWD</td></tr>
-        <tr data-cat="MWD/LWD"><td class="acro-abbr">GR</td><td class="acro-full">Gamma Ray</td><td class="acro-desc">A log that detects natural radioactivity; high values indicate shale, low values indicate clean sands or carbonates.</td><td class="acro-cat">MWD/LWD</td></tr>
-        <tr data-cat="MWD/LWD"><td class="acro-abbr">RT</td><td class="acro-full">True Resistivity</td><td class="acro-desc">The electrical resistance of undisturbed formation away from the borehole wall; high values indicate hydrocarbons.</td><td class="acro-cat">MWD/LWD</td></tr>
-        <tr data-cat="MWD/LWD"><td class="acro-abbr">NPHI</td><td class="acro-full">Neutron Porosity</td><td class="acro-desc">A porosity measurement from neutron bombardment of the formation; responds to hydrogen content, including bound water.</td><td class="acro-cat">MWD/LWD</td></tr>
-        <tr data-cat="MWD/LWD"><td class="acro-abbr">RHOB</td><td class="acro-full">Bulk Density</td><td class="acro-desc">Formation density from a gamma-gamma tool; combined with NPHI to calculate porosity and identify gas zones.</td><td class="acro-cat">MWD/LWD</td></tr>
-        <tr data-cat="MWD/LWD"><td class="acro-abbr">APWD</td><td class="acro-full">Annular Pressure While Drilling</td><td class="acro-desc">Real-time downhole annular pressure measurement from the MWD tool; the direct read of ECD and wellbore stability.</td><td class="acro-cat">MWD/LWD</td></tr>
-        <tr data-cat="MWD/LWD"><td class="acro-abbr">INC</td><td class="acro-full">Inclination</td><td class="acro-desc">The angle of the wellbore from vertical; 0° is straight down, 90° is horizontal.</td><td class="acro-cat">MWD/LWD</td></tr>
-        <tr data-cat="MWD/LWD"><td class="acro-abbr">AZI</td><td class="acro-full">Azimuth</td><td class="acro-desc">The compass bearing of the wellbore direction; combined with inclination to define the 3D trajectory.</td><td class="acro-cat">MWD/LWD</td></tr>
-        <tr data-cat="MWD/LWD"><td class="acro-abbr">EM-MWD</td><td class="acro-full">Electromagnetic MWD</td><td class="acro-desc">An MWD transmission method using electromagnetic signals through rock instead of mud pulses; works in air- or foam-drilled wells.</td><td class="acro-cat">MWD/LWD</td></tr>
-        <tr data-cat="MWD/LWD"><td class="acro-abbr">AGS</td><td class="acro-full">At-Bit Gamma Ray / Steerable</td><td class="acro-desc">A gamma-ray sensor positioned very close to the drill bit for faster geosteering response in thin reservoir layers.</td><td class="acro-cat">MWD/LWD</td></tr>
-        <tr data-cat="MWD/LWD"><td class="acro-abbr">NMR</td><td class="acro-full">Nuclear Magnetic Resonance</td><td class="acro-desc">An advanced LWD measurement that directly measures pore size distribution and movable fluid volumes.</td><td class="acro-cat">MWD/LWD</td></tr>
-        <tr data-cat="MWD/LWD"><td class="acro-abbr">SWD</td><td class="acro-full">Seismic While Drilling</td><td class="acro-desc">A technique using downhole geophones to receive seismic signals, providing look-ahead images of formations ahead of the bit.</td><td class="acro-cat">MWD/LWD</td></tr>
-        <tr data-cat="MWD/LWD"><td class="acro-abbr">UBIA</td><td class="acro-full">Ultrasonic Borehole Imager</td><td class="acro-desc">An LWD tool using ultrasound to image the borehole wall; reveals fractures, dips, and breakouts in real time.</td><td class="acro-cat">MWD/LWD</td></tr>
-        <tr data-cat="MWD/LWD"><td class="acro-abbr">PWD</td><td class="acro-full">Pressure While Drilling</td><td class="acro-desc">Any downhole pressure tool in the BHA; records both annular and internal pipe pressure for ECD management.</td><td class="acro-cat">MWD/LWD</td></tr>
-        <tr data-cat="MWD/LWD"><td class="acro-abbr">DWOB</td><td class="acro-full">Downhole Weight on Bit</td><td class="acro-desc">WOB measured at the bit by the MWD tool; often differs from surface readings due to friction in deviated wells.</td><td class="acro-cat">MWD/LWD</td></tr>
-
-        <!-- ── COMPLETIONS ─────────────────────────────────────────── -->
-        <tr data-cat="COMPLETIONS"><td class="acro-abbr">PERF</td><td class="acro-full">Perforation</td><td class="acro-desc">Explosive charges that punch holes through casing and cement into the reservoir, creating a flow path for hydrocarbons.</td><td class="acro-cat">COMPLETIONS</td></tr>
-        <tr data-cat="COMPLETIONS"><td class="acro-abbr">TCP</td><td class="acro-full">Tubing-Conveyed Perforating</td><td class="acro-desc">A perforating system where guns are run on production tubing and fired downhole at the target interval.</td><td class="acro-cat">COMPLETIONS</td></tr>
-        <tr data-cat="COMPLETIONS"><td class="acro-abbr">SCAB</td><td class="acro-full">Sand Control And Barrier</td><td class="acro-desc">Gravel packs, screens, or chemical consolidation methods that prevent sand from flowing into the wellbore and damaging equipment.</td><td class="acro-cat">COMPLETIONS</td></tr>
-        <tr data-cat="COMPLETIONS"><td class="acro-abbr">GPK</td><td class="acro-full">Gravel Pack</td><td class="acro-desc">Sand control method that places sized gravel between the screen and formation to filter out reservoir sand.</td><td class="acro-cat">COMPLETIONS</td></tr>
-        <tr data-cat="COMPLETIONS"><td class="acro-abbr">FRAC</td><td class="acro-full">Hydraulic Fracturing</td><td class="acro-desc">High-pressure injection of fluid to crack the reservoir rock, creating fractures that dramatically increase well productivity.</td><td class="acro-cat">COMPLETIONS</td></tr>
-        <tr data-cat="COMPLETIONS"><td class="acro-abbr">FDP</td><td class="acro-full">Field Development Plan</td><td class="acro-desc">The engineering document that defines how a reservoir will be produced — well count, spacing, facilities, and schedule.</td><td class="acro-cat">COMPLETIONS</td></tr>
-        <tr data-cat="COMPLETIONS"><td class="acro-abbr">PBTD</td><td class="acro-full">Plug Back Total Depth</td><td class="acro-desc">The depth of a downhole plug set to isolate a lower zone; the effective new bottom of the wellbore above the plug.</td><td class="acro-cat">COMPLETIONS</td></tr>
-        <tr data-cat="COMPLETIONS"><td class="acro-abbr">SSD</td><td class="acro-full">Sliding Side Door</td><td class="acro-desc">A completion tool with a sliding sleeve that can be opened to allow selective communication between tubing and annulus or formation.</td><td class="acro-cat">COMPLETIONS</td></tr>
-        <tr data-cat="COMPLETIONS"><td class="acro-abbr">SCSSV</td><td class="acro-full">Surface-Controlled Subsurface Safety Valve</td><td class="acro-desc">A downhole valve held open by hydraulic pressure from surface; fails closed automatically if the line is cut or depressured.</td><td class="acro-cat">COMPLETIONS</td></tr>
-        <tr data-cat="COMPLETIONS"><td class="acro-abbr">DHSV</td><td class="acro-full">Downhole Safety Valve</td><td class="acro-desc">A generic term for any safety valve installed inside the production tubing, designed to isolate the reservoir in an emergency.</td><td class="acro-cat">COMPLETIONS</td></tr>
-        <tr data-cat="COMPLETIONS"><td class="acro-abbr">WHP</td><td class="acro-full">Wellhead Pressure</td><td class="acro-desc">The pressure measured at the top of the well at surface; reflects reservoir drive and tubing pressure losses.</td><td class="acro-cat">COMPLETIONS</td></tr>
-        <tr data-cat="COMPLETIONS"><td class="acro-abbr">THP</td><td class="acro-full">Tubing Head Pressure</td><td class="acro-desc">The flowing pressure at the tubing hanger at surface; a key parameter for production monitoring and choke management.</td><td class="acro-cat">COMPLETIONS</td></tr>
-        <tr data-cat="COMPLETIONS"><td class="acro-abbr">CHP</td><td class="acro-full">Casing Head Pressure</td><td class="acro-desc">The pressure reading on the annulus side at surface; monitored for signs of tubing leaks or barrier integrity issues.</td><td class="acro-cat">COMPLETIONS</td></tr>
-        <tr data-cat="COMPLETIONS"><td class="acro-abbr">XMAS TREE</td><td class="acro-full">Christmas Tree</td><td class="acro-desc">The surface valve assembly on top of a completed well that controls and monitors production flow.</td><td class="acro-cat">COMPLETIONS</td></tr>
-        <tr data-cat="COMPLETIONS"><td class="acro-abbr">PLT</td><td class="acro-full">Production Logging Tool</td><td class="acro-desc">A wireline tool run in a producing well to measure where fluid is entering and identify high-water or depleted zones.</td><td class="acro-cat">COMPLETIONS</td></tr>
-        <tr data-cat="COMPLETIONS"><td class="acro-abbr">SWC</td><td class="acro-full">Sidewall Core</td><td class="acro-desc">Rock samples collected from the wellbore wall during wireline logging; used to confirm fluid contacts and reservoir quality.</td><td class="acro-cat">COMPLETIONS</td></tr>
-        <tr data-cat="COMPLETIONS"><td class="acro-abbr">WO</td><td class="acro-full">Workover</td><td class="acro-desc">Any remedial operation on an existing well to restore or improve production — reperforating, squeezing, or plug-and-abandonment.</td><td class="acro-cat">COMPLETIONS</td></tr>
-
-        <!-- ── PRODUCTION ──────────────────────────────────────────── -->
-        <tr data-cat="PRODUCTION"><td class="acro-abbr">GOR</td><td class="acro-full">Gas-Oil Ratio</td><td class="acro-desc">Cubic feet of gas produced per barrel of oil; a rising GOR indicates a gas cap is coning into the wellbore.</td><td class="acro-cat">PRODUCTION</td></tr>
-        <tr data-cat="PRODUCTION"><td class="acro-abbr">WOR</td><td class="acro-full">Water-Oil Ratio</td><td class="acro-desc">Barrels of water produced per barrel of oil; a rising WOR indicates water breakthrough from a connected aquifer.</td><td class="acro-cat">PRODUCTION</td></tr>
-        <tr data-cat="PRODUCTION"><td class="acro-abbr">BOPD</td><td class="acro-full">Barrels of Oil Per Day</td><td class="acro-desc">The standard unit for measuring a well or field's oil production rate.</td><td class="acro-cat">PRODUCTION</td></tr>
-        <tr data-cat="PRODUCTION"><td class="acro-abbr">BWPD</td><td class="acro-full">Barrels of Water Per Day</td><td class="acro-desc">The rate of water production from a well; drives disposal costs and can indicate reservoir depletion.</td><td class="acro-cat">PRODUCTION</td></tr>
-        <tr data-cat="PRODUCTION"><td class="acro-abbr">MMSCFD</td><td class="acro-full">Million Standard Cubic Feet per Day</td><td class="acro-desc">The standard unit for gas production rates at surface conditions (60 °F, 14.7 psi).</td><td class="acro-cat">PRODUCTION</td></tr>
-        <tr data-cat="PRODUCTION"><td class="acro-abbr">API</td><td class="acro-full">API Gravity</td><td class="acro-desc">A measure of crude oil density; light crudes (>31° API) are more valuable, heavy crudes (&lt;22° API) require more refining.</td><td class="acro-cat">PRODUCTION</td></tr>
-        <tr data-cat="PRODUCTION"><td class="acro-abbr">ESP</td><td class="acro-full">Electric Submersible Pump</td><td class="acro-desc">An electric pump lowered into the production tubing to lift fluids in low-pressure or high-watercut wells.</td><td class="acro-cat">PRODUCTION</td></tr>
-        <tr data-cat="PRODUCTION"><td class="acro-abbr">GL</td><td class="acro-full">Gas Lift</td><td class="acro-desc">An artificial lift method that injects gas into the annulus to aerate produced fluids and reduce hydrostatic head.</td><td class="acro-cat">PRODUCTION</td></tr>
-        <tr data-cat="PRODUCTION"><td class="acro-abbr">FTHP</td><td class="acro-full">Flowing Tubing Head Pressure</td><td class="acro-desc">Wellhead pressure measured while the well is producing; used to back-calculate flowing bottomhole pressure.</td><td class="acro-cat">PRODUCTION</td></tr>
-        <tr data-cat="PRODUCTION"><td class="acro-abbr">SBHP</td><td class="acro-full">Static Bottom Hole Pressure</td><td class="acro-desc">Reservoir pressure when the well is shut in and pressure has fully built up; the best measure of reservoir energy.</td><td class="acro-cat">PRODUCTION</td></tr>
-        <tr data-cat="PRODUCTION"><td class="acro-abbr">PI</td><td class="acro-full">Productivity Index</td><td class="acro-desc">Barrels per day per psi of drawdown; a measure of how easily a reservoir gives up its fluids to the wellbore.</td><td class="acro-cat">PRODUCTION</td></tr>
-        <tr data-cat="PRODUCTION"><td class="acro-abbr">IPR</td><td class="acro-full">Inflow Performance Relationship</td><td class="acro-desc">A curve that plots well flow rate versus bottomhole flowing pressure; used to optimise artificial lift design.</td><td class="acro-cat">PRODUCTION</td></tr>
-        <tr data-cat="PRODUCTION"><td class="acro-abbr">VLP</td><td class="acro-full">Vertical Lift Performance</td><td class="acro-desc">The pressure losses in the tubing as fluids travel from reservoir to surface; intersects IPR to find the natural flow rate.</td><td class="acro-cat">PRODUCTION</td></tr>
-        <tr data-cat="PRODUCTION"><td class="acro-abbr">WHFP</td><td class="acro-full">Wellhead Flowing Pressure</td><td class="acro-desc">Surface pressure while the well is on production; monitored daily to track reservoir decline and line pressure changes.</td><td class="acro-cat">PRODUCTION</td></tr>
-        <tr data-cat="PRODUCTION"><td class="acro-abbr">EWT</td><td class="acro-full">Extended Well Test</td><td class="acro-desc">A prolonged production test lasting weeks or months to gather reservoir data and process performance before permanent facilities are built.</td><td class="acro-cat">PRODUCTION</td></tr>
-        <tr data-cat="PRODUCTION"><td class="acro-abbr">DST</td><td class="acro-full">Drill Stem Test</td><td class="acro-desc">A temporary completion run on drill pipe to flow a reservoir interval and gather pressure/fluid data before full completion.</td><td class="acro-cat">PRODUCTION</td></tr>
-        <tr data-cat="PRODUCTION"><td class="acro-abbr">PBU</td><td class="acro-full">Pressure Build-Up Test</td><td class="acro-desc">A well test where flow is stopped and the pressure rise is analysed to determine permeability and skin damage.</td><td class="acro-cat">PRODUCTION</td></tr>
-        <tr data-cat="PRODUCTION"><td class="acro-abbr">AOF</td><td class="acro-full">Absolute Open Flow</td><td class="acro-desc">The theoretical maximum flow rate of a gas well if wellhead pressure were zero; the benchmark for gas well deliverability.</td><td class="acro-cat">PRODUCTION</td></tr>
-        <tr data-cat="PRODUCTION"><td class="acro-abbr">FPSO</td><td class="acro-full">Floating Production Storage and Offloading</td><td class="acro-desc">A ship-shaped vessel moored offshore that processes, stores, and offloads crude oil without a pipeline to shore.</td><td class="acro-cat">PRODUCTION</td></tr>
-        <tr data-cat="PRODUCTION"><td class="acro-abbr">TLP</td><td class="acro-full">Tension Leg Platform</td><td class="acro-desc">An offshore production platform held in place by taut vertical tendons anchored to the seabed; suited to deepwater fields.</td><td class="acro-cat">PRODUCTION</td></tr>
-
-        <!-- ── HSE ────────────────────────────────────────────────── -->
-        <tr data-cat="HSE"><td class="acro-abbr">HSE</td><td class="acro-full">Health, Safety &amp; Environment</td><td class="acro-desc">The combined management discipline covering worker protection, process safety, and environmental stewardship on a rig or facility.</td><td class="acro-cat">HSE</td></tr>
-        <tr data-cat="HSE"><td class="acro-abbr">PTW</td><td class="acro-full">Permit to Work</td><td class="acro-desc">A formal written authorisation required before any hazardous task begins; ensures hazards are identified and controls in place.</td><td class="acro-cat">HSE</td></tr>
-        <tr data-cat="HSE"><td class="acro-abbr">JSA</td><td class="acro-full">Job Safety Analysis</td><td class="acro-desc">A step-by-step hazard identification exercise completed before a task; each step is assessed for risks and mitigations.</td><td class="acro-cat">HSE</td></tr>
-        <tr data-cat="HSE"><td class="acro-abbr">LOTO</td><td class="acro-full">Lock-Out / Tag-Out</td><td class="acro-desc">Energy isolation procedure where equipment is physically locked off before maintenance to prevent accidental start-up.</td><td class="acro-cat">HSE</td></tr>
-        <tr data-cat="HSE"><td class="acro-abbr">PPE</td><td class="acro-full">Personal Protective Equipment</td><td class="acro-desc">Hard hats, boots, gloves, glasses, and coveralls worn to protect workers from workplace hazards.</td><td class="acro-cat">HSE</td></tr>
-        <tr data-cat="HSE"><td class="acro-abbr">SIMOPS</td><td class="acro-full">Simultaneous Operations</td><td class="acro-desc">Managing two or more hazardous operations happening at the same time on a rig or platform, requiring a formal risk review.</td><td class="acro-cat">HSE</td></tr>
-        <tr data-cat="HSE"><td class="acro-abbr">MSDS</td><td class="acro-full">Material Safety Data Sheet</td><td class="acro-desc">A document describing the hazards, handling requirements, and emergency response for a chemical used on location.</td><td class="acro-cat">HSE</td></tr>
-        <tr data-cat="HSE"><td class="acro-abbr">TRIC</td><td class="acro-full">Total Recordable Incident Count</td><td class="acro-desc">The total number of OSHA-recordable injuries and illnesses on a job site over a given period.</td><td class="acro-cat">HSE</td></tr>
-        <tr data-cat="HSE"><td class="acro-abbr">LTI</td><td class="acro-full">Lost Time Incident</td><td class="acro-desc">An injury that results in a worker missing at least one scheduled shift; the key lag indicator for safety performance.</td><td class="acro-cat">HSE</td></tr>
-        <tr data-cat="HSE"><td class="acro-abbr">LTISR</td><td class="acro-full">Lost Time Incident Severity Rate</td><td class="acro-desc">The average number of days lost per LTI; measures the severity of injuries rather than just their frequency.</td><td class="acro-cat">HSE</td></tr>
-        <tr data-cat="HSE"><td class="acro-abbr">NORM</td><td class="acro-full">Naturally Occurring Radioactive Material</td><td class="acro-desc">Low-level radioactive scales and sludge that can accumulate in production equipment; requires special disposal procedures.</td><td class="acro-cat">HSE</td></tr>
-        <tr data-cat="HSE"><td class="acro-abbr">ERP</td><td class="acro-full">Emergency Response Plan</td><td class="acro-desc">The documented procedures for evacuating, mustering, and responding to fires, blowouts, or medical emergencies on location.</td><td class="acro-cat">HSE</td></tr>
-        <tr data-cat="HSE"><td class="acro-abbr">HAZAN</td><td class="acro-full">Hazard Analysis</td><td class="acro-desc">A systematic review of a process or task to identify all hazards and the likelihood and consequence of each.</td><td class="acro-cat">HSE</td></tr>
-        <tr data-cat="HSE"><td class="acro-abbr">HAZOP</td><td class="acro-full">Hazard and Operability Study</td><td class="acro-desc">A structured team review of P&amp;IDs using guide words (more, less, reverse…) to find deviations that could cause harm.</td><td class="acro-cat">HSE</td></tr>
-        <tr data-cat="HSE"><td class="acro-abbr">MUSTER</td><td class="acro-full">Emergency Muster Point</td><td class="acro-desc">The designated gathering point where all personnel must report during an emergency so a headcount can be completed.</td><td class="acro-cat">HSE</td></tr>
-        <tr data-cat="HSE"><td class="acro-abbr">OIM</td><td class="acro-full">Offshore Installation Manager</td><td class="acro-desc">The most senior person on an offshore platform; has legal authority over all personnel and operations on the installation.</td><td class="acro-cat">HSE</td></tr>
-        <tr data-cat="HSE"><td class="acro-abbr">ALARP</td><td class="acro-full">As Low As Reasonably Practicable</td><td class="acro-desc">The UK/international risk management standard requiring risk reduction until the cost of further reduction is grossly disproportionate to the benefit.</td><td class="acro-cat">HSE</td></tr>
-        <tr data-cat="HSE"><td class="acro-abbr">MOC</td><td class="acro-full">Management of Change</td><td class="acro-desc">A formal process to assess the safety implications of any change to people, processes, or equipment before it is implemented.</td><td class="acro-cat">HSE</td></tr>
-
-        <!-- ── GENERAL ──────────────────────────────────────────────── -->
-        <tr data-cat="GENERAL"><td class="acro-abbr">AFE</td><td class="acro-full">Authority for Expenditure</td><td class="acro-desc">The approved budget document for a well or project; spending beyond the AFE requires formal re-approval.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">NOC</td><td class="acro-full">National Oil Company</td><td class="acro-desc">A state-owned oil company (e.g. Saudi Aramco, ADNOC, Petronas) that controls a country's hydrocarbon resources.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">IOC</td><td class="acro-full">International Oil Company</td><td class="acro-desc">A privately or publicly traded oil major (e.g. BP, Shell, ExxonMobil) that operates in multiple countries.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">PSC</td><td class="acro-full">Production Sharing Contract</td><td class="acro-desc">An agreement where an IOC recovers its costs from production then splits remaining profit oil with the host government.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">JOA</td><td class="acro-full">Joint Operating Agreement</td><td class="acro-desc">A legal contract between partners in a licence that defines decision-making authority, cost sharing, and operatorship.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">WI</td><td class="acro-full">Working Interest</td><td class="acro-desc">The percentage share of costs and production rights a company holds in an oil and gas licence.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">NRI</td><td class="acro-full">Net Revenue Interest</td><td class="acro-desc">The share of revenue a working interest owner receives after royalties are paid out.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">OPEX</td><td class="acro-full">Operating Expenditure</td><td class="acro-desc">Day-to-day costs of running a producing field — labour, maintenance, chemicals, and workovers.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">CAPEX</td><td class="acro-full">Capital Expenditure</td><td class="acro-desc">Large one-time investment costs — drilling wells, installing platforms, building pipelines — that appear on the balance sheet as assets.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">NPV</td><td class="acro-full">Net Present Value</td><td class="acro-desc">The discounted value today of all future project cash flows; the primary economic decision metric for new wells.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">IRR</td><td class="acro-full">Internal Rate of Return</td><td class="acro-desc">The discount rate that makes a project's NPV equal to zero; projects with IRR above the hurdle rate are sanctioned.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">DP</td><td class="acro-full">Dynamic Positioning</td><td class="acro-desc">A computer-controlled thruster system that holds a drillship or MODU precisely on location without anchors.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">MODU</td><td class="acro-full">Mobile Offshore Drilling Unit</td><td class="acro-desc">Any movable offshore rig — jackup, semi-submersible, or drillship — that can be repositioned between wells.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">SEMI</td><td class="acro-full">Semi-Submersible Rig</td><td class="acro-desc">A floating rig supported by submerged pontoons that dampen wave motion; used in deepwater where jackups cannot reach.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">JU</td><td class="acro-full">Jackup Rig</td><td class="acro-desc">A bottom-supported offshore rig with retractable legs that are lowered to the seabed; limited to ~150 m water depth.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">DRLG</td><td class="acro-full">Drilling</td><td class="acro-desc">Common abbreviation used in morning reports and well programmes to denote the drilling phase of an operation.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">MR</td><td class="acro-full">Morning Report</td><td class="acro-desc">The daily operational summary sent to company and government offices detailing progress, NPT, and next 24-hour plan.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">NPT</td><td class="acro-full">Non-Productive Time</td><td class="acro-desc">Rig time spent on problems rather than progressing the well — stuck pipe, equipment failures, waiting on weather.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">PO</td><td class="acro-full">Purchase Order</td><td class="acro-desc">The formal document authorising a supplier to deliver goods or services to a specific cost and specification.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">WITS</td><td class="acro-full">Wellsite Information Transfer Standard</td><td class="acro-desc">A data transmission protocol used to send real-time drilling parameters from the rig floor to offices and third parties.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">WITSML</td><td class="acro-full">Wellsite Information Transfer Standard Markup Language</td><td class="acro-desc">The XML-based successor to WITS; enables structured digital transfer of all well data between software systems.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">DLIS</td><td class="acro-full">Digital Log Interchange Standard</td><td class="acro-desc">The industry-standard file format for storing and exchanging wireline and LWD log data.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">LAS</td><td class="acro-full">Log ASCII Standard</td><td class="acro-desc">A simpler, widely-supported text file format for well log data; easier to read than DLIS but less feature-rich.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">OWC</td><td class="acro-full">Oil-Water Contact</td><td class="acro-desc">The depth at which oil transitions to water in the reservoir; defines the bottom of the oil column.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">GOC</td><td class="acro-full">Gas-Oil Contact</td><td class="acro-desc">The depth at which free gas overlies oil in the reservoir; defines the top of the oil column.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">GWC</td><td class="acro-full">Gas-Water Contact</td><td class="acro-desc">In a gas reservoir with no oil, the depth where gas transitions directly to water.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">STOIIP</td><td class="acro-full">Stock Tank Oil Initially In Place</td><td class="acro-desc">The total estimated volume of oil in the reservoir at surface conditions before any production begins.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">GIIP</td><td class="acro-full">Gas Initially In Place</td><td class="acro-desc">The total estimated volume of gas in the reservoir at surface conditions; the starting point for recovery factor calculations.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">RF</td><td class="acro-full">Recovery Factor</td><td class="acro-desc">The fraction of STOIIP or GIIP that can economically be produced; typically 20-60% for oil, higher for gas.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">2P</td><td class="acro-full">Proved + Probable Reserves</td><td class="acro-desc">The sum of proved and probable reserve categories; the most commonly quoted reserves figure in annual reports.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">SPS</td><td class="acro-full">Subsea Production System</td><td class="acro-desc">The complete set of seafloor equipment — trees, manifolds, flowlines — that ties subsea wells back to a production host.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">SCM</td><td class="acro-full">Subsea Control Module</td><td class="acro-desc">The electronic pod on a subsea tree that receives hydraulic and electrical commands from surface to operate valves.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">P&amp;ID</td><td class="acro-full">Piping and Instrumentation Diagram</td><td class="acro-desc">An engineering drawing that shows all piping, valves, instruments, and control loops in a process system.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">FEED</td><td class="acro-full">Front-End Engineering Design</td><td class="acro-desc">The detailed engineering study completed before a final investment decision; defines scope, cost, and schedule with high confidence.</td><td class="acro-cat">GENERAL</td></tr>
-        <tr data-cat="GENERAL"><td class="acro-abbr">FID</td><td class="acro-full">Final Investment Decision</td><td class="acro-desc">The board-level approval to commit capital and proceed with full project execution; a major project milestone.</td><td class="acro-cat">GENERAL</td></tr>
-
-      </tbody>
-    </table>
-
-    <div id="no-results">[ NO MATCHING ACRONYMS FOUND ]</div>
-
-    <!-- SEO Content Section -->
-    <div class="seo-section">
-      <div class="divider divider--spaced"></div>
-      <div class="pixel-card">
-        <div class="pixel-card__inner prose">
-          <h2>DRILLING ACRONYM DECODER</h2>
-
-          <h3>WHAT IS THIS PAGE?</h3>
-          <p>
-            This is a free, searchable reference for oil and gas acronyms used every day on drilling rigs, in operations centres, and across the upstream energy industry. Whether you are a brand-new roughneck on your first hitch or an experienced petroleum engineer reviewing well programmes, the alphabet soup of abbreviations can be overwhelming. This decoder covers more than 150 of the most important terms across seven disciplines: drilling operations, well control, MWD/LWD, completions, production, health and safety (HSE), and general industry terms.
-          </p>
-
-          <h3>WHY DO DRILLING ACRONYMS MATTER?</h3>
-          <p>
-            On a rig, communication must be fast, precise, and unambiguous. Acronyms exist because they compress long technical phrases into a handful of characters that every crew member can instantly decode on a morning report, over the radio, or in a drilling programme. When a driller shouts "BOP" or a company man queries the "ECD", there is no room for confusion — the wrong interpretation can mean the difference between a safe operation and a well control incident. Knowing your acronyms is therefore not just a career skill; in many situations it is a safety-critical one.
-          </p>
-
-          <h3>HOW TO USE THE SEARCH</h3>
-          <p>
-            Type any acronym, full name, or keyword into the search box above and results filter instantly. The category buttons let you narrow down to a specific discipline — useful when you know you're looking for a well control term but can't quite remember the letters. All 155 entries include the acronym, the full expansion, and a plain-English one-liner so even non-engineers can get the gist.
-          </p>
-
-          <h3>ABOUT DRILL-O-DORO</h3>
-          <p>
-            Drill-O-Doro is a free suite of retro-styled tools built for drilling engineers, wellsite geologists, and operations crews. Alongside this acronym decoder you will find a Pomodoro-style deep-work timer tuned to rig schedules, a comprehensive drilling unit converter, and a hydraulics and well-control calculator — all free, no sign-up required.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div class="support-bar">
-      <a href="https://www.buymeacoffee.com/rgibbon97o" target="_blank" id="bmc-btn" title="Buy Me a Coffee">
-        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee">
-      </a>
-      <a href="https://www.linkedin.com/in/ross-gibbon-506a2316a/" target="_blank" class="linkedin-btn" title="LinkedIn">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-label="LinkedIn">
-          <path d="M20.447 20.452H17.01v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.583V9h3.296v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a1.914 1.914 0 1 1 0-3.828 1.914 1.914 0 0 1 0 3.828zm1.658 13.019H3.68V9h3.315v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-        </svg>
-      </a>
-    </div>
-
-    <footer class="site-footer">
-      <p>DRILL-O-DORO &copy; 2025 &mdash; FREE TOOLS FOR THE DRILLING INDUSTRY</p>
-    </footer>
-
-  </div><!-- /.page-wrap -->
-
-  <script>
-    const searchInput = document.getElementById('search');
-    const rows        = Array.from(document.querySelectorAll('#acroBody tr'));
-    const countEl     = document.getElementById('count');
-    const noResults   = document.getElementById('no-results');
-    const filterBtns  = document.querySelectorAll('.filter-btn');
-    const total       = rows.length;
-
-    let activeCat = 'ALL';
-
-    /* ── Filter by category ────────────────────────────────────── */
-    filterBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        filterBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        activeCat = btn.dataset.cat;
-        applyFilters();
-      });
-    });
-
-    /* ── Real-time search ──────────────────────────────────────── */
-    searchInput.addEventListener('input', applyFilters);
-
-    function applyFilters() {
-      const query = searchInput.value.trim().toLowerCase();
-      let visible = 0;
-
-      rows.forEach(row => {
-        const cat   = row.dataset.cat;
-        const cells = row.querySelectorAll('td');
-        const text  = Array.from(cells).map(c => c.textContent).join(' ').toLowerCase();
-
-        const catMatch  = activeCat === 'ALL' || cat === activeCat;
-        const textMatch = !query || text.includes(query);
-
-        if (catMatch && textMatch) {
-          row.classList.remove('hidden');
-          visible++;
-          if (query) highlightRow(row, query);
-          else clearHighlight(row);
-        } else {
-          row.classList.add('hidden');
-          clearHighlight(row);
-        }
-      });
-
-      countEl.textContent = visible;
-      noResults.style.display = visible === 0 ? 'block' : 'none';
-    }
-
-    /* ── Text highlight ────────────────────────────────────────── */
-    const originals = new Map();
-    rows.forEach(row => {
-      originals.set(row, Array.from(row.querySelectorAll('td')).map(td => td.innerHTML));
-    });
-
-    function highlightRow(row, query) {
-      const tds   = row.querySelectorAll('td');
-      const saved = originals.get(row);
-      const re    = new RegExp(`(${escapeRe(query)})`, 'gi');
-      tds.forEach((td, i) => {
-        td.innerHTML = saved[i].replace(re, '<mark>$1</mark>');
-      });
-    }
-
-    function clearHighlight(row) {
-      const tds   = row.querySelectorAll('td');
-      const saved = originals.get(row);
-      tds.forEach((td, i) => { td.innerHTML = saved[i]; });
-    }
-
-    function escapeRe(s) {
-      return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    }
-  </script>
+<p class="p1"><span class="s1"><a href="file:///Users/rossgibbon/my-first-project/index.html">DERRICK</a></span></p>
+<p class="p1"><span class="s2"><a href="file:///Users/rossgibbon/my-first-project/index.html">▶<span class="s3"> HOME</span></a></span><span class="s4"> <a href="file:///Users/rossgibbon/my-first-project/timer.html"><span class="s5">▶</span><span class="s6"> DRILL-O-DORO</span></a> <a href="file:///Users/rossgibbon/my-first-project/converter.html"><span class="s5">▶</span><span class="s6"> CONVERTER</span></a> <a href="file:///Users/rossgibbon/my-first-project/calculator.html"><span class="s5">▶</span><span class="s6"> CALCULATOR</span></a> <a href="file:///Users/rossgibbon/my-first-project/acronyms.html"><span class="s5">▶</span><span class="s6"> ACRONYMS</span></a> <a href="file:///Users/rossgibbon/my-first-project/wellcontrol.html"><span class="s5">▶</span><span class="s6"> WELL CONTROL</span></a> <a href="file:///Users/rossgibbon/my-first-project/schematic.html"><span class="s5">▶</span><span class="s6"> SCHEMATIC</span></a> <a href="file:///Users/rossgibbon/my-first-project/killsheet.html"><span class="s5">▶</span><span class="s6"> KILL SHEET</span></a></span></p>
+<h1 style="margin: 0.0px 0.0px 16.1px 0.0px; font: 24.0px Times; -webkit-text-stroke: #000000"><span class="s7"><b>DRILLING ACRONYM DECODER</b></span></h1>
+<p class="p3"><span class="s7">150+ OIL &amp; GAS TERMS — INSTANT SEARCH</span></p>
+<p class="p4"><span class="s7"></span><br></p>
+<p class="p5"><span class="s7">SHOWING 155 OF 155 TERMS</span></p>
+<p class="p6"><span class="s7">ALL</span></p>
+<p class="p6"><span class="s7">DRILLING</span></p>
+<p class="p6"><span class="s7">WELL CONTROL</span></p>
+<p class="p6"><span class="s7">MWD/LWD</span></p>
+<p class="p6"><span class="s7">COMPLETIONS</span></p>
+<p class="p6"><span class="s7">PRODUCTION</span></p>
+<p class="p6"><span class="s7">HSE</span></p>
+<p class="p6"><span class="s7">GENERAL</span></p>
+<table cellspacing="0" cellpadding="0" class="t1">
+  <tbody>
+    <tr>
+      <td valign="middle" class="td1">
+        <p class="p7"><span class="s7"><b>ACRONYM</b></span></p>
+      </td>
+      <td valign="middle" class="td2">
+        <p class="p7"><span class="s7"><b>FULL NAME</b></span></p>
+      </td>
+      <td valign="middle" class="td3">
+        <p class="p7"><span class="s7"><b>PLAIN ENGLISH</b></span></p>
+      </td>
+      <td valign="middle" class="td4">
+        <p class="p7"><span class="s7"><b>CAT</b></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">BHA</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Bottom Hole Assembly</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The collection of drill collars, stabilisers, and tools attached to the bottom of the drill string, directly above the bit.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">BHP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Bottom Hole Pressure</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The total pressure acting at the bottom of the well; must stay above pore pressure and below fracture pressure.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">BHT</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Bottom Hole Temperature</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The temperature measured at total depth; governs elastomer selection and mud stability.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">BIT</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Bit — Drill Bit</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The rotating cutting tool at the end of the drill string that actually grinds through rock.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">DC</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Drill Collar</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Heavy, thick-walled pipe near the bit that provides weight-on-bit and stiffens the BHA.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">DD</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Directional Driller</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The specialist on the rig floor who steers the wellbore to hit the target reservoir.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">DP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Drill Pipe</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The long, lightweight pipe that connects the surface to the BHA and transmits rotation and fluid.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">ECD</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Equivalent Circulating Density</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The effective mud weight seen at the bit when mud is being pumped; always higher than static mud weight due to friction.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">EMW</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Equivalent Mud Weight</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Any downhole pressure expressed as a mud density in ppg or sg for easy comparison to the mud window.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">FIT</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Formation Integrity Test</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A pressure test applied to a new formation after setting casing to confirm it can hold the expected maximum wellbore pressure.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">LOT</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Leak-Off Test</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A test pumped until the formation begins to fracture, establishing the upper pressure limit for that hole section.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">WOB</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Weight on Bit</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The downward force applied to the drill bit, measured in thousands of pounds, that drives penetration rate.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">RPM</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Rotations Per Minute</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">How fast the drill string or bit is spinning; too fast or slow can damage the bit or cause vibration.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">ROP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Rate of Penetration</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">How fast the bit drills through rock, measured in feet or metres per hour; the primary drilling efficiency metric.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">SPM</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Strokes Per Minute</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The speed of the mud pump pistons; used to calculate flow rate and detect kicks by monitoring stroke count.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">GPM</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Gallons Per Minute</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Flow rate unit for mud pumps; determines annular velocity and hole cleaning efficiency.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">TFA</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Total Flow Area</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The combined nozzle area of the drill bit; determines jet velocity and hydraulic horsepower at the bit.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">HSI</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Hydraulic Horsepower per Square Inch</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A measure of the cleaning energy delivered at the bit face; typically optimised between 1.0–1.5 HSI.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">PDC</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Polycrystalline Diamond Compact</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A modern drill bit type using synthetic diamond cutters; faster and longer-lasting than roller-cone bits in many formations.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">TIH</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Trip In Hole</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Running the drill string back down the wellbore after it was pulled for bit change or BHA maintenance.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">POOH</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Pull Out Of Hole</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Pulling the drill string (or wireline tool) out of the well; often done to change the bit or run casing.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">TD</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Total Depth</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The deepest point reached in a wellbore; declaring TD means drilling has stopped and logging or casing can begin.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">KOP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Kick-Off Point</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The depth at which a directional well begins to deviate from vertical; set by the wellbore design.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">DLS</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Dog-Leg Severity</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The rate of change of wellbore direction, measured in degrees per 100 ft; high DLS risks pipe fatigue and stuck pipe.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">TVD</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">True Vertical Depth</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The straight-line vertical distance from surface to the point of interest; used for pressure calculations.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">MD</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Measured Depth</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The actual length of wellbore along the borehole path; always ≥ TVD in a deviated well.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">MW</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Mud Weight</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The density of drilling fluid, commonly in ppg or sg; the primary tool for controlling downhole pressure.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">OBM</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Oil-Based Mud</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Drilling fluid with oil as the continuous phase; superior shale inhibition and lubricating properties but stricter disposal rules.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">WBM</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Water-Based Mud</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Drilling fluid with water as the continuous phase; cheaper and easier to dispose of but less inhibitive than OBM.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">SBM</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Synthetic-Based Mud</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Drilling fluid using synthetic (non-petroleum) base oil; performs like OBM but with lower environmental toxicity.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">LCM</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Lost Circulation Material</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Fibres, flakes, or granules mixed into mud to plug thief zones and stop drilling fluid being lost into the formation.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">MWD</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Measurement While Drilling</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Downhole tools that send wellbore direction, inclination, and pressure data to surface in real time via mud pulse.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">RSS</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Rotary Steerable System</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">An automated directional drilling tool that steers the bit while the entire drill string rotates, giving faster and smoother wellbores.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">PDM</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Positive Displacement Motor</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A downhole mud motor powered by drilling fluid flow; used to rotate the bit independently of the surface drive.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">JAR</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Drilling Jar</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A downhole tool that releases a sudden impact force to free a stuck drill string; either hydraulic or mechanical.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">HWDP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Heavy Weight Drill Pipe</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Intermediate-weight pipe between drill collars and standard drill pipe; reduces fatigue failures in the transition zone.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">SCR</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Slow Circulating Rate</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The pump pressure recorded at a reduced, fixed stroke rate; a baseline used when displacing a kick or spotting pills.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">SICP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Shut-In Casing Pressure</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The pressure reading on the annulus side after shutting in on a kick; indicates the degree of underbalance.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">SIDPP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Shut-In Drill Pipe Pressure</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The pressure at the drill pipe after shutting in on a kick; used to calculate the kill mud weight needed.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">DRILLING</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">BOP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Blowout Preventer</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The pressure-rated valve assembly at the wellhead that can seal around or shear the drill string to prevent a blowout.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">WELL CONTROL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">BOPE</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Blowout Preventer Equipment</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The full stack of BOP components including annular preventers, rams, choke manifold, and kill lines.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">WELL CONTROL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">MAASP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Maximum Allowable Annular Surface Pressure</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The highest surface casing pressure permitted before the weakest downhole formation would fracture; a hard kill-weight ceiling.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">WELL CONTROL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">KMW</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Kill Mud Weight</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The increased mud density required to balance reservoir pressure and stop influx; calculated from SIDPP.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">WELL CONTROL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">ICP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Initial Circulating Pressure</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The pump pressure at SCR at the start of a well kill; kept constant while heavy mud reaches the bit (Driller's method).</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">WELL CONTROL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">FCP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Final Circulating Pressure</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The pump pressure at SCR when kill-weight mud fills the drill string; the target pressure for the second circulation.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">WELL CONTROL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">WC</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Well Control</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The discipline and procedures used to detect, manage, and stop unplanned influxes of formation fluid into the wellbore.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">WELL CONTROL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">IADC</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">International Association of Drilling Contractors</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The global trade body that sets well control standards, rig classifications, and training certifications for the drilling industry.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">WELL CONTROL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">IWCF</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">International Well Control Forum</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The body that manages the global well control certification exam taken by drillers, toolpushers, and company men.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">WELL CONTROL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">PIW</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Pit Gain / Influx Volume</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The volume of formation fluid that has entered the wellbore, monitored via the pit volume totaliser on surface.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">WELL CONTROL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">PVT</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Pit Volume Totaliser</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Instruments that continuously monitor active pit volumes; a sudden gain is the primary kick indicator.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">WELL CONTROL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">MPD</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Managed Pressure Drilling</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A closed-loop drilling technique that precisely controls annular pressure to stay within a tight pore-to-frac margin.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">WELL CONTROL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">UBD</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Underbalanced Drilling</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Drilling with wellbore pressure intentionally below reservoir pressure to improve ROP and reduce formation damage.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">WELL CONTROL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">H2S</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Hydrogen Sulphide</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A toxic, flammable gas encountered in sour wells; detectable by smell at low levels but immediately dangerous at high concentrations.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">WELL CONTROL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">LWD</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Logging While Drilling</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Sensors in the BHA that measure formation properties (resistivity, gamma ray, porosity) in real time as the well is drilled.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">MWD/LWD</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">GR</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Gamma Ray</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A log that detects natural radioactivity; high values indicate shale, low values indicate clean sands or carbonates.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">MWD/LWD</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">RT</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">True Resistivity</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The electrical resistance of undisturbed formation away from the borehole wall; high values indicate hydrocarbons.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">MWD/LWD</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">NPHI</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Neutron Porosity</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A porosity measurement from neutron bombardment of the formation; responds to hydrogen content, including bound water.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">MWD/LWD</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">RHOB</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Bulk Density</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Formation density from a gamma-gamma tool; combined with NPHI to calculate porosity and identify gas zones.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">MWD/LWD</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">APWD</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Annular Pressure While Drilling</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Real-time downhole annular pressure measurement from the MWD tool; the direct read of ECD and wellbore stability.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">MWD/LWD</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">INC</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Inclination</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The angle of the wellbore from vertical; 0° is straight down, 90° is horizontal.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">MWD/LWD</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">AZI</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Azimuth</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The compass bearing of the wellbore direction; combined with inclination to define the 3D trajectory.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">MWD/LWD</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">EM-MWD</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Electromagnetic MWD</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">An MWD transmission method using electromagnetic signals through rock instead of mud pulses; works in air- or foam-drilled wells.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">MWD/LWD</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">AGS</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">At-Bit Gamma Ray / Steerable</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A gamma-ray sensor positioned very close to the drill bit for faster geosteering response in thin reservoir layers.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">MWD/LWD</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">NMR</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Nuclear Magnetic Resonance</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">An advanced LWD measurement that directly measures pore size distribution and movable fluid volumes.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">MWD/LWD</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">SWD</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Seismic While Drilling</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A technique using downhole geophones to receive seismic signals, providing look-ahead images of formations ahead of the bit.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">MWD/LWD</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">UBIA</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Ultrasonic Borehole Imager</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">An LWD tool using ultrasound to image the borehole wall; reveals fractures, dips, and breakouts in real time.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">MWD/LWD</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">PWD</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Pressure While Drilling</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Any downhole pressure tool in the BHA; records both annular and internal pipe pressure for ECD management.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">MWD/LWD</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">DWOB</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Downhole Weight on Bit</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">WOB measured at the bit by the MWD tool; often differs from surface readings due to friction in deviated wells.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">MWD/LWD</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">PERF</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Perforation</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Explosive charges that punch holes through casing and cement into the reservoir, creating a flow path for hydrocarbons.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">COMPLETIONS</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">TCP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Tubing-Conveyed Perforating</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A perforating system where guns are run on production tubing and fired downhole at the target interval.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">COMPLETIONS</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">SCAB</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Sand Control And Barrier</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Gravel packs, screens, or chemical consolidation methods that prevent sand from flowing into the wellbore and damaging equipment.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">COMPLETIONS</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">GPK</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Gravel Pack</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Sand control method that places sized gravel between the screen and formation to filter out reservoir sand.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">COMPLETIONS</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">FRAC</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Hydraulic Fracturing</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">High-pressure injection of fluid to crack the reservoir rock, creating fractures that dramatically increase well productivity.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">COMPLETIONS</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">FDP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Field Development Plan</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The engineering document that defines how a reservoir will be produced — well count, spacing, facilities, and schedule.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">COMPLETIONS</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">PBTD</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Plug Back Total Depth</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The depth of a downhole plug set to isolate a lower zone; the effective new bottom of the wellbore above the plug.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">COMPLETIONS</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">SSD</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Sliding Side Door</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A completion tool with a sliding sleeve that can be opened to allow selective communication between tubing and annulus or formation.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">COMPLETIONS</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">SCSSV</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Surface-Controlled Subsurface Safety Valve</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A downhole valve held open by hydraulic pressure from surface; fails closed automatically if the line is cut or depressured.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">COMPLETIONS</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">DHSV</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Downhole Safety Valve</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A generic term for any safety valve installed inside the production tubing, designed to isolate the reservoir in an emergency.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">COMPLETIONS</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">WHP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Wellhead Pressure</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The pressure measured at the top of the well at surface; reflects reservoir drive and tubing pressure losses.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">COMPLETIONS</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">THP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Tubing Head Pressure</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The flowing pressure at the tubing hanger at surface; a key parameter for production monitoring and choke management.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">COMPLETIONS</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">CHP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Casing Head Pressure</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The pressure reading on the annulus side at surface; monitored for signs of tubing leaks or barrier integrity issues.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">COMPLETIONS</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">XMAS TREE</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Christmas Tree</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The surface valve assembly on top of a completed well that controls and monitors production flow.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">COMPLETIONS</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">PLT</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Production Logging Tool</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A wireline tool run in a producing well to measure where fluid is entering and identify high-water or depleted zones.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">COMPLETIONS</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">SWC</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Sidewall Core</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Rock samples collected from the wellbore wall during wireline logging; used to confirm fluid contacts and reservoir quality.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">COMPLETIONS</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">WO</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Workover</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Any remedial operation on an existing well to restore or improve production — reperforating, squeezing, or plug-and-abandonment.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">COMPLETIONS</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">GOR</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Gas-Oil Ratio</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Cubic feet of gas produced per barrel of oil; a rising GOR indicates a gas cap is coning into the wellbore.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">PRODUCTION</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">WOR</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Water-Oil Ratio</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Barrels of water produced per barrel of oil; a rising WOR indicates water breakthrough from a connected aquifer.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">PRODUCTION</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">BOPD</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Barrels of Oil Per Day</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The standard unit for measuring a well or field's oil production rate.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">PRODUCTION</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">BWPD</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Barrels of Water Per Day</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The rate of water production from a well; drives disposal costs and can indicate reservoir depletion.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">PRODUCTION</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">MMSCFD</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Million Standard Cubic Feet per Day</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The standard unit for gas production rates at surface conditions (60 °F, 14.7 psi).</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">PRODUCTION</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">API</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">API Gravity</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A measure of crude oil density; light crudes (&gt;31° API) are more valuable, heavy crudes (&lt;22° API) require more refining.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">PRODUCTION</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">ESP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Electric Submersible Pump</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">An electric pump lowered into the production tubing to lift fluids in low-pressure or high-watercut wells.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">PRODUCTION</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">GL</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Gas Lift</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">An artificial lift method that injects gas into the annulus to aerate produced fluids and reduce hydrostatic head.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">PRODUCTION</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">FTHP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Flowing Tubing Head Pressure</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Wellhead pressure measured while the well is producing; used to back-calculate flowing bottomhole pressure.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">PRODUCTION</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">SBHP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Static Bottom Hole Pressure</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Reservoir pressure when the well is shut in and pressure has fully built up; the best measure of reservoir energy.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">PRODUCTION</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">PI</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Productivity Index</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Barrels per day per psi of drawdown; a measure of how easily a reservoir gives up its fluids to the wellbore.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">PRODUCTION</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">IPR</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Inflow Performance Relationship</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A curve that plots well flow rate versus bottomhole flowing pressure; used to optimise artificial lift design.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">PRODUCTION</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">VLP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Vertical Lift Performance</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The pressure losses in the tubing as fluids travel from reservoir to surface; intersects IPR to find the natural flow rate.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">PRODUCTION</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">WHFP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Wellhead Flowing Pressure</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Surface pressure while the well is on production; monitored daily to track reservoir decline and line pressure changes.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">PRODUCTION</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">EWT</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Extended Well Test</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A prolonged production test lasting weeks or months to gather reservoir data and process performance before permanent facilities are built.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">PRODUCTION</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">DST</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Drill Stem Test</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A temporary completion run on drill pipe to flow a reservoir interval and gather pressure/fluid data before full completion.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">PRODUCTION</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">PBU</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Pressure Build-Up Test</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A well test where flow is stopped and the pressure rise is analysed to determine permeability and skin damage.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">PRODUCTION</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">AOF</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Absolute Open Flow</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The theoretical maximum flow rate of a gas well if wellhead pressure were zero; the benchmark for gas well deliverability.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">PRODUCTION</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">FPSO</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Floating Production Storage and Offloading</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A ship-shaped vessel moored offshore that processes, stores, and offloads crude oil without a pipeline to shore.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">PRODUCTION</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">TLP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Tension Leg Platform</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">An offshore production platform held in place by taut vertical tendons anchored to the seabed; suited to deepwater fields.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">PRODUCTION</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">HSE</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Health, Safety &amp; Environment</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The combined management discipline covering worker protection, process safety, and environmental stewardship on a rig or facility.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">HSE</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">PTW</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Permit to Work</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A formal written authorisation required before any hazardous task begins; ensures hazards are identified and controls in place.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">HSE</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">JSA</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Job Safety Analysis</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A step-by-step hazard identification exercise completed before a task; each step is assessed for risks and mitigations.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">HSE</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">LOTO</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Lock-Out / Tag-Out</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Energy isolation procedure where equipment is physically locked off before maintenance to prevent accidental start-up.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">HSE</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">PPE</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Personal Protective Equipment</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Hard hats, boots, gloves, glasses, and coveralls worn to protect workers from workplace hazards.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">HSE</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">SIMOPS</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Simultaneous Operations</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Managing two or more hazardous operations happening at the same time on a rig or platform, requiring a formal risk review.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">HSE</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">MSDS</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Material Safety Data Sheet</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A document describing the hazards, handling requirements, and emergency response for a chemical used on location.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">HSE</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">TRIC</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Total Recordable Incident Count</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The total number of OSHA-recordable injuries and illnesses on a job site over a given period.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">HSE</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">LTI</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Lost Time Incident</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">An injury that results in a worker missing at least one scheduled shift; the key lag indicator for safety performance.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">HSE</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">LTISR</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Lost Time Incident Severity Rate</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The average number of days lost per LTI; measures the severity of injuries rather than just their frequency.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">HSE</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">NORM</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Naturally Occurring Radioactive Material</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Low-level radioactive scales and sludge that can accumulate in production equipment; requires special disposal procedures.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">HSE</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">ERP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Emergency Response Plan</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The documented procedures for evacuating, mustering, and responding to fires, blowouts, or medical emergencies on location.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">HSE</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">HAZAN</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Hazard Analysis</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A systematic review of a process or task to identify all hazards and the likelihood and consequence of each.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">HSE</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">HAZOP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Hazard and Operability Study</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A structured team review of P&amp;IDs using guide words (more, less, reverse…) to find deviations that could cause harm.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">HSE</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">MUSTER</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Emergency Muster Point</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The designated gathering point where all personnel must report during an emergency so a headcount can be completed.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">HSE</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">OIM</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Offshore Installation Manager</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The most senior person on an offshore platform; has legal authority over all personnel and operations on the installation.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">HSE</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">ALARP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">As Low As Reasonably Practicable</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The UK/international risk management standard requiring risk reduction until the cost of further reduction is grossly disproportionate to the benefit.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">HSE</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">MOC</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Management of Change</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A formal process to assess the safety implications of any change to people, processes, or equipment before it is implemented.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">HSE</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">AFE</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Authority for Expenditure</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The approved budget document for a well or project; spending beyond the AFE requires formal re-approval.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">NOC</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">National Oil Company</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A state-owned oil company (e.g. Saudi Aramco, ADNOC, Petronas) that controls a country's hydrocarbon resources.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">IOC</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">International Oil Company</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A privately or publicly traded oil major (e.g. BP, Shell, ExxonMobil) that operates in multiple countries.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">PSC</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Production Sharing Contract</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">An agreement where an IOC recovers its costs from production then splits remaining profit oil with the host government.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">JOA</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Joint Operating Agreement</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A legal contract between partners in a licence that defines decision-making authority, cost sharing, and operatorship.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">WI</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Working Interest</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The percentage share of costs and production rights a company holds in an oil and gas licence.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">NRI</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Net Revenue Interest</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The share of revenue a working interest owner receives after royalties are paid out.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">OPEX</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Operating Expenditure</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Day-to-day costs of running a producing field — labour, maintenance, chemicals, and workovers.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">CAPEX</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Capital Expenditure</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Large one-time investment costs — drilling wells, installing platforms, building pipelines — that appear on the balance sheet as assets.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">NPV</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Net Present Value</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The discounted value today of all future project cash flows; the primary economic decision metric for new wells.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">IRR</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Internal Rate of Return</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The discount rate that makes a project's NPV equal to zero; projects with IRR above the hurdle rate are sanctioned.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">DP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Dynamic Positioning</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A computer-controlled thruster system that holds a drillship or MODU precisely on location without anchors.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">MODU</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Mobile Offshore Drilling Unit</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Any movable offshore rig — jackup, semi-submersible, or drillship — that can be repositioned between wells.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">SEMI</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Semi-Submersible Rig</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A floating rig supported by submerged pontoons that dampen wave motion; used in deepwater where jackups cannot reach.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">JU</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Jackup Rig</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A bottom-supported offshore rig with retractable legs that are lowered to the seabed; limited to ~150 m water depth.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">DRLG</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Drilling</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Common abbreviation used in morning reports and well programmes to denote the drilling phase of an operation.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">MR</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Morning Report</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The daily operational summary sent to company and government offices detailing progress, NPT, and next 24-hour plan.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">NPT</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Non-Productive Time</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">Rig time spent on problems rather than progressing the well — stuck pipe, equipment failures, waiting on weather.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">PO</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Purchase Order</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The formal document authorising a supplier to deliver goods or services to a specific cost and specification.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">WITS</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Wellsite Information Transfer Standard</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A data transmission protocol used to send real-time drilling parameters from the rig floor to offices and third parties.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">WITSML</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Wellsite Information Transfer Standard Markup Language</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The XML-based successor to WITS; enables structured digital transfer of all well data between software systems.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">DLIS</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Digital Log Interchange Standard</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The industry-standard file format for storing and exchanging wireline and LWD log data.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">LAS</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Log ASCII Standard</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">A simpler, widely-supported text file format for well log data; easier to read than DLIS but less feature-rich.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">OWC</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Oil-Water Contact</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The depth at which oil transitions to water in the reservoir; defines the bottom of the oil column.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">GOC</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Gas-Oil Contact</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The depth at which free gas overlies oil in the reservoir; defines the top of the oil column.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">GWC</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Gas-Water Contact</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">In a gas reservoir with no oil, the depth where gas transitions directly to water.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">STOIIP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Stock Tank Oil Initially In Place</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The total estimated volume of oil in the reservoir at surface conditions before any production begins.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">GIIP</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Gas Initially In Place</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The total estimated volume of gas in the reservoir at surface conditions; the starting point for recovery factor calculations.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">RF</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Recovery Factor</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The fraction of STOIIP or GIIP that can economically be produced; typically 20-60% for oil, higher for gas.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">2P</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Proved + Probable Reserves</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The sum of proved and probable reserve categories; the most commonly quoted reserves figure in annual reports.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">SPS</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Subsea Production System</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The complete set of seafloor equipment — trees, manifolds, flowlines — that ties subsea wells back to a production host.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">SCM</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Subsea Control Module</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The electronic pod on a subsea tree that receives hydraulic and electrical commands from surface to operate valves.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">P&amp;ID</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Piping and Instrumentation Diagram</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">An engineering drawing that shows all piping, valves, instruments, and control loops in a process system.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">FEED</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Front-End Engineering Design</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The detailed engineering study completed before a final investment decision; defines scope, cost, and schedule with high confidence.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td5">
+        <p class="p8"><span class="s7">FID</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p7"><span class="s7">Final Investment Decision</span></p>
+      </td>
+      <td valign="top" class="td7">
+        <p class="p9"><span class="s7">The board-level approval to commit capital and proceed with full project execution; a major project milestone.</span></p>
+      </td>
+      <td valign="top" class="td8">
+        <p class="p10"><span class="s7">GENERAL</span></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p class="p4"><span class="s7"></span><br></p>
+<h2 style="margin: 0.0px 0.0px 14.9px 0.0px; font: 18.0px Times; -webkit-text-stroke: #000000"><span class="s7"><b>DRILLING ACRONYM DECODER</b></span></h2>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; font: 14.0px Times; -webkit-text-stroke: #000000"><span class="s7"><b>WHAT IS THIS PAGE?</b></span></h3>
+<p class="p13"><span class="s7">This is a free, searchable reference for oil and gas acronyms used every day on drilling rigs, in operations centres, and across the upstream energy industry. Whether you are a brand-new roughneck on your first hitch or an experienced petroleum engineer reviewing well programmes, the alphabet soup of abbreviations can be overwhelming. This decoder covers more than 150 of the most important terms across seven disciplines: drilling operations, well control, MWD/LWD, completions, production, health and safety (HSE), and general industry terms.</span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; font: 14.0px Times; -webkit-text-stroke: #000000"><span class="s7"><b>WHY DO DRILLING ACRONYMS MATTER?</b></span></h3>
+<p class="p13"><span class="s7">On a rig, communication must be fast, precise, and unambiguous. Acronyms exist because they compress long technical phrases into a handful of characters that every crew member can instantly decode on a morning report, over the radio, or in a drilling programme. When a driller shouts "BOP" or a company man queries the "ECD", there is no room for confusion — the wrong interpretation can mean the difference between a safe operation and a well control incident. Knowing your acronyms is therefore not just a career skill; in many situations it is a safety-critical one.</span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; font: 14.0px Times; -webkit-text-stroke: #000000"><span class="s7"><b>HOW TO USE THE SEARCH</b></span></h3>
+<p class="p13"><span class="s7">Type any acronym, full name, or keyword into the search box above and results filter instantly. The category buttons let you narrow down to a specific discipline — useful when you know you're looking for a well control term but can't quite remember the letters. All 155 entries include the acronym, the full expansion, and a plain-English one-liner so even non-engineers can get the gist.</span></p>
+<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; font: 14.0px Times; -webkit-text-stroke: #000000"><span class="s7"><b>ABOUT DRILL-O-DORO</b></span></h3>
+<p class="p13"><span class="s7">Drill-O-Doro is a free suite of retro-styled tools built for drilling engineers, wellsite geologists, and operations crews. Alongside this acronym decoder you will find a Pomodoro-style deep-work timer tuned to rig schedules, a comprehensive drilling unit converter, and a hydraulics and well-control calculator — all free, no sign-up required.</span></p>
+<p class="p1"><span class="s7"><a href="https://www.buymeacoffee.com/rgibbon97o"><img src="file:///default-yellow.png" alt="default-yellow.png"><span class="s8"></span></a></span></p>
+<p class="p13"><span class="s7">DRILL-O-DORO © 2025 — FREE TOOLS FOR THE DRILLING INDUSTRY</span></p>
 </body>
 </html>
