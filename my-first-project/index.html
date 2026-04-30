@@ -20,12 +20,18 @@
       overflow-x: hidden;
     }
 
-    /* ── Inline rig ──────────────────────────────────────────────── */
+    /* ── Background rig ─────────────────────────────────────────── */
     #rig-bg {
-      display: block;
-      margin: 8px auto 0;
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 900px;
+      opacity: 0.17;
       image-rendering: pixelated;
       pointer-events: none;
+      z-index: 0;
     }
 
     /* ── Foreground shell ────────────────────────────────────────── */
@@ -359,6 +365,8 @@
 </head>
 <body>
 
+  <canvas id="rig-bg" width="320" height="360" aria-hidden="true"></canvas>
+
   <div class="page-shell">
 
     <nav class="top-nav" aria-label="Site navigation">
@@ -373,13 +381,9 @@
     <section class="hero">
 
       <div>
-        <div class="hero__title">DERRICK</div>
-        <div class="hero__subtitle">YOUR DRILLING ENGINEER TOOLKIT</div>
+        <div class="hero__title">DRILLODORO</div>
+        <div class="hero__subtitle">FREE TOOLS FOR DRILLING ENGINEERS</div>
       </div>
-
-      <canvas id="rig-bg" width="320" height="360"
-              style="width:320px;height:360px;"
-              aria-hidden="true"></canvas>
 
       <div class="chat-wrap">
         <div class="chat-input-row">
