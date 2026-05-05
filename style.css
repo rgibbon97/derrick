@@ -414,6 +414,64 @@ textarea:disabled {
 }
 
 
+/* ── Site brand (sub-page header) ──────────────────────────────*/
+.site-brand {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  color: var(--orange);
+  text-decoration: none;
+  letter-spacing: 4px;
+  text-shadow: 1px 1px 0 var(--orange-shadow);
+  display: block;
+  margin-bottom: 16px;
+  opacity: 0.8;
+  transition: opacity 0.1s;
+}
+
+.site-brand:hover {
+  opacity: 1;
+}
+
+/* ── Support bar (Buy Me a Coffee + LinkedIn) ───────────────────*/
+.support-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 48px;
+}
+
+#bmc-btn {
+  display: block;
+  opacity: 0.45;
+  transition: opacity 0.2s;
+  image-rendering: auto;
+}
+#bmc-btn:hover { opacity: 1; }
+#bmc-btn img {
+  height: 32px;
+  width: auto;
+  border: 2px solid var(--border-dim);
+  image-rendering: auto;
+}
+
+.linkedin-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.45;
+  transition: opacity 0.2s;
+  color: var(--gold);
+  text-decoration: none;
+}
+.linkedin-btn:hover { opacity: 1; }
+.linkedin-btn svg {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--border-dim);
+  fill: var(--gold);
+}
+
 /* ── Page footer ────────────────────────────────────────────────*/
 .site-footer {
   margin-top: 64px;
