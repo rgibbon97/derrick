@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI &amp; Automation News for Oil &amp; Gas | Drillodoro</title>
-  <meta name="description" content="Curated AI and automation news for the oil and gas industry, ranked by relevance for drilling engineers.">
+  <meta name="description"
+    content="Curated AI and automation news for the oil and gas industry, ranked by relevance for drilling engineers.">
   <meta property="og:title" content="AI &amp; Automation News for Oil &amp; Gas">
-  <meta property="og:description" content="Curated AI and automation news for the oil and gas industry, ranked by relevance for drilling engineers.">
+  <meta property="og:description"
+    content="Curated AI and automation news for the oil and gas industry, ranked by relevance for drilling engineers.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://drillodoro.com/news">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -49,8 +52,15 @@
       transition: color 0.1s, border-color 0.1s;
     }
 
-    .top-nav a:hover                { color: var(--gold);   border-color: var(--gold); }
-    .top-nav a[aria-current="page"] { color: var(--orange); border-color: var(--orange); }
+    .top-nav a:hover {
+      color: var(--gold);
+      border-color: var(--gold);
+    }
+
+    .top-nav a[aria-current="page"] {
+      color: var(--orange);
+      border-color: var(--orange);
+    }
 
     /* ── Page header ────────────────────────────────────────────── */
     .news-header {
@@ -78,56 +88,131 @@
 
     /* ── Rig animations ─────────────────────────────────────────── */
     @keyframes avi-pulse {
-      0%, 100% { opacity: 0.15; }
-      50%       { opacity: 1;    }
+
+      0%,
+      100% {
+        opacity: 0.15;
+      }
+
+      50% {
+        opacity: 1;
+      }
     }
+
     @keyframes dk-glow {
-      0%, 100% { opacity: 0.3; }
-      50%       { opacity: 1;   }
+
+      0%,
+      100% {
+        opacity: 0.3;
+      }
+
+      50% {
+        opacity: 1;
+      }
     }
+
     @keyframes nav-blink {
-      0%, 100% { opacity: 0.2; }
-      50%       { opacity: 0.85; }
+
+      0%,
+      100% {
+        opacity: 0.2;
+      }
+
+      50% {
+        opacity: 0.85;
+      }
     }
+
     @keyframes flare-flicker {
-      0%, 100% { transform: scaleY(1)    scaleX(1);    opacity: 0.5;  }
-      35%       { transform: scaleY(1.2) scaleX(0.85); opacity: 0.65; }
-      65%       { transform: scaleY(0.88) scaleX(1.1); opacity: 0.42; }
+
+      0%,
+      100% {
+        transform: scaleY(1) scaleX(1);
+        opacity: 0.5;
+      }
+
+      35% {
+        transform: scaleY(1.2) scaleX(0.85);
+        opacity: 0.65;
+      }
+
+      65% {
+        transform: scaleY(0.88) scaleX(1.1);
+        opacity: 0.42;
+      }
     }
+
     @keyframes ptcl-rise {
-      0%   { transform: translateY(0px)   translateX(0px); opacity: 0.65; }
-      100% { transform: translateY(-18px) translateX(2px); opacity: 0;    }
+      0% {
+        transform: translateY(0px) translateX(0px);
+        opacity: 0.65;
+      }
+
+      100% {
+        transform: translateY(-18px) translateX(2px);
+        opacity: 0;
+      }
     }
 
     .avi-lt {
       animation: avi-pulse 3s ease-in-out infinite;
       filter: drop-shadow(0 0 4px #ff3a3a);
     }
-    .dk-lt { filter: drop-shadow(0 0 3px #ff8c30); }
-    .lt-1  { animation: dk-glow 5s ease-in-out infinite 0s;  }
-    .lt-2  { animation: dk-glow 5s ease-in-out infinite 1s;  }
-    .lt-3  { animation: dk-glow 5s ease-in-out infinite 2s;  }
-    .lt-4  { animation: dk-glow 5s ease-in-out infinite 3s;  }
-    .lt-5  { animation: dk-glow 5s ease-in-out infinite 4s;  }
+
+    .dk-lt {
+      filter: drop-shadow(0 0 3px #ff8c30);
+    }
+
+    .lt-1 {
+      animation: dk-glow 5s ease-in-out infinite 0s;
+    }
+
+    .lt-2 {
+      animation: dk-glow 5s ease-in-out infinite 1s;
+    }
+
+    .lt-3 {
+      animation: dk-glow 5s ease-in-out infinite 2s;
+    }
+
+    .lt-4 {
+      animation: dk-glow 5s ease-in-out infinite 3s;
+    }
+
+    .lt-5 {
+      animation: dk-glow 5s ease-in-out infinite 4s;
+    }
+
     .nav-lt {
       animation: nav-blink 7s ease-in-out infinite 2s;
       filter: drop-shadow(0 0 3px #3aff8a);
     }
+
     .flare-outer {
       transform-box: fill-box;
       transform-origin: center bottom;
       animation: flare-flicker 2.1s ease-in-out infinite;
       opacity: 0.5;
     }
+
     .flare-inner {
       transform-box: fill-box;
       transform-origin: center bottom;
       animation: flare-flicker 1.5s ease-in-out infinite 0.4s;
       opacity: 0.65;
     }
-    .ptcl { animation: ptcl-rise 2.4s ease-out infinite; }
-    .ptcl-b { animation-delay: 0.8s;  }
-    .ptcl-c { animation-delay: 1.6s;  }
+
+    .ptcl {
+      animation: ptcl-rise 2.4s ease-out infinite;
+    }
+
+    .ptcl-b {
+      animation-delay: 0.8s;
+    }
+
+    .ptcl-c {
+      animation-delay: 1.6s;
+    }
 
     .news-header__eyebrow {
       font-family: var(--font-pixel);
@@ -200,7 +285,7 @@
 
     .news-card:first-child:hover {
       border-left-color: var(--orange);
-      box-shadow: -4px 0 0 var(--orange-shadow), 0 0 28px rgba(255,107,53,0.15);
+      box-shadow: -4px 0 0 var(--orange-shadow), 0 0 28px rgba(255, 107, 53, 0.15);
     }
 
     /* ── Card anatomy ───────────────────────────────────────────── */
@@ -270,8 +355,15 @@
     }
 
     @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0; }
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0;
+      }
     }
 
     .loading-dot {
@@ -279,25 +371,54 @@
       animation: blink 1.2s infinite;
     }
 
-    .loading-dot:nth-child(2) { animation-delay: 0.2s; }
-    .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+    .loading-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .loading-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
 
     /* ── Responsive ─────────────────────────────────────────────── */
     @media (max-width: 840px) {
-      .news-grid { grid-template-columns: repeat(2, 1fr); }
-      .news-card:first-child { grid-column: span 2; }
-      h1.news-header__title { font-size: 18px; }
+      .news-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .news-card:first-child {
+        grid-column: span 2;
+      }
+
+      h1.news-header__title {
+        font-size: 18px;
+      }
     }
 
     @media (max-width: 540px) {
-      .news-grid { grid-template-columns: 1fr; }
-      .news-card:first-child { grid-column: span 1; }
-      .news-card:first-child .card-title { font-size: 9px; }
-      h1.news-header__title { font-size: 13px; letter-spacing: 2px; }
-      .news-header__rig { display: none; }
+      .news-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .news-card:first-child {
+        grid-column: span 1;
+      }
+
+      .news-card:first-child .card-title {
+        font-size: 9px;
+      }
+
+      h1.news-header__title {
+        font-size: 13px;
+        letter-spacing: 2px;
+      }
+
+      .news-header__rig {
+        display: none;
+      }
     }
   </style>
 </head>
+
 <body>
 
   <div class="page-shell">
@@ -320,157 +441,158 @@
       </div>
 
       <!-- Animated rig silhouette — viewBox matches canvas proportions from index.html -->
-      <svg class="news-header__rig" viewBox="0 0 280 170" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <svg class="news-header__rig" viewBox="0 0 280 170" fill="none" xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true">
 
         <!-- Sea -->
-        <rect x="0" y="148" width="280" height="22" fill="#060e1e" opacity="0.8"/>
-        <line x1="0" y1="148" x2="280" y2="148" stroke="#1a3a6a" stroke-width="1.5"/>
-        <line x1="0" y1="152" x2="280" y2="152" stroke="#112240" stroke-width="1" opacity="0.6"/>
+        <rect x="0" y="148" width="280" height="22" fill="#060e1e" opacity="0.8" />
+        <line x1="0" y1="148" x2="280" y2="148" stroke="#1a3a6a" stroke-width="1.5" />
+        <line x1="0" y1="152" x2="280" y2="152" stroke="#112240" stroke-width="1" opacity="0.6" />
 
         <!-- Pontoon caps at base of legs -->
-        <rect x="58"  y="147" width="26" height="12" fill="#1a2030"/>
-        <rect x="58"  y="147" width="26" height="2"  fill="#2e3a4a"/>
-        <rect x="127" y="147" width="26" height="12" fill="#1a2030"/>
-        <rect x="127" y="147" width="26" height="2"  fill="#2e3a4a"/>
-        <rect x="196" y="147" width="26" height="12" fill="#1a2030"/>
-        <rect x="196" y="147" width="26" height="2"  fill="#2e3a4a"/>
+        <rect x="58" y="147" width="26" height="12" fill="#1a2030" />
+        <rect x="58" y="147" width="26" height="2" fill="#2e3a4a" />
+        <rect x="127" y="147" width="26" height="12" fill="#1a2030" />
+        <rect x="127" y="147" width="26" height="2" fill="#2e3a4a" />
+        <rect x="196" y="147" width="26" height="12" fill="#1a2030" />
+        <rect x="196" y="147" width="26" height="2" fill="#2e3a4a" />
 
         <!-- Support legs (left cx=71, center cx=140, right cx=209) -->
-        <rect x="66"  y="112" width="10" height="48" fill="#222c3a"/>
-        <rect x="66"  y="112" width="2"  height="48" fill="#2e3a4a"/>
-        <rect x="74"  y="112" width="2"  height="48" fill="#141c28"/>
-        <rect x="135" y="107" width="10" height="53" fill="#222c3a"/>
-        <rect x="135" y="107" width="2"  height="53" fill="#2e3a4a"/>
-        <rect x="143" y="107" width="2"  height="53" fill="#141c28"/>
-        <rect x="204" y="112" width="10" height="48" fill="#222c3a"/>
-        <rect x="204" y="112" width="2"  height="48" fill="#2e3a4a"/>
-        <rect x="212" y="112" width="2"  height="48" fill="#141c28"/>
+        <rect x="66" y="112" width="10" height="48" fill="#222c3a" />
+        <rect x="66" y="112" width="2" height="48" fill="#2e3a4a" />
+        <rect x="74" y="112" width="2" height="48" fill="#141c28" />
+        <rect x="135" y="107" width="10" height="53" fill="#222c3a" />
+        <rect x="135" y="107" width="2" height="53" fill="#2e3a4a" />
+        <rect x="143" y="107" width="2" height="53" fill="#141c28" />
+        <rect x="204" y="112" width="10" height="48" fill="#222c3a" />
+        <rect x="204" y="112" width="2" height="48" fill="#2e3a4a" />
+        <rect x="212" y="112" width="2" height="48" fill="#141c28" />
 
         <!-- Cross-bracing between legs (2 rows, X pattern — matches canvas diagonal step) -->
-        <line x1="71"  y1="114" x2="140" y2="129" stroke="#1a2030" stroke-width="1.5"/>
-        <line x1="140" y1="114" x2="71"  y2="129" stroke="#1a2030" stroke-width="1.5"/>
-        <line x1="71"  y1="129" x2="140" y2="144" stroke="#1a2030" stroke-width="1.5"/>
-        <line x1="140" y1="129" x2="71"  y2="144" stroke="#1a2030" stroke-width="1.5"/>
-        <line x1="140" y1="114" x2="209" y2="129" stroke="#1a2030" stroke-width="1.5"/>
-        <line x1="209" y1="114" x2="140" y2="129" stroke="#1a2030" stroke-width="1.5"/>
-        <line x1="140" y1="129" x2="209" y2="144" stroke="#1a2030" stroke-width="1.5"/>
-        <line x1="209" y1="129" x2="140" y2="144" stroke="#1a2030" stroke-width="1.5"/>
+        <line x1="71" y1="114" x2="140" y2="129" stroke="#1a2030" stroke-width="1.5" />
+        <line x1="140" y1="114" x2="71" y2="129" stroke="#1a2030" stroke-width="1.5" />
+        <line x1="71" y1="129" x2="140" y2="144" stroke="#1a2030" stroke-width="1.5" />
+        <line x1="140" y1="129" x2="71" y2="144" stroke="#1a2030" stroke-width="1.5" />
+        <line x1="140" y1="114" x2="209" y2="129" stroke="#1a2030" stroke-width="1.5" />
+        <line x1="209" y1="114" x2="140" y2="129" stroke="#1a2030" stroke-width="1.5" />
+        <line x1="140" y1="129" x2="209" y2="144" stroke="#1a2030" stroke-width="1.5" />
+        <line x1="209" y1="129" x2="140" y2="144" stroke="#1a2030" stroke-width="1.5" />
 
         <!-- Main deck (x=42–238, y=96–112) -->
-        <rect x="42" y="96" width="196" height="16" fill="#1e2535"/>
-        <rect x="42" y="96" width="196" height="3"  fill="#2a3345"/>
-        <rect x="42" y="112" width="196" height="4" fill="#1a2030"/>
-        <rect x="42" y="96" width="3"   height="16" fill="#3a4255"/>
-        <rect x="235" y="96" width="3"  height="16" fill="#3a4255"/>
+        <rect x="42" y="96" width="196" height="16" fill="#1e2535" />
+        <rect x="42" y="96" width="196" height="3" fill="#2a3345" />
+        <rect x="42" y="112" width="196" height="4" fill="#1a2030" />
+        <rect x="42" y="96" width="3" height="16" fill="#3a4255" />
+        <rect x="235" y="96" width="3" height="16" fill="#3a4255" />
 
         <!-- Accommodation block (x=44–109, y=68–96) -->
-        <rect x="44" y="68" width="65" height="28" fill="#2a3040"/>
-        <rect x="44" y="68" width="65" height="3"  fill="#3a4255"/>
+        <rect x="44" y="68" width="65" height="28" fill="#2a3040" />
+        <rect x="44" y="68" width="65" height="3" fill="#3a4255" />
         <!-- Yellow windows -->
-        <rect x="52" y="75" width="8" height="5" fill="#2a2010"/>
-        <rect x="52" y="75" width="8" height="5" fill="#ffe080" opacity="0.45"/>
-        <rect x="65" y="75" width="8" height="5" fill="#2a2010"/>
-        <rect x="65" y="75" width="8" height="5" fill="#ffe080" opacity="0.38"/>
-        <rect x="78" y="75" width="8" height="5" fill="#2a2010"/>
-        <rect x="78" y="75" width="8" height="5" fill="#ffe080" opacity="0.42"/>
-        <rect x="91" y="75" width="8" height="5" fill="#2a2010"/>
-        <rect x="91" y="75" width="8" height="5" fill="#ffe080" opacity="0.36"/>
+        <rect x="52" y="75" width="8" height="5" fill="#2a2010" />
+        <rect x="52" y="75" width="8" height="5" fill="#ffe080" opacity="0.45" />
+        <rect x="65" y="75" width="8" height="5" fill="#2a2010" />
+        <rect x="65" y="75" width="8" height="5" fill="#ffe080" opacity="0.38" />
+        <rect x="78" y="75" width="8" height="5" fill="#2a2010" />
+        <rect x="78" y="75" width="8" height="5" fill="#ffe080" opacity="0.42" />
+        <rect x="91" y="75" width="8" height="5" fill="#2a2010" />
+        <rect x="91" y="75" width="8" height="5" fill="#ffe080" opacity="0.36" />
         <!-- Orange service lights below windows (matches canvas lightOrGlw row) -->
-        <rect x="52" y="86" width="7" height="4" fill="#ff6b1a" opacity="0.55"/>
-        <rect x="65" y="86" width="7" height="4" fill="#ff6b1a" opacity="0.55"/>
-        <rect x="78" y="86" width="7" height="4" fill="#ff6b1a" opacity="0.55"/>
-        <rect x="91" y="86" width="7" height="4" fill="#ff6b1a" opacity="0.55"/>
+        <rect x="52" y="86" width="7" height="4" fill="#ff6b1a" opacity="0.55" />
+        <rect x="65" y="86" width="7" height="4" fill="#ff6b1a" opacity="0.55" />
+        <rect x="78" y="86" width="7" height="4" fill="#ff6b1a" opacity="0.55" />
+        <rect x="91" y="86" width="7" height="4" fill="#ff6b1a" opacity="0.55" />
 
         <!-- Equipment module right (x=172–218, y=74–96) -->
-        <rect x="172" y="74" width="46" height="22" fill="#2a3040"/>
-        <rect x="172" y="74" width="46" height="3"  fill="#3a4255"/>
-        <rect x="180" y="81" width="7"  height="4"  fill="#ffe080" opacity="0.38"/>
-        <rect x="192" y="81" width="7"  height="4"  fill="#ffe080" opacity="0.42"/>
-        <rect x="204" y="81" width="7"  height="4"  fill="#ffe080" opacity="0.35"/>
+        <rect x="172" y="74" width="46" height="22" fill="#2a3040" />
+        <rect x="172" y="74" width="46" height="3" fill="#3a4255" />
+        <rect x="180" y="81" width="7" height="4" fill="#ffe080" opacity="0.38" />
+        <rect x="192" y="81" width="7" height="4" fill="#ffe080" opacity="0.42" />
+        <rect x="204" y="81" width="7" height="4" fill="#ffe080" opacity="0.35" />
 
         <!-- Drill floor substructure -->
-        <rect x="124" y="90" width="32" height="6" fill="#1a2030"/>
-        <rect x="124" y="90" width="32" height="1" fill="#3a4a5c"/>
-        <rect x="130" y="96" width="20" height="7" fill="#1a2030"/>
-        <rect x="132" y="97" width="16" height="5" fill="#111820"/>
+        <rect x="124" y="90" width="32" height="6" fill="#1a2030" />
+        <rect x="124" y="90" width="32" height="1" fill="#3a4a5c" />
+        <rect x="130" y="96" width="20" height="7" fill="#1a2030" />
+        <rect x="132" y="97" width="16" height="5" fill="#111820" />
 
         <!-- Flare stack (x=42–46, y=54–96) -->
-        <rect x="42" y="54" width="4" height="42" fill="#1a2030"/>
-        <rect x="42" y="54" width="1" height="42" fill="#3a4255"/>
+        <rect x="42" y="54" width="4" height="42" fill="#1a2030" />
+        <rect x="42" y="54" width="1" height="42" fill="#3a4255" />
         <!-- Flare flame + particles -->
         <g>
-          <ellipse cx="44" cy="50" rx="7" ry="9" fill="#ff6b35" class="flare-outer"/>
-          <ellipse cx="44" cy="52" rx="3.5" ry="5" fill="#ffd040" class="flare-inner"/>
-          <circle cx="44" cy="42" r="1.5" fill="#ff8c30" class="ptcl"/>
-          <circle cx="48" cy="39" r="1"   fill="#ff6b35" class="ptcl ptcl-b"/>
-          <circle cx="40" cy="40" r="1"   fill="#ffa040" class="ptcl ptcl-c"/>
+          <ellipse cx="44" cy="50" rx="7" ry="9" fill="#ff6b35" class="flare-outer" />
+          <ellipse cx="44" cy="52" rx="3.5" ry="5" fill="#ffd040" class="flare-inner" />
+          <circle cx="44" cy="42" r="1.5" fill="#ff8c30" class="ptcl" />
+          <circle cx="48" cy="39" r="1" fill="#ff6b35" class="ptcl ptcl-b" />
+          <circle cx="40" cy="40" r="1" fill="#ffa040" class="ptcl ptcl-c" />
         </g>
 
         <!-- Crane arm (right, matches canvas craneX position) -->
-        <rect x="222" y="71" width="5" height="25" fill="#1a2030"/>
-        <rect x="222" y="71" width="1" height="25" fill="#3a4255"/>
-        <line x1="224" y1="72" x2="243" y2="58" stroke="#1a2030" stroke-width="3.5" stroke-linecap="round"/>
-        <line x1="224" y1="72" x2="243" y2="58" stroke="#3a4255" stroke-width="1"/>
-        <line x1="243" y1="58" x2="245" y2="70" stroke="#2a3040" stroke-width="1"/>
+        <rect x="222" y="71" width="5" height="25" fill="#1a2030" />
+        <rect x="222" y="71" width="1" height="25" fill="#3a4255" />
+        <line x1="224" y1="72" x2="243" y2="58" stroke="#1a2030" stroke-width="3.5" stroke-linecap="round" />
+        <line x1="224" y1="72" x2="243" y2="58" stroke="#3a4255" stroke-width="1" />
+        <line x1="243" y1="58" x2="245" y2="70" stroke="#2a3040" stroke-width="1" />
 
         <!-- Derrick tower — two-face like canvas drawDerrick() -->
         <!-- Left face (derrick colour) -->
-        <polygon points="127,96 136,6 140,6 131,96" fill="#2e3848"/>
+        <polygon points="127,96 136,6 140,6 131,96" fill="#2e3848" />
         <!-- Left edge highlight -->
-        <polygon points="127,96 136,6 137,6 128,96" fill="#3a4a5c"/>
+        <polygon points="127,96 136,6 137,6 128,96" fill="#3a4a5c" />
         <!-- Right face -->
-        <polygon points="153,96 144,6 140,6 148,96" fill="#2a3040"/>
+        <polygon points="153,96 144,6 140,6 148,96" fill="#2a3040" />
         <!-- Right edge shadow -->
-        <polygon points="152,96 143,6 144,6 153,96" fill="#1a2030"/>
+        <polygon points="152,96 143,6 144,6 153,96" fill="#1a2030" />
 
         <!-- 8-level derrick cross-bracing (diagonals, matches canvas levels loop) -->
-        <line x1="127" y1="96" x2="152" y2="85" stroke="#3a4a5c" stroke-width="1" opacity="0.7"/>
-        <line x1="153" y1="96" x2="128" y2="85" stroke="#3a4a5c" stroke-width="1" opacity="0.7"/>
-        <line x1="128" y1="85" x2="151" y2="74" stroke="#3a4a5c" stroke-width="1" opacity="0.65"/>
-        <line x1="152" y1="85" x2="129" y2="74" stroke="#3a4a5c" stroke-width="1" opacity="0.65"/>
-        <line x1="129" y1="74" x2="150" y2="62" stroke="#3a4a5c" stroke-width="1" opacity="0.6"/>
-        <line x1="151" y1="74" x2="130" y2="62" stroke="#3a4a5c" stroke-width="1" opacity="0.6"/>
-        <line x1="130" y1="62" x2="149" y2="51" stroke="#3a4a5c" stroke-width="1" opacity="0.55"/>
-        <line x1="150" y1="62" x2="131" y2="51" stroke="#3a4a5c" stroke-width="1" opacity="0.55"/>
-        <line x1="131" y1="51" x2="147" y2="40" stroke="#3a4a5c" stroke-width="1" opacity="0.5"/>
-        <line x1="149" y1="51" x2="133" y2="40" stroke="#3a4a5c" stroke-width="1" opacity="0.5"/>
-        <line x1="133" y1="40" x2="146" y2="29" stroke="#3a4a5c" stroke-width="1" opacity="0.5"/>
-        <line x1="147" y1="40" x2="134" y2="29" stroke="#3a4a5c" stroke-width="1" opacity="0.5"/>
-        <line x1="134" y1="29" x2="145" y2="17" stroke="#3a4a5c" stroke-width="1" opacity="0.5"/>
-        <line x1="146" y1="29" x2="135" y2="17" stroke="#3a4a5c" stroke-width="1" opacity="0.5"/>
-        <line x1="135" y1="17" x2="144" y2="6"  stroke="#3a4a5c" stroke-width="1" opacity="0.5"/>
-        <line x1="145" y1="17" x2="136" y2="6"  stroke="#3a4a5c" stroke-width="1" opacity="0.5"/>
+        <line x1="127" y1="96" x2="152" y2="85" stroke="#3a4a5c" stroke-width="1" opacity="0.7" />
+        <line x1="153" y1="96" x2="128" y2="85" stroke="#3a4a5c" stroke-width="1" opacity="0.7" />
+        <line x1="128" y1="85" x2="151" y2="74" stroke="#3a4a5c" stroke-width="1" opacity="0.65" />
+        <line x1="152" y1="85" x2="129" y2="74" stroke="#3a4a5c" stroke-width="1" opacity="0.65" />
+        <line x1="129" y1="74" x2="150" y2="62" stroke="#3a4a5c" stroke-width="1" opacity="0.6" />
+        <line x1="151" y1="74" x2="130" y2="62" stroke="#3a4a5c" stroke-width="1" opacity="0.6" />
+        <line x1="130" y1="62" x2="149" y2="51" stroke="#3a4a5c" stroke-width="1" opacity="0.55" />
+        <line x1="150" y1="62" x2="131" y2="51" stroke="#3a4a5c" stroke-width="1" opacity="0.55" />
+        <line x1="131" y1="51" x2="147" y2="40" stroke="#3a4a5c" stroke-width="1" opacity="0.5" />
+        <line x1="149" y1="51" x2="133" y2="40" stroke="#3a4a5c" stroke-width="1" opacity="0.5" />
+        <line x1="133" y1="40" x2="146" y2="29" stroke="#3a4a5c" stroke-width="1" opacity="0.5" />
+        <line x1="147" y1="40" x2="134" y2="29" stroke="#3a4a5c" stroke-width="1" opacity="0.5" />
+        <line x1="134" y1="29" x2="145" y2="17" stroke="#3a4a5c" stroke-width="1" opacity="0.5" />
+        <line x1="146" y1="29" x2="135" y2="17" stroke="#3a4a5c" stroke-width="1" opacity="0.5" />
+        <line x1="135" y1="17" x2="144" y2="6" stroke="#3a4a5c" stroke-width="1" opacity="0.5" />
+        <line x1="145" y1="17" x2="136" y2="6" stroke="#3a4a5c" stroke-width="1" opacity="0.5" />
 
         <!-- Horizontal rungs at each level boundary -->
-        <line x1="128" y1="85" x2="152" y2="85" stroke="#1a2030" stroke-width="1.5"/>
-        <line x1="129" y1="74" x2="151" y2="74" stroke="#1a2030" stroke-width="1.5"/>
-        <line x1="130" y1="62" x2="150" y2="62" stroke="#1a2030" stroke-width="1.5"/>
-        <line x1="131" y1="51" x2="149" y2="51" stroke="#1a2030" stroke-width="1.5"/>
-        <line x1="133" y1="40" x2="147" y2="40" stroke="#1a2030" stroke-width="1.5"/>
-        <line x1="134" y1="29" x2="146" y2="29" stroke="#1a2030" stroke-width="1.5"/>
-        <line x1="135" y1="17" x2="145" y2="17" stroke="#1a2030" stroke-width="1.5"/>
+        <line x1="128" y1="85" x2="152" y2="85" stroke="#1a2030" stroke-width="1.5" />
+        <line x1="129" y1="74" x2="151" y2="74" stroke="#1a2030" stroke-width="1.5" />
+        <line x1="130" y1="62" x2="150" y2="62" stroke="#1a2030" stroke-width="1.5" />
+        <line x1="131" y1="51" x2="149" y2="51" stroke="#1a2030" stroke-width="1.5" />
+        <line x1="133" y1="40" x2="147" y2="40" stroke="#1a2030" stroke-width="1.5" />
+        <line x1="134" y1="29" x2="146" y2="29" stroke="#1a2030" stroke-width="1.5" />
+        <line x1="135" y1="17" x2="145" y2="17" stroke="#1a2030" stroke-width="1.5" />
 
         <!-- Crown block (matches canvas: cx±(tHalf+2), topY-4) -->
-        <rect x="134" y="1" width="12" height="5" fill="#2a3040"/>
-        <rect x="134" y="1" width="12" height="1" fill="#3a4255"/>
+        <rect x="134" y="1" width="12" height="5" fill="#2a3040" />
+        <rect x="134" y="1" width="12" height="1" fill="#3a4255" />
 
         <!-- Traveling block + crown line (matches canvas hookY = baseY - h*0.45) -->
-        <line x1="140" y1="5"  x2="140" y2="56" stroke="#3a4a5c" stroke-width="1" opacity="0.6"/>
-        <rect x="137" y="56"  width="6"  height="8" fill="#1a2030"/>
-        <rect x="137" y="56"  width="6"  height="1" fill="#3a4255"/>
+        <line x1="140" y1="5" x2="140" y2="56" stroke="#3a4a5c" stroke-width="1" opacity="0.6" />
+        <rect x="137" y="56" width="6" height="8" fill="#1a2030" />
+        <rect x="137" y="56" width="6" height="1" fill="#3a4255" />
 
         <!-- Deck lights (matches canvas [74,104,134,186,216,246] × 0.875 → 65,91,117,163,189,215) -->
-        <circle cx="65"  cy="95" r="2.5" fill="#ff8c30" class="dk-lt lt-1"/>
-        <circle cx="91"  cy="95" r="2.5" fill="#ff8c30" class="dk-lt lt-2"/>
-        <circle cx="163" cy="95" r="2.5" fill="#ff8c30" class="dk-lt lt-3"/>
-        <circle cx="189" cy="95" r="2.5" fill="#ff8c30" class="dk-lt lt-4"/>
-        <circle cx="215" cy="95" r="2.5" fill="#ff8c30" class="dk-lt lt-5"/>
+        <circle cx="65" cy="95" r="2.5" fill="#ff8c30" class="dk-lt lt-1" />
+        <circle cx="91" cy="95" r="2.5" fill="#ff8c30" class="dk-lt lt-2" />
+        <circle cx="163" cy="95" r="2.5" fill="#ff8c30" class="dk-lt lt-3" />
+        <circle cx="189" cy="95" r="2.5" fill="#ff8c30" class="dk-lt lt-4" />
+        <circle cx="215" cy="95" r="2.5" fill="#ff8c30" class="dk-lt lt-5" />
 
         <!-- Green nav light on right leg (matches canvas: legXs[2]+6, y=160 → 215, 128) -->
-        <rect x="213" y="128" width="4" height="4" fill="#3aff8a" class="nav-lt"/>
+        <rect x="213" y="128" width="4" height="4" fill="#3aff8a" class="nav-lt" />
 
         <!-- Red aviation light at derrick top (matches canvas: dkCx-1, dkTop-5) -->
-        <rect x="138" y="2" width="3" height="3" fill="#ff3a3a" class="avi-lt"/>
+        <rect x="138" y="2" width="3" height="3" fill="#ff3a3a" class="avi-lt" />
 
       </svg>
     </header>
@@ -479,7 +601,8 @@
       <div class="news-state">
         <div class="news-state__icon">&#9654;</div>
         <div class="news-state__text">
-          LOADING FEED<span class="loading-dot">.</span><span class="loading-dot">.</span><span class="loading-dot">.</span>
+          LOADING FEED<span class="loading-dot">.</span><span class="loading-dot">.</span><span
+            class="loading-dot">.</span>
         </div>
       </div>
     </div>
@@ -488,9 +611,11 @@
       <a href="https://www.buymeacoffee.com/rgibbon97o" target="_blank" id="bmc-btn" title="Buy Me a Coffee">
         <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee">
       </a>
-      <a href="https://www.linkedin.com/in/ross-gibbon-506a2316a/" target="_blank" class="linkedin-btn" title="LinkedIn">
+      <a href="https://www.linkedin.com/in/ross-gibbon-506a2316a/" target="_blank" class="linkedin-btn"
+        title="LinkedIn">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-label="LinkedIn">
-          <path d="M20.447 20.452H17.01v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.583V9h3.296v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a1.914 1.914 0 1 1 0-3.828 1.914 1.914 0 0 1 0 3.828zm1.658 13.019H3.68V9h3.315v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+          <path
+            d="M20.447 20.452H17.01v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.583V9h3.296v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a1.914 1.914 0 1 1 0-3.828 1.914 1.914 0 0 1 0 3.828zm1.658 13.019H3.68V9h3.315v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
         </svg>
       </a>
     </div>
@@ -506,7 +631,7 @@
       const container = document.getElementById('news-container');
 
       try {
-        const res  = await fetch('/.netlify/functions/news');
+        const res = await fetch('/.netlify/functions/news');
         const data = await res.json();
 
         if (!res.ok || !Array.isArray(data.articles) || data.articles.length === 0) {
@@ -523,10 +648,10 @@
 
     function buildCard(article) {
       const a = document.createElement('a');
-      a.className  = 'news-card';
-      a.href       = article.url || '#';
-      a.target     = '_blank';
-      a.rel        = 'noopener noreferrer';
+      a.className = 'news-card';
+      a.href = article.url || '#';
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
       a.setAttribute('aria-label', article.title);
 
       // Meta row
@@ -535,21 +660,21 @@
 
       if (article.source) {
         const src = document.createElement('span');
-        src.className   = 'card-source';
+        src.className = 'card-source';
         src.textContent = article.source;
         meta.appendChild(src);
       }
 
       if (article.relevance !== null) {
         const rel = document.createElement('span');
-        rel.className   = 'card-relevance';
+        rel.className = 'card-relevance';
         rel.textContent = article.relevance + '/10';
         meta.appendChild(rel);
       }
 
       // Title
       const title = document.createElement('div');
-      title.className   = 'card-title';
+      title.className = 'card-title';
       title.textContent = article.title;
 
       // Summary
@@ -558,7 +683,7 @@
 
       if (article.summary) {
         const summary = document.createElement('div');
-        summary.className   = 'card-summary';
+        summary.className = 'card-summary';
         summary.textContent = article.summary;
         a.appendChild(summary);
       }
@@ -585,4 +710,5 @@
   </script>
 
 </body>
+
 </html>
