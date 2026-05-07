@@ -67,7 +67,7 @@
       width: 100%;
       padding: 44px 0 32px;
       border-bottom: 2px solid var(--border-dim);
-      margin-bottom: 36px;
+      margin-bottom: 20px;
       display: flex;
       align-items: center;
       gap: 40px;
@@ -379,6 +379,69 @@
       animation-delay: 0.4s;
     }
 
+    /* ── Tag filter bar ─────────────────────────────────────────── */
+    .tag-filter-bar {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 16px 0 20px;
+      border-bottom: 2px solid var(--border-dim);
+      margin-bottom: 32px;
+    }
+
+    .tag-pill {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--gold);
+      background: var(--bg-card);
+      border: 1px solid var(--border-dim);
+      padding: 5px 10px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: color 0.1s, border-color 0.1s, background 0.1s;
+    }
+
+    .tag-pill:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .tag-pill--active {
+      background: var(--orange);
+      color: #0a0a1a;
+      border-color: var(--orange);
+    }
+
+    /* ── Card date ───────────────────────────────────────────────── */
+    .card-date {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    /* ── Card tag pills ──────────────────────────────────────────── */
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: auto;
+      padding-top: 4px;
+    }
+
+    .card-tag {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--orange);
+      background: #100818;
+      border: 1px solid var(--border-dim);
+      padding: 3px 7px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
     /* ── Responsive ─────────────────────────────────────────────── */
     @media (max-width: 840px) {
       .news-grid {
@@ -597,6 +660,8 @@
       </svg>
     </header>
 
+    <div id="tag-filter" class="tag-filter-bar" style="display:none" aria-label="Filter by tag"></div>
+
     <div id="news-container" class="news-grid" aria-live="polite" aria-label="News articles">
       <div class="news-state">
         <div class="news-state__icon">&#9654;</div>
@@ -627,23 +692,69 @@
   </div>
 
   <script>
+    let allArticles = [];
+
     async function loadNews() {
       const container = document.getElementById('news-container');
-
       try {
         const res = await fetch('/.netlify/functions/news');
         const data = await res.json();
-
         if (!res.ok || !Array.isArray(data.articles) || data.articles.length === 0) {
           showState(container, '&#9888;', data.error || 'No articles found.');
           return;
         }
-
-        container.innerHTML = '';
-        data.articles.forEach(article => container.appendChild(buildCard(article)));
+        allArticles = data.articles;
+        renderFilterBar();
+        renderArticles(allArticles);
       } catch {
         showState(container, '&#9888;', 'Could not reach the server. Check your connection.');
       }
+    }
+
+    function renderFilterBar() {
+      const bar = document.getElementById('tag-filter');
+      const tagSet = new Set();
+      allArticles.forEach(a => (a.tags || []).forEach(t => tagSet.add(t)));
+      const tags = [...tagSet].sort();
+      if (tags.length === 0) return;
+
+      bar.style.display = '';
+
+      const allPill = document.createElement('button');
+      allPill.className = 'tag-pill tag-pill--active';
+      allPill.textContent = 'ALL';
+      allPill.dataset.tag = '';
+      allPill.addEventListener('click', () => setFilter(null, allPill));
+      bar.appendChild(allPill);
+
+      tags.forEach(tag => {
+        const pill = document.createElement('button');
+        pill.className = 'tag-pill';
+        pill.textContent = tag;
+        pill.dataset.tag = tag;
+        pill.addEventListener('click', () => setFilter(tag, pill));
+        bar.appendChild(pill);
+      });
+    }
+
+    function setFilter(tag, clickedPill) {
+      document.querySelectorAll('#tag-filter .tag-pill').forEach(p => p.classList.remove('tag-pill--active'));
+      clickedPill.classList.add('tag-pill--active');
+      const filtered = tag ? allArticles.filter(a => (a.tags || []).includes(tag)) : allArticles;
+      renderArticles(filtered);
+    }
+
+    function renderArticles(articles) {
+      const container = document.getElementById('news-container');
+      container.innerHTML = '';
+      articles.forEach(article => container.appendChild(buildCard(article)));
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      const [year, month, day] = dateStr.split('-');
+      const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+      return `${parseInt(day, 10)} ${months[parseInt(month, 10) - 1]} ${year}`;
     }
 
     function buildCard(article) {
@@ -654,7 +765,6 @@
       a.rel = 'noopener noreferrer';
       a.setAttribute('aria-label', article.title);
 
-      // Meta row
       const meta = document.createElement('div');
       meta.className = 'card-meta';
 
@@ -665,6 +775,14 @@
         meta.appendChild(src);
       }
 
+      const dateStr = formatDate(article.date);
+      if (dateStr) {
+        const dateEl = document.createElement('span');
+        dateEl.className = 'card-date';
+        dateEl.textContent = dateStr;
+        meta.appendChild(dateEl);
+      }
+
       if (article.relevance !== null) {
         const rel = document.createElement('span');
         rel.className = 'card-relevance';
@@ -672,12 +790,10 @@
         meta.appendChild(rel);
       }
 
-      // Title
       const title = document.createElement('div');
       title.className = 'card-title';
       title.textContent = article.title;
 
-      // Summary
       a.appendChild(meta);
       a.appendChild(title);
 
@@ -686,6 +802,18 @@
         summary.className = 'card-summary';
         summary.textContent = article.summary;
         a.appendChild(summary);
+      }
+
+      if (article.tags && article.tags.length > 0) {
+        const tagsEl = document.createElement('div');
+        tagsEl.className = 'card-tags';
+        article.tags.forEach(tag => {
+          const span = document.createElement('span');
+          span.className = 'card-tag';
+          span.textContent = tag;
+          tagsEl.appendChild(span);
+        });
+        a.appendChild(tagsEl);
       }
 
       return a;

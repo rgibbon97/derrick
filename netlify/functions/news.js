@@ -42,6 +42,8 @@ exports.handler = async function (event) {
         source:    p.Source?.rich_text?.map(t => t.plain_text).join('') ?? '',
         relevance: p.Relevance?.number ?? null,
         url:       p.URL?.url ?? null,
+        tags:      (p.Tags?.multi_select ?? []).map(t => t.name),
+        date:      p.Date?.date?.start ?? null,
       };
     }).filter(a => a.title && a.url);
 
