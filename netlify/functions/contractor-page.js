@@ -321,7 +321,8 @@ function render404(slug) {
 }
 
 exports.handler = async function (event) {
-  const slug = event.queryStringParameters?.slug || '';
+  const pathMatch = (event.path || '').match(/^\/contractors\/([^/]+)/);
+  const slug = pathMatch?.[1] || event.queryStringParameters?.slug || '';
 
   if (!slug) {
     return { statusCode: 302, headers: { Location: '/rigs' } };

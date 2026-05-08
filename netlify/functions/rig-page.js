@@ -353,7 +353,11 @@ function render404(slug) {
 }
 
 exports.handler = async function (event) {
-  const slug = event.queryStringParameters?.slug || '';
+  // event.path is the original request path (e.g. /rigs/valaris-ds-9).
+  // Query params from the rewrite rule are unreliable in status=200 rewrites,
+  // so parse the slug from the path and fall back to the query param.
+  const pathMatch = (event.path || '').match(/^\/rigs\/([^/]+)/);
+  const slug = pathMatch?.[1] || event.queryStringParameters?.slug || '';
 
   if (!slug) {
     return { statusCode: 302, headers: { Location: '/rigs' } };
