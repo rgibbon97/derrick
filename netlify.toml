@@ -7,3 +7,18 @@
   port      = 8888
   targetPort = 3000
   autoLaunch = false
+
+[[redirects]]
+  from   = "/rigs/:slug"
+  to     = "/.netlify/functions/rig-page?slug=:slug"
+  status = 200
+
+[[redirects]]
+  from   = "/contractors/:slug"
+  to     = "/.netlify/functions/contractor-page?slug=:slug"
+  status = 200
+
+[[redirects]]
+  from   = "/sitemap.xml"
+  to     = "/.netlify/functions/sitemap"
+  status = 200

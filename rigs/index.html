@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offshore Rig Fleet Status — DERRICK</title>
+  <meta name="description"
+    content="Live fleet status tracker for offshore drilling rigs. Search and filter rigs from Valaris, Noble, Transocean and more by type, region, status, and contractor.">
+  <meta property="og:title" content="Offshore Rig Fleet Status — DERRICK">
+  <meta property="og:description"
+    content="Track the status of offshore drilling rigs worldwide. Contracted, stacked, and available rigs across all major contractors.">
+  <link rel="canonical" href="https://drillodoro.com/rigs">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    body {
+      justify-content: flex-start;
+      align-items: center;
+      padding: 0 20px 80px;
+      min-height: 100vh;
+    }
+
+    .page-shell {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .top-nav {
+      width: 100%;
+      display: flex;
+      gap: 2px;
+      flex-wrap: wrap;
+      padding: 20px 0 24px;
+      border-bottom: 2px solid var(--border-dim);
+    }
+
+    .top-nav a {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 1px;
+      padding: 7px 11px;
+      border: 2px solid transparent;
+      text-transform: uppercase;
+      transition: color 0.1s, border-color 0.1s;
+    }
+
+    .top-nav a:hover { color: var(--gold); border-color: var(--gold); }
+    .top-nav a[aria-current="page"] { color: var(--orange); border-color: var(--orange); }
+
+    /* ── Page header ─────────────────────────────────────────────── */
+    .page-header {
+      padding: 36px 0 24px;
+      border-bottom: 2px solid var(--border-dim);
+      margin-bottom: 24px;
+    }
+
+    .page-header h1 {
+      font-size: 18px;
+      text-align: left;
+      margin-bottom: 6px;
+    }
+
+    .page-header p {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      line-height: 2;
+      margin-bottom: 20px;
+    }
+
+    /* ── Stats bar ──────────────────────────────────────────────── */
+    .stats-bar {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .stat-chip {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      letter-spacing: 1px;
+      padding: 8px 12px;
+      border: 2px solid var(--border-dim);
+      background: var(--bg-card);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 90px;
+    }
+
+    .stat-chip__label { color: var(--subtle); font-size: 6px; }
+    .stat-chip__value { color: var(--gold); font-size: 14px; font-family: 'Courier New', monospace; }
+    .stat-chip__value--green { color: var(--green-glow); }
+    .stat-chip__value--orange { color: var(--orange); }
+    .stat-chip__value--muted { color: var(--muted); }
+
+    /* ── Filters panel ──────────────────────────────────────────── */
+    .filters-panel {
+      background: var(--bg-card);
+      border: 2px solid var(--border-dim);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .filters-panel h2 {
+      font-size: 8px;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-dim);
+    }
+
+    .filters-search {
+      margin-bottom: 14px;
+    }
+
+    .filters-search input {
+      font-size: 9px;
+      padding: 10px 14px;
+      border: 2px solid var(--border-dim);
+      background: var(--bg-input);
+      color: var(--gold);
+      width: 100%;
+      letter-spacing: 1px;
+    }
+
+    .filters-search input:focus { border-color: var(--gold); }
+    .filters-search input::placeholder { color: var(--subtle); }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .filter-group label {
+      font-family: var(--font-pixel);
+      font-size: 6px;
+      color: var(--subtle);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .filter-group select,
+    .filter-group input[type="number"] {
+      font-family: var(--font-pixel);
+      font-size: 8px;
+      background: var(--bg-input);
+      color: var(--gold);
+      border: 2px solid var(--border-dim);
+      padding: 7px 8px;
+      cursor: pointer;
+      width: 100%;
+      letter-spacing: 0.5px;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .filter-group select:focus,
+    .filter-group input[type="number"]:focus { border-color: var(--gold); }
+
+    .filter-year-range {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .filters-toggles {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-dim);
+    }
+
+    .toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .toggle-wrap input[type="checkbox"] {
+      width: 0;
+      height: 0;
+      position: absolute;
+      opacity: 0;
+    }
+
+    .toggle-track {
+      width: 36px;
+      height: 18px;
+      background: var(--bg-input);
+      border: 2px solid var(--border-dim);
+      position: relative;
+      transition: background 0.15s, border-color 0.15s;
+      flex-shrink: 0;
+    }
+
+    .toggle-thumb {
+      width: 10px;
+      height: 10px;
+      background: var(--subtle);
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.15s, background 0.15s;
+    }
+
+    .toggle-wrap input:checked + .toggle-track {
+      border-color: var(--gold);
+    }
+
+    .toggle-wrap input:checked + .toggle-track .toggle-thumb {
+      transform: translateX(18px);
+      background: var(--gold);
+    }
+
+    .toggle-label {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    /* ── Results bar ────────────────────────────────────────────── */
+    .results-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .results-count {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    .results-count strong { color: var(--gold); }
+
+    .btn-clear {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--orange);
+      background: transparent;
+      border: 2px solid var(--orange);
+      padding: 6px 10px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: background 0.1s, color 0.1s;
+      display: none;
+    }
+
+    .btn-clear:hover { background: var(--orange); color: var(--bg-page); }
+    .btn-clear.visible { display: block; }
+
+    /* ── Rig table ──────────────────────────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+      border: 2px solid var(--border-dim);
+      margin-bottom: 40px;
+    }
+
+    .rigs-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+
+    .rigs-table thead th {
+      font-family: var(--font-pixel);
+      font-size: 6px;
+      color: var(--gold);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 12px 10px;
+      background: var(--bg-card);
+      border-bottom: 2px solid var(--border-dim);
+      text-align: left;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .rigs-table thead th:hover { color: var(--orange); }
+
+    .rigs-table thead th.sort-asc::after { content: ' ▲'; font-size: 5px; }
+    .rigs-table thead th.sort-desc::after { content: ' ▼'; font-size: 5px; }
+
+    .rigs-table tbody td {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 13px;
+      color: #b8b8cc;
+      padding: 10px 10px;
+      border-bottom: 1px solid var(--row-divider);
+      vertical-align: middle;
+    }
+
+    .rigs-table tbody tr:hover td { background: var(--bg-input); }
+
+    .rig-name-link {
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: normal;
+      transition: color 0.1s;
+    }
+
+    .rig-name-link:hover { color: var(--orange); }
+
+    .contractor-link {
+      color: #b8b8cc;
+      text-decoration: none;
+      transition: color 0.1s;
+    }
+
+    .contractor-link:hover { color: var(--gold); }
+
+    .status-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      font-size: 12px;
+    }
+
+    .status-dot::before {
+      content: '■';
+      font-size: 10px;
+      flex-shrink: 0;
+    }
+
+    .status-dot--contracted::before { color: #88ff88; }
+    .status-dot--available::before  { color: #00d4ff; }
+    .status-dot--warm::before       { color: #e8d44d; }
+    .status-dot--cold::before       { color: #ff6b35; }
+    .status-dot--sale::before       { color: #aaaaaa; }
+    .status-dot--sold::before       { color: #ff4444; }
+
+    .day-rate-val {
+      color: var(--green-glow);
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+    }
+
+    /* ── Empty / loading states ─────────────────────────────────── */
+    .table-state {
+      padding: 48px 24px;
+      text-align: center;
+      font-family: var(--font-pixel);
+      font-size: 8px;
+      color: var(--subtle);
+      letter-spacing: 1px;
+      line-height: 2.5;
+    }
+
+    .loading-dots span {
+      animation: blink 1.2s infinite;
+    }
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    /* ── Mobile ─────────────────────────────────────────────────── */
+    @media (max-width: 620px) {
+      .page-header h1 { font-size: 13px; }
+      .filters-grid { grid-template-columns: 1fr 1fr; }
+      .stat-chip { min-width: 70px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="page-shell">
+
+    <nav class="top-nav" aria-label="Site navigation">
+      <a href="/index.html">&#9654; HOME</a>
+      <a href="/news.html">&#9654; NEWS</a>
+      <a href="/rigs" aria-current="page">&#9654; RIGS</a>
+      <a href="/timer.html">&#9654; DRILL-O-DORO</a>
+      <a href="/converter.html">&#9654; CONVERTER</a>
+      <a href="/calculator.html">&#9654; CALCULATOR</a>
+      <a href="/acronyms.html">&#9654; ACRONYMS</a>
+      <a href="/wellcontrol.html">&#9654; WELL CONTROL</a>
+    </nav>
+
+    <div class="page-header">
+      <h1>FLEET STATUS HUB</h1>
+      <p>Offshore drilling rigs tracked across all major contractors</p>
+      <div class="stats-bar" id="stats-bar">
+        <div class="stat-chip">
+          <div class="stat-chip__label">TOTAL RIGS</div>
+          <div class="stat-chip__value" id="stat-total">—</div>
+        </div>
+        <div class="stat-chip">
+          <div class="stat-chip__label">CONTRACTED</div>
+          <div class="stat-chip__value stat-chip__value--green" id="stat-contracted">—</div>
+        </div>
+        <div class="stat-chip">
+          <div class="stat-chip__label">AVAILABLE</div>
+          <div class="stat-chip__value" id="stat-available">—</div>
+        </div>
+        <div class="stat-chip">
+          <div class="stat-chip__label">STACKED</div>
+          <div class="stat-chip__value stat-chip__value--orange" id="stat-stacked">—</div>
+        </div>
+        <div class="stat-chip">
+          <div class="stat-chip__label">OTHER</div>
+          <div class="stat-chip__value stat-chip__value--muted" id="stat-other">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="filters-panel">
+      <h2>FILTER RIGS</h2>
+
+      <div class="filters-search">
+        <input type="search" id="filter-search" placeholder="Search rig name, customer, location..." autocomplete="off">
+      </div>
+
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label for="filter-type">RIG TYPE</label>
+          <select id="filter-type">
+            <option value="">All Types</option>
+            <option value="Drillship">Drillship</option>
+            <option value="Semi-Submersible">Semi-Submersible</option>
+            <option value="Jackup-HE">Jackup (High-Spec)</option>
+            <option value="Jackup-BE">Jackup (Below-Enhancement)</option>
+            <option value="Jackup-Legacy">Jackup (Legacy)</option>
+            <option value="Managed">Managed</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filter-contractor">CONTRACTOR</label>
+          <select id="filter-contractor">
+            <option value="">All Contractors</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filter-region">REGION</label>
+          <select id="filter-region">
+            <option value="">All Regions</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filter-status">STATUS</label>
+          <select id="filter-status">
+            <option value="">All Statuses</option>
+            <option value="Contracted">Contracted</option>
+            <option value="Available">Available</option>
+            <option value="Warm Stacked">Warm Stacked</option>
+            <option value="Cold Stacked">Cold Stacked</option>
+            <option value="Held for Sale">Held for Sale</option>
+            <option value="Sold">Sold</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filter-customer">CUSTOMER</label>
+          <select id="filter-customer">
+            <option value="">All Customers</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>YEAR BUILT</label>
+          <div class="filter-year-range">
+            <input type="number" id="filter-year-min" placeholder="From" min="1960" max="2030">
+            <input type="number" id="filter-year-max" placeholder="To"   min="1960" max="2030">
+          </div>
+        </div>
+      </div>
+
+      <div class="filters-toggles">
+        <label class="toggle-wrap">
+          <input type="checkbox" id="toggle-stacked">
+          <div class="toggle-track"><div class="toggle-thumb"></div></div>
+          <span class="toggle-label">INCLUDE STACKED</span>
+        </label>
+        <label class="toggle-wrap">
+          <input type="checkbox" id="toggle-sold">
+          <div class="toggle-track"><div class="toggle-thumb"></div></div>
+          <span class="toggle-label">INCLUDE SOLD / HELD FOR SALE</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="results-bar">
+      <div class="results-count" id="results-count">Loading…</div>
+      <button class="btn-clear" id="btn-clear" type="button">CLEAR FILTERS</button>
+    </div>
+
+    <div class="table-wrap">
+      <table class="rigs-table" id="rigs-table" aria-label="Rig fleet status">
+        <thead>
+          <tr>
+            <th data-col="rig_name">RIG NAME</th>
+            <th data-col="contractor">CONTRACTOR</th>
+            <th data-col="rig_type">TYPE</th>
+            <th data-col="current_status">STATUS</th>
+            <th data-col="current_customer">CUSTOMER</th>
+            <th data-col="current_location">LOCATION</th>
+            <th data-col="region">REGION</th>
+            <th data-col="end_date">CONTRACT END</th>
+            <th data-col="day_rate">DAY RATE</th>
+          </tr>
+        </thead>
+        <tbody id="rigs-tbody">
+          <tr>
+            <td colspan="9" class="table-state">
+              LOADING FLEET DATA
+              <span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="support-bar">
+      <a href="https://www.buymeacoffee.com/rgibbon97o" target="_blank" id="bmc-btn" title="Buy Me a Coffee">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee">
+      </a>
+      <a href="https://www.linkedin.com/in/ross-gibbon-506a2316a/" target="_blank" class="linkedin-btn"
+        title="LinkedIn">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-label="LinkedIn">
+          <path
+            d="M20.447 20.452H17.01v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.583V9h3.296v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a1.914 1.914 0 1 1 0-3.828 1.914 1.914 0 0 1 0 3.828zm1.658 13.019H3.68V9h3.315v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+        </svg>
+      </a>
+    </div>
+
+    <footer class="site-footer">
+      Started because I needed it. Kept going because others might too.
+    </footer>
+
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://guxqgvhbemiqqtmbgyqr.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_n2lDBSvdoRqC8K04Bq6Weg__VcL_Wtv';
+
+    const STACKED_STATUSES = new Set(['Warm Stacked', 'Cold Stacked']);
+    const SOLD_STATUSES    = new Set(['Held for Sale', 'Sold']);
+
+    const STATUS_DOT_CLASS = {
+      'Contracted':    'status-dot--contracted',
+      'Available':     'status-dot--available',
+      'Warm Stacked':  'status-dot--warm',
+      'Cold Stacked':  'status-dot--cold',
+      'Held for Sale': 'status-dot--sale',
+      'Sold':          'status-dot--sold',
+    };
+
+    let allRigs  = [];
+    let sortCol  = 'rig_name';
+    let sortDir  = 'asc';
+
+    /* ── Helpers ─────────────────────────────────────────────────── */
+    function slugify(str) {
+      return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    function esc(str) {
+      if (str == null) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function getCurrentContract(rig) {
+      if (!rig.contracts || rig.contracts.length === 0) return null;
+      if (rig.current_customer) {
+        const m = rig.contracts.find(c => c.customer === rig.current_customer);
+        if (m) return m;
+      }
+      return rig.contracts[rig.contracts.length - 1];
+    }
+
+    function formatDayRate(contract) {
+      if (!contract) return '—';
+      if (contract.day_rate_disclosed && contract.day_rate) {
+        return '$' + Number(contract.day_rate).toLocaleString() + '/d';
+      }
+      if (contract.day_rate_disclosed === false) return 'Undisclosed';
+      return '—';
+    }
+
+    /* ── Supabase fetch ─────────────────────────────────────────── */
+    async function fetchRigs() {
+      const fields = [
+        'id', 'rig_name', 'contractor', 'rig_type', 'year_built',
+        'current_status', 'current_customer', 'current_location', 'region',
+        'report_date',
+        'contracts(customer,end_date,day_rate,day_rate_disclosed)',
+      ].join(',');
+
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/rigs?select=${encodeURIComponent(fields)}&order=rig_name.asc`,
+        {
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_KEY,
+          },
+        }
+      );
+
+      if (!res.ok) throw new Error('Failed to fetch rigs: ' + res.status);
+      return res.json();
+    }
+
+    /* ── Stats ──────────────────────────────────────────────────── */
+    function updateStats(rigs) {
+      let contracted = 0, available = 0, stacked = 0, other = 0;
+      for (const r of rigs) {
+        if (r.current_status === 'Contracted') contracted++;
+        else if (r.current_status === 'Available') available++;
+        else if (STACKED_STATUSES.has(r.current_status)) stacked++;
+        else other++;
+      }
+      document.getElementById('stat-total').textContent      = rigs.length;
+      document.getElementById('stat-contracted').textContent = contracted;
+      document.getElementById('stat-available').textContent  = available;
+      document.getElementById('stat-stacked').textContent    = stacked;
+      document.getElementById('stat-other').textContent      = other;
+    }
+
+    /* ── Populate dropdowns ─────────────────────────────────────── */
+    function populateSelect(id, values) {
+      const sel = document.getElementById(id);
+      const sorted = [...values].sort();
+      for (const v of sorted) {
+        if (!v) continue;
+        const opt = document.createElement('option');
+        opt.value = v;
+        opt.textContent = v;
+        sel.appendChild(opt);
+      }
+    }
+
+    function buildFilterOptions(rigs) {
+      populateSelect('filter-contractor', new Set(rigs.map(r => r.contractor)));
+      populateSelect('filter-region',     new Set(rigs.map(r => r.region)));
+      populateSelect('filter-customer',   new Set(rigs.map(r => r.current_customer).filter(Boolean)));
+    }
+
+    /* ── Filter ─────────────────────────────────────────────────── */
+    function getFilters() {
+      return {
+        search:          document.getElementById('filter-search').value.trim().toLowerCase(),
+        rigType:         document.getElementById('filter-type').value,
+        contractor:      document.getElementById('filter-contractor').value,
+        region:          document.getElementById('filter-region').value,
+        status:          document.getElementById('filter-status').value,
+        customer:        document.getElementById('filter-customer').value,
+        yearMin:         parseInt(document.getElementById('filter-year-min').value) || 0,
+        yearMax:         parseInt(document.getElementById('filter-year-max').value) || 9999,
+        includeStacked:  document.getElementById('toggle-stacked').checked,
+        includeSold:     document.getElementById('toggle-sold').checked,
+      };
+    }
+
+    function isFiltered(f) {
+      return f.search || f.rigType || f.contractor || f.region || f.status || f.customer
+        || f.yearMin || f.yearMax < 9999 || f.includeStacked || f.includeSold;
+    }
+
+    function applyFilters(rigs) {
+      const f = getFilters();
+      return rigs.filter(r => {
+        if (!f.includeStacked && STACKED_STATUSES.has(r.current_status)) return false;
+        if (!f.includeSold   && SOLD_STATUSES.has(r.current_status))     return false;
+        if (f.search) {
+          const hay = [r.rig_name, r.contractor, r.current_customer, r.current_location]
+            .filter(Boolean).join(' ').toLowerCase();
+          if (!hay.includes(f.search)) return false;
+        }
+        if (f.rigType    && r.rig_type         !== f.rigType)    return false;
+        if (f.contractor && r.contractor        !== f.contractor) return false;
+        if (f.region     && r.region            !== f.region)    return false;
+        if (f.status     && r.current_status    !== f.status)    return false;
+        if (f.customer   && r.current_customer  !== f.customer)  return false;
+        if (r.year_built && r.year_built < f.yearMin)            return false;
+        if (r.year_built && r.year_built > f.yearMax)            return false;
+        return true;
+      });
+    }
+
+    /* ── Sort ───────────────────────────────────────────────────── */
+    function sortRigs(rigs) {
+      return [...rigs].sort((a, b) => {
+        let va = a[sortCol] ?? '';
+        let vb = b[sortCol] ?? '';
+        if (sortCol === 'end_date') {
+          va = getCurrentContract(a)?.end_date ?? '';
+          vb = getCurrentContract(b)?.end_date ?? '';
+        }
+        if (sortCol === 'day_rate') {
+          va = getCurrentContract(a)?.day_rate ?? 0;
+          vb = getCurrentContract(b)?.day_rate ?? 0;
+          return sortDir === 'asc' ? va - vb : vb - va;
+        }
+        const cmp = String(va).localeCompare(String(vb));
+        return sortDir === 'asc' ? cmp : -cmp;
+      });
+    }
+
+    /* ── Render table ───────────────────────────────────────────── */
+    function renderTable(rigs) {
+      const tbody = document.getElementById('rigs-tbody');
+
+      if (rigs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="table-state">NO RIGS MATCH YOUR FILTERS</td></tr>';
+        return;
+      }
+
+      const sorted = sortRigs(rigs);
+      const rows = sorted.map(r => {
+        const contract     = getCurrentContract(r);
+        const endDate      = contract?.end_date ?? '—';
+        const dayRateRaw   = formatDayRate(contract);
+        const dayRateHtml  = contract?.day_rate_disclosed && contract?.day_rate
+          ? `<span class="day-rate-val">${esc(dayRateRaw)}</span>`
+          : `<span style="color:var(--subtle)">${esc(dayRateRaw)}</span>`;
+
+        const rigSlug         = slugify(r.rig_name);
+        const contractorSlug  = slugify(r.contractor);
+        const dotClass        = STATUS_DOT_CLASS[r.current_status] || '';
+
+        return `<tr>
+          <td><a class="rig-name-link" href="/rigs/${rigSlug}">${esc(r.rig_name)}</a></td>
+          <td><a class="contractor-link" href="/contractors/${contractorSlug}">${esc(r.contractor)}</a></td>
+          <td style="color:var(--muted);font-size:12px">${esc(r.rig_type)}</td>
+          <td><span class="status-dot ${dotClass}">${esc(r.current_status)}</span></td>
+          <td>${esc(r.current_customer || '—')}</td>
+          <td style="color:var(--muted);font-size:12px">${esc(r.current_location || '—')}</td>
+          <td style="color:var(--muted);font-size:12px">${esc(r.region || '—')}</td>
+          <td style="color:var(--muted);font-size:12px">${esc(endDate)}</td>
+          <td>${dayRateHtml}</td>
+        </tr>`;
+      }).join('');
+
+      tbody.innerHTML = rows;
+    }
+
+    /* ── Update sort headers ────────────────────────────────────── */
+    function updateSortHeaders() {
+      document.querySelectorAll('.rigs-table thead th').forEach(th => {
+        th.classList.remove('sort-asc', 'sort-desc');
+        if (th.dataset.col === sortCol) {
+          th.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+        }
+      });
+    }
+
+    /* ── Refresh ─────────────────────────────────────────────────── */
+    function refresh() {
+      const filtered = applyFilters(allRigs);
+      renderTable(filtered);
+
+      const countEl  = document.getElementById('results-count');
+      const clearBtn = document.getElementById('btn-clear');
+      const f        = getFilters();
+
+      countEl.innerHTML = `Showing <strong>${filtered.length}</strong> of <strong>${allRigs.length}</strong> rigs`;
+      clearBtn.classList.toggle('visible', !!isFiltered(f));
+      updateSortHeaders();
+    }
+
+    /* ── Clear filters ──────────────────────────────────────────── */
+    function clearFilters() {
+      document.getElementById('filter-search').value   = '';
+      document.getElementById('filter-type').value     = '';
+      document.getElementById('filter-contractor').value = '';
+      document.getElementById('filter-region').value   = '';
+      document.getElementById('filter-status').value   = '';
+      document.getElementById('filter-customer').value = '';
+      document.getElementById('filter-year-min').value = '';
+      document.getElementById('filter-year-max').value = '';
+      document.getElementById('toggle-stacked').checked = false;
+      document.getElementById('toggle-sold').checked    = false;
+      refresh();
+    }
+
+    /* ── Wire up events ─────────────────────────────────────────── */
+    function wireEvents() {
+      const filterIds = [
+        'filter-search', 'filter-type', 'filter-contractor', 'filter-region',
+        'filter-status', 'filter-customer', 'filter-year-min', 'filter-year-max',
+        'toggle-stacked', 'toggle-sold',
+      ];
+      filterIds.forEach(id => {
+        const el = document.getElementById(id);
+        el.addEventListener(el.tagName === 'INPUT' && el.type === 'search' ? 'input' : 'change', refresh);
+        if (el.type === 'number') el.addEventListener('input', refresh);
+      });
+
+      document.getElementById('btn-clear').addEventListener('click', clearFilters);
+
+      document.querySelectorAll('.rigs-table thead th[data-col]').forEach(th => {
+        th.addEventListener('click', () => {
+          const col = th.dataset.col;
+          if (sortCol === col) {
+            sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+          } else {
+            sortCol = col;
+            sortDir = 'asc';
+          }
+          refresh();
+        });
+      });
+    }
+
+    /* ── Init ───────────────────────────────────────────────────── */
+    async function init() {
+      wireEvents();
+
+      try {
+        allRigs = await fetchRigs();
+        updateStats(allRigs);
+        buildFilterOptions(allRigs);
+        refresh();
+      } catch (err) {
+        console.error(err);
+        document.getElementById('rigs-tbody').innerHTML =
+          '<tr><td colspan="9" class="table-state">FAILED TO LOAD DATA — CHECK YOUR CONNECTION</td></tr>';
+        document.getElementById('results-count').textContent = 'Error loading rigs';
+      }
+    }
+
+    init();
+  </script>
+
+</body>
+</html>
