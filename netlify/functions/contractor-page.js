@@ -1,5 +1,5 @@
-const SUPABASE_URL = 'https://guxqgvhbemiqqtmbgyqr.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_n2lDBSvdoRqC8K04Bq6Weg__VcL_Wtv';
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
 const SITE_URL     = 'https://drillodoro.com';
 
 const STATUS_DOT_CSS = {
