@@ -43,21 +43,22 @@ function formatDayRate(c) {
   return '—';
 }
 
-function navHtml(activePath) {
-  const links = [
-    ['/', 'HOME'],
-    ['/news.html', 'NEWS'],
-    ['/rigs', 'RIGS'],
-    ['/timer.html', 'DRILL-O-DORO'],
-    ['/converter.html', 'CONVERTER'],
-    ['/calculator.html', 'CALCULATOR'],
-    ['/acronyms.html', 'ACRONYMS'],
-    ['/wellcontrol.html', 'WELL CONTROL'],
-  ];
-  return links.map(([href, label]) => {
-    const active = href === activePath ? ' aria-current="page"' : '';
-    return `<a href="${href}"${active}>&#9654; ${label}</a>`;
-  }).join('\n      ');
+function navHtml() {
+  return `<a href="/">&#9654; HOME</a>
+    <a href="/news.html">&#9654; NEWS</a>
+    <a href="/rigs" aria-current="page">&#9654; FLEET STATUS</a>
+    <a href="/automation.html">&#9654; AUTOMATION</a>
+    <div class="nav-dropdown">
+      <button class="nav-dropdown__toggle" type="button">&#9654; TOOLS &#9660;</button>
+      <div class="nav-dropdown__menu">
+        <a href="/">Ask Derrick</a>
+        <a href="/timer.html">Drill-o-doro</a>
+        <a href="/converter.html">Unit Converter</a>
+        <a href="/calculator.html">Drilling Calculator</a>
+        <a href="/acronyms.html">Acronym Lookup</a>
+        <a href="/wellcontrol.html">Well Control</a>
+      </div>
+    </div>`;
 }
 
 function renderRigPage(rig, contracts) {
@@ -262,7 +263,7 @@ function renderRigPage(rig, contracts) {
 <div class="page-shell">
 
   <nav class="top-nav" aria-label="Site navigation">
-    ${navHtml('/rigs')}
+    ${navHtml()}
   </nav>
 
   <div class="breadcrumb">
@@ -341,7 +342,7 @@ function render404(slug) {
 </head>
 <body>
 <div class="page-shell">
-  <nav class="top-nav">${navHtml('/rigs')}</nav>
+  <nav class="top-nav">${navHtml()}</nav>
   <div class="not-found">
     <h1>RIG NOT FOUND</h1>
     <p>No rig found for <strong style="color:var(--gold)">${esc(slug)}</strong>.<br>

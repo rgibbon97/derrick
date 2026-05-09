@@ -539,3 +539,107 @@ textarea:disabled {
     padding: 0 16px;
   }
 }
+
+
+/* ── Nav dropdown ────────────────────────────────────────────────
+   TOOLS dropdown used in the main navigation on every page.
+   ────────────────────────────────────────────────────────────── */
+.nav-dropdown {
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+}
+
+/* Override global button styles for the toggle */
+.nav-dropdown__toggle {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  background: transparent;
+  color: var(--muted);
+  border: 2px solid transparent;
+  padding: 7px 11px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: color 0.1s, border-color 0.1s;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.nav-dropdown__toggle:hover,
+.nav-dropdown:hover .nav-dropdown__toggle {
+  color: var(--gold);
+  border-color: var(--gold);
+  background: transparent;
+}
+
+.nav-dropdown__toggle:active {
+  transform: none;
+}
+
+.nav-dropdown__toggle.active {
+  color: var(--orange);
+  border-color: var(--orange);
+}
+
+.nav-dropdown__menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--bg-card);
+  border: 2px solid var(--gold);
+  min-width: 190px;
+  z-index: 200;
+  flex-direction: column;
+}
+
+.nav-dropdown:hover .nav-dropdown__menu,
+.nav-dropdown:focus-within .nav-dropdown__menu {
+  display: flex;
+}
+
+.nav-dropdown__menu a {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--muted);
+  text-decoration: none;
+  letter-spacing: 1px;
+  padding: 10px 14px;
+  border: none;
+  border-bottom: 1px solid var(--border-dim);
+  background: transparent;
+  transition: color 0.1s, background 0.1s;
+  display: block;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.nav-dropdown__menu a:last-child {
+  border-bottom: none;
+}
+
+.nav-dropdown__menu a:hover {
+  color: var(--gold);
+  background: var(--bg-input);
+  border-color: var(--border-dim);
+}
+
+.nav-dropdown__menu a[aria-current="page"] {
+  color: var(--orange);
+}
+
+@media (max-width: 620px) {
+  .nav-dropdown {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .nav-dropdown__menu {
+    position: static;
+    border: none;
+    border-top: 1px solid var(--border-dim);
+    min-width: unset;
+    width: 100%;
+  }
+}

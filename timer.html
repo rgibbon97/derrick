@@ -494,20 +494,114 @@
       border-color: #ff6b35;
     }
 
+    .nav-dropdown {
+      position: relative;
+      display: inline-flex;
+      align-items: stretch;
+    }
+
+    .nav-dropdown__toggle {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      background: transparent;
+      color: #aaa;
+      border: 2px solid transparent;
+      padding: 8px 12px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: color 0.1s, border-color 0.1s;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .nav-dropdown__toggle:hover,
+    .nav-dropdown:hover .nav-dropdown__toggle {
+      color: #e8d44d;
+      border-color: #e8d44d;
+      background: transparent;
+    }
+
+    .nav-dropdown__toggle:active { transform: none; }
+
+    .nav-dropdown__toggle.active {
+      color: #ff6b35;
+      border-color: #ff6b35;
+    }
+
+    .nav-dropdown__menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: #0d0d20;
+      border: 2px solid #e8d44d;
+      min-width: 190px;
+      z-index: 200;
+      flex-direction: column;
+    }
+
+    .nav-dropdown:hover .nav-dropdown__menu,
+    .nav-dropdown:focus-within .nav-dropdown__menu {
+      display: flex;
+    }
+
+    .nav-dropdown__menu a {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 7px;
+      color: #aaa;
+      text-decoration: none;
+      letter-spacing: 1px;
+      padding: 10px 14px;
+      border: none;
+      border-bottom: 1px solid #333340;
+      background: transparent;
+      transition: color 0.1s, background 0.1s;
+      display: block;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .nav-dropdown__menu a:last-child { border-bottom: none; }
+
+    .nav-dropdown__menu a:hover {
+      color: #e8d44d;
+      background: #1a1a3a;
+    }
+
+    .nav-dropdown__menu a[aria-current="page"] { color: #ff6b35; }
+
+    @media (max-width: 620px) {
+      .nav-dropdown { width: 100%; flex-direction: column; }
+      .nav-dropdown__menu {
+        position: static;
+        border: none;
+        border-top: 1px solid #333340;
+        min-width: unset;
+        width: 100%;
+      }
+    }
+
   </style>
 </head>
 <body>
   <a class="site-brand" href="index.html">DERRICK</a>
-  <nav class="site-nav">
+  <nav class="site-nav" aria-label="Site navigation">
     <a href="index.html">&#9654; HOME</a>
-    <a href="timer.html" aria-current="page">&#9654; DRILL-O-DORO</a>
     <a href="news.html">&#9654; NEWS</a>
-    <a href="/rigs">&#9654; RIGS</a>
-
-    <a href="converter.html">&#9654; CONVERTER</a>
-    <a href="calculator.html">&#9654; CALCULATOR</a>
-    <a href="acronyms.html">&#9654; ACRONYMS</a>
-    <a href="wellcontrol.html">&#9654; WELL CONTROL</a>
+    <a href="/rigs">&#9654; FLEET STATUS</a>
+    <a href="automation.html">&#9654; AUTOMATION</a>
+    <div class="nav-dropdown">
+      <button class="nav-dropdown__toggle active" type="button">&#9654; TOOLS &#9660;</button>
+      <div class="nav-dropdown__menu">
+        <a href="/">Ask Derrick</a>
+        <a href="timer.html" aria-current="page">Drill-o-doro</a>
+        <a href="converter.html">Unit Converter</a>
+        <a href="calculator.html">Drilling Calculator</a>
+        <a href="acronyms.html">Acronym Lookup</a>
+        <a href="wellcontrol.html">Well Control</a>
+      </div>
+    </div>
   </nav>
   <div id="app">
     <div id="canvas-wrap">
