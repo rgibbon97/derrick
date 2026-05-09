@@ -4,37 +4,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ask Derrick — AI Drilling Assistant</title>
+  <title>DERRICK — Drilling Intelligence</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <meta name="description"
-    content="Free tools for drilling engineers — Pomodoro timer, unit converter, pressure calculator, acronym decoder, and AI drilling assistant.">
+    content="AI tools for drilling engineers — AI assistant, offshore rig fleet tracker, industry news, and workflow automation.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
   <link rel="stylesheet" href="style.css">
   <style>
-    /* ── Page layout ─────────────────────────────────────────────── */
     body {
       justify-content: flex-start;
       align-items: center;
       padding: 0 20px 80px;
       min-height: 100vh;
-      position: relative;
-      overflow-x: hidden;
     }
 
-
-    /* ── Foreground shell ────────────────────────────────────────── */
     .page-shell {
       position: relative;
       z-index: 1;
       width: 100%;
-      max-width: 720px;
+      max-width: 800px;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
-    /* ── Top nav ─────────────────────────────────────────────────── */
     .top-nav {
       width: 100%;
       display: flex;
@@ -56,15 +50,8 @@
       transition: color 0.1s, border-color 0.1s;
     }
 
-    .top-nav a:hover {
-      color: var(--gold);
-      border-color: var(--gold);
-    }
-
-    .top-nav a[aria-current="page"] {
-      color: var(--orange);
-      border-color: var(--orange);
-    }
+    .top-nav a:hover { color: var(--gold); border-color: var(--gold); }
+    .top-nav a[aria-current="page"] { color: var(--orange); border-color: var(--orange); }
 
     /* ── Hero ────────────────────────────────────────────────────── */
     .hero {
@@ -73,7 +60,7 @@
       align-items: center;
       gap: 16px;
       width: 100%;
-      padding: 48px 0 32px;
+      padding: 48px 0 40px;
     }
 
     .hero__title {
@@ -98,300 +85,119 @@
       text-shadow: 1px 1px 0 var(--gold-shadow);
     }
 
-    /* ── Chat input ──────────────────────────────────────────────── */
-    .chat-wrap {
-      width: 100%;
-      margin-top: 24px;
-      display: flex;
-      flex-direction: column;
+    /* ── Hub grid ────────────────────────────────────────────────── */
+    .hub-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
       gap: 16px;
+      width: 100%;
+      margin: 8px 0 24px;
     }
 
-    .chat-input-row {
+    .hub-card {
       display: flex;
-      border: 3px solid var(--gold);
-      box-shadow: 0 0 0 3px var(--gold-shadow), 0 0 32px var(--gold-dim);
-      background: var(--bg-input);
+      flex-direction: column;
+      gap: 12px;
+      padding: 24px 22px;
+      border: 2px solid var(--border-dim);
+      background: var(--bg-card);
+      text-decoration: none;
       transition: border-color 0.15s, box-shadow 0.15s;
     }
 
-    .chat-input-row:focus-within {
+    .hub-card:hover {
+      border-color: var(--gold);
+      box-shadow: 0 0 20px var(--gold-dim);
+    }
+
+    .hub-card--ai {
       border-color: var(--orange);
-      box-shadow: 0 0 0 3px var(--orange-shadow), 0 0 40px rgba(255, 107, 53, 0.18);
+      box-shadow: 0 0 12px rgba(255, 107, 53, 0.1);
     }
 
-    #chat-input {
-      flex: 1;
+    .hub-card--ai:hover {
+      border-color: var(--orange);
+      box-shadow: 0 0 28px rgba(255, 107, 53, 0.22);
+    }
+
+    .hub-card__tag {
       font-family: var(--font-pixel);
-      font-size: 9px;
-      background: transparent;
-      color: var(--gold);
-      border: none;
-      padding: 18px 20px;
-      outline: none;
-      letter-spacing: 1px;
-      line-height: 1.8;
-      resize: none;
-      min-height: 64px;
+      font-size: 6px;
+      color: var(--muted);
+      letter-spacing: 2px;
     }
 
-    #chat-input::placeholder {
-      color: var(--subtle);
-    }
-
-    #chat-input:focus {
-      color: var(--gold);
-      border: none;
-    }
-
-    .chat-send-btn {
+    .hub-card__title {
       font-family: var(--font-pixel);
-      font-size: 9px;
-      background: var(--bg-input);
+      font-size: 10px;
       color: var(--orange);
-      border: none;
-      border-left: 3px solid var(--gold);
-      padding: 18px 20px;
-      cursor: pointer;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      align-self: stretch;
-      transition: background 0.1s, color 0.1s, border-color 0.1s;
+      letter-spacing: 2px;
+      line-height: 1.6;
     }
 
-    .chat-send-btn:hover {
-      background: var(--orange);
-      color: var(--bg-page);
-      border-left-color: var(--orange);
-    }
+    .hub-card--ai .hub-card__title { color: var(--gold); }
 
-    .chat-send-btn:active {
-      transform: none;
-    }
-
-    /* ── Suggestion chips ────────────────────────────────────────── */
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: center;
-    }
-
-    .chip {
+    .hub-card__desc {
       font-family: var(--font-pixel);
       font-size: 7px;
       color: var(--muted);
-      background: var(--bg-card);
-      border: 2px solid var(--border-dim);
-      padding: 10px 14px;
-      cursor: pointer;
-      letter-spacing: 1px;
-      line-height: 1.6;
-      text-align: left;
-      transition: color 0.1s, border-color 0.1s, background 0.1s;
-    }
-
-    .chip:hover {
-      color: var(--gold);
-      border-color: var(--gold);
-      background: var(--bg-input);
-    }
-
-    .chip:active {
-      transform: translateY(1px);
-    }
-
-    /* ── Inline disclaimer ───────────────────────────────────────── */
-    .chat-disclaimer {
-      font-family: var(--font-pixel);
-      font-size: 6px;
-      color: #a03a10;
-      letter-spacing: 1px;
-      text-align: center;
-      line-height: 2.2;
-      margin-top: 4px;
-    }
-
-    /* ── Chat thread ─────────────────────────────────────────────── */
-    .chat-thread {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .chat-msg {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      padding: 14px 16px;
-      border: 2px solid var(--border-dim);
-      background: var(--bg-card);
-    }
-
-    .chat-msg--user {
-      border-color: var(--gold-shadow);
-      background: var(--bg-input);
-      align-items: flex-end;
-    }
-
-    .chat-msg--derrick {
-      border-color: var(--orange);
-      box-shadow: 0 0 12px rgba(255, 107, 53, 0.08);
-    }
-
-    .chat-msg__label {
-      font-family: var(--font-pixel);
-      font-size: 6px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-
-    .chat-msg--user .chat-msg__label {
-      color: var(--gold);
-    }
-
-    .chat-msg--derrick .chat-msg__label {
-      color: var(--orange);
-    }
-
-    .chat-msg__text {
-      font-family: var(--font-pixel);
-      font-size: 8px;
-      line-height: 2;
       letter-spacing: 0.5px;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .chat-msg--user .chat-msg__text {
-      color: var(--gold);
-      text-align: right;
-    }
-
-    .chat-msg--derrick .chat-msg__text {
-      color: var(--fg);
-      font-size: 9px;
-      line-height: 2.4;
-      white-space: normal;
-    }
-
-    /* ── Markdown rendering in Derrick's replies ─────────────────── */
-    .chat-msg--derrick .chat-msg__text h2 {
-      font-family: var(--font-pixel);
-      font-size: 9px;
-      color: var(--orange);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin: 16px 0 8px;
-      padding-bottom: 4px;
-      border-bottom: 1px solid var(--border-dim);
-    }
-
-    .chat-msg--derrick .chat-msg__text strong {
-      color: var(--gold);
-      font-weight: normal;
-      text-shadow: 0 0 6px rgba(255, 180, 0, 0.3);
-    }
-
-    .chat-msg--derrick .chat-msg__text ul {
-      margin: 8px 0 12px;
-      padding-left: 0;
-      list-style: none;
-    }
-
-    .chat-msg--derrick .chat-msg__text ul li {
-      position: relative;
-      padding-left: 16px;
-      margin-bottom: 8px;
       line-height: 2.2;
+      flex: 1;
     }
 
-    .chat-msg--derrick .chat-msg__text ul li::before {
-      content: "▸";
-      position: absolute;
-      left: 0;
-      color: var(--orange);
-    }
-
-    .chat-msg--derrick .chat-msg__text p {
-      margin: 0 0 12px;
-    }
-
-    .chat-msg--derrick .chat-msg__text p:last-child {
-      margin-bottom: 0;
-    }
-
-    .chat-thinking {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 12px 16px;
-      border: 2px solid var(--orange);
-      background: var(--bg-card);
+    .hub-card__cta {
       font-family: var(--font-pixel);
       font-size: 7px;
-      color: var(--orange);
-      letter-spacing: 2px;
+      color: var(--border-dim);
+      letter-spacing: 1px;
+      margin-top: 4px;
+      transition: color 0.1s;
     }
 
-    .chat-thinking__dots span {
-      animation: blink 1.2s infinite;
+    .hub-card:hover .hub-card__cta { color: var(--gold); }
+    .hub-card--ai:hover .hub-card__cta { color: var(--orange); }
+
+    /* ── Tools row ───────────────────────────────────────────────── */
+    .tools-section {
+      width: 100%;
+      margin-bottom: 32px;
     }
 
-    .chat-thinking__dots span:nth-child(2) {
-      animation-delay: 0.2s;
+    .tools-label {
+      font-family: var(--font-pixel);
+      font-size: 6px;
+      color: var(--muted);
+      letter-spacing: 3px;
+      margin-bottom: 12px;
+      border-top: 2px solid var(--border-dim);
+      padding-top: 20px;
     }
 
-    .chat-thinking__dots span:nth-child(3) {
-      animation-delay: 0.4s;
+    .tools-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
-    @keyframes blink {
-
-      0%,
-      100% {
-        opacity: 1;
-      }
-
-      50% {
-        opacity: 0;
-      }
+    .tools-row a {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 8px 12px;
+      border: 2px solid var(--border-dim);
+      letter-spacing: 1px;
+      transition: color 0.1s, border-color 0.1s;
     }
+
+    .tools-row a:hover { color: var(--gold); border-color: var(--gold); }
 
     /* ── Responsive ─────────────────────────────────────────────── */
-    @media (max-width: 540px) {
-      .hero {
-        padding: 48px 0 32px;
-      }
-
-      .hero__title {
-        font-size: 30px;
-        letter-spacing: 3px;
-      }
-
-      .hero__subtitle {
-        font-size: 6px;
-      }
-
-      #chat-input {
-        font-size: 8px;
-        padding: 14px;
-      }
-
-      .chat-send-btn {
-        font-size: 8px;
-        padding: 14px;
-      }
-
-      .chip {
-        font-size: 6px;
-        padding: 9px 11px;
-      }
+    @media (max-width: 560px) {
+      .hub-grid { grid-template-columns: 1fr; }
+      .hero__title { font-size: 30px; letter-spacing: 3px; }
+      .hero__subtitle { font-size: 6px; }
     }
   </style>
 </head>
@@ -408,7 +214,7 @@
       <div class="nav-dropdown">
         <button class="nav-dropdown__toggle" type="button">&#9654; TOOLS &#9660;</button>
         <div class="nav-dropdown__menu">
-          <a href="/">Ask Derrick</a>
+          <a href="ask.html">Ask Derrick</a>
           <a href="timer.html">Drill-o-doro</a>
           <a href="converter.html">Unit Converter</a>
           <a href="calculator.html">Drilling Calculator</a>
@@ -419,42 +225,52 @@
     </nav>
 
     <section class="hero">
-
-      <div>
-        <div class="hero__title">DERRICK</div>
-        <div class="hero__subtitle">YOUR DRILLING ENGINEER TOOLKIT</div>
-      </div>
-
-      <div class="chat-wrap">
-        <div class="chat-input-row">
-          <textarea id="chat-input" rows="2" placeholder="Ask Derrick anything about drilling..."></textarea>
-          <button class="chat-send-btn" type="button" aria-label="Send">
-            SEND &#9654;
-          </button>
-        </div>
-
-        <div class="chips" role="list" aria-label="Suggested questions">
-          <button class="chip" type="button" role="listitem" data-prompt="Walk me through Driller's Method">
-            Walk me through Driller's Method
-          </button>
-          <button class="chip" type="button" role="listitem" data-prompt="What does BHA stand for?">
-            What does BHA stand for?
-          </button>
-          <button class="chip" type="button" role="listitem" data-prompt="Calculate my kill mud weight">
-            Calculate my kill mud weight
-          </button>
-          <button class="chip" type="button" role="listitem" data-prompt="What are the signs of a kick?">
-            What are the signs of a kick?
-          </button>
-        </div>
-
-        <p class="chat-disclaimer">Derrick is powered by Claude by Anthropic. He's a study tool — always verify answers
-          against official training materials and company procedures.</p>
-      </div>
-
+      <div class="hero__title">DERRICK</div>
+      <div class="hero__subtitle">DRILLING INTELLIGENCE FOR THE OIL PATCH</div>
     </section>
 
-    <div class="chat-thread" id="chat-thread" aria-live="polite" aria-label="Conversation"></div>
+    <div class="hub-grid">
+
+      <a class="hub-card hub-card--ai" href="ask.html">
+        <div class="hub-card__tag">&#9654; AI ASSISTANT</div>
+        <div class="hub-card__title">ASK DERRICK</div>
+        <p class="hub-card__desc">Ask anything about well control, mud engineering, BHA, and IWCF prep.</p>
+        <div class="hub-card__cta">&#9654; OPEN ASSISTANT</div>
+      </a>
+
+      <a class="hub-card" href="news.html">
+        <div class="hub-card__tag">&#9654; NEWS</div>
+        <div class="hub-card__title">INDUSTRY NEWS</div>
+        <p class="hub-card__desc">AI &amp; automation developments in oil &amp; gas technology.</p>
+        <div class="hub-card__cta">&#9654; READ NEWS</div>
+      </a>
+
+      <a class="hub-card" href="/rigs">
+        <div class="hub-card__tag">&#9654; LIVE DATA</div>
+        <div class="hub-card__title">FLEET STATUS</div>
+        <p class="hub-card__desc">Offshore rig tracker across major contractors worldwide.</p>
+        <div class="hub-card__cta">&#9654; VIEW FLEET</div>
+      </a>
+
+      <a class="hub-card" href="automation.html">
+        <div class="hub-card__tag">&#9654; COMING SOON</div>
+        <div class="hub-card__title">AUTOMATION</div>
+        <p class="hub-card__desc">Custom n8n workflow automation for oil &amp; gas operations.</p>
+        <div class="hub-card__cta">&#9654; LEARN MORE</div>
+      </a>
+
+    </div>
+
+    <div class="tools-section">
+      <div class="tools-label">&#9654; TOOLS</div>
+      <div class="tools-row">
+        <a href="timer.html">DRILL-O-DORO</a>
+        <a href="converter.html">UNIT CONVERTER</a>
+        <a href="calculator.html">DRILLING CALCULATOR</a>
+        <a href="acronyms.html">ACRONYM LOOKUP</a>
+        <a href="wellcontrol.html">WELL CONTROL</a>
+      </div>
+    </div>
 
     <div class="support-bar">
       <a href="https://www.buymeacoffee.com/rgibbon97o" target="_blank" id="bmc-btn" title="Buy Me a Coffee">
@@ -475,155 +291,5 @@
 
   </div>
 
-  <script>
-    /* ── Chat state ──────────────────────────────────────────────── */
-    const history = [];   // [{role, content}]
-    const thread = document.getElementById('chat-thread');
-    const inputEl = document.getElementById('chat-input');
-    const sendBtn = document.querySelector('.chat-send-btn');
-
-    /* ── Chips populate the input ────────────────────────────────── */
-    document.querySelectorAll('.chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        inputEl.value = chip.dataset.prompt;
-        inputEl.focus();
-      });
-    });
-
-    /* ── Markdown renderer ───────────────────────────────────────── */
-    function renderMarkdown(text) {
-      const lines = text.split('\n');
-      const out = [];
-      let inList = false;
-
-      for (let i = 0; i < lines.length; i++) {
-        let line = lines[i];
-
-        if (/^##\s+/.test(line)) {
-          if (inList) { out.push('</ul>'); inList = false; }
-          const content = line.replace(/^##\s+/, '');
-          out.push('<h2>' + escMd(content) + '</h2>');
-          continue;
-        }
-
-        if (/^[-*]\s+/.test(line)) {
-          if (!inList) { out.push('<ul>'); inList = true; }
-          const content = line.replace(/^[-*]\s+/, '');
-          out.push('<li>' + inlineMd(content) + '</li>');
-          continue;
-        }
-
-        if (inList) { out.push('</ul>'); inList = false; }
-
-        if (line.trim() === '') {
-          out.push('</p><p>');
-          continue;
-        }
-
-        out.push(inlineMd(line));
-      }
-
-      if (inList) out.push('</ul>');
-
-      return '<p>' + out.join('\n') + '</p>'
-        .replace(/<p>\s*<\/p>/g, '')
-        .replace(/<p>\n*<\/p>/g, '');
-    }
-
-    function escMd(str) {
-      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    }
-
-    function inlineMd(str) {
-      str = escMd(str);
-      str = str.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-      str = str.replace(/__(.+?)__/g, '<strong>$1</strong>');
-      return str;
-    }
-
-    /* ── Render helpers ──────────────────────────────────────────── */
-    function appendMessage(role, text) {
-      const wrap = document.createElement('div');
-      wrap.className = `chat-msg chat-msg--${role === 'user' ? 'user' : 'derrick'}`;
-
-      const label = document.createElement('div');
-      label.className = 'chat-msg__label';
-      label.textContent = role === 'user' ? 'YOU' : 'DERRICK';
-
-      const body = document.createElement('div');
-      body.className = 'chat-msg__text';
-
-      if (role === 'user') {
-        body.textContent = text;
-      } else {
-        body.innerHTML = renderMarkdown(text);
-      }
-
-      wrap.appendChild(label);
-      wrap.appendChild(body);
-      thread.appendChild(wrap);
-      wrap.scrollIntoView({ behavior: 'smooth', block: 'end' });
-      return wrap;
-    }
-
-    function showThinking() {
-      const el = document.createElement('div');
-      el.className = 'chat-thinking';
-      el.innerHTML = 'DERRICK IS THINKING<span class="chat-thinking__dots">' +
-        '<span>.</span><span>.</span><span>.</span></span>';
-      thread.appendChild(el);
-      el.scrollIntoView({ behavior: 'smooth', block: 'end' });
-      return el;
-    }
-
-    /* ── Send message ────────────────────────────────────────────── */
-    async function sendMessage() {
-      const text = inputEl.value.trim();
-      if (!text) return;
-
-      inputEl.value = '';
-      inputEl.disabled = true;
-      sendBtn.disabled = true;
-
-      appendMessage('user', text);
-      history.push({ role: 'user', content: text });
-
-      const thinking = showThinking();
-
-      try {
-        const res = await fetch('/.netlify/functions/derrick', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: history }),
-        });
-
-        const data = await res.json();
-
-        thinking.remove();
-
-        if (!res.ok) {
-          appendMessage('derrick', 'Something went wrong on my end. Try again in a moment.');
-        } else {
-          const reply = data.response || 'No response received.';
-          appendMessage('derrick', reply);
-          history.push({ role: 'assistant', content: reply });
-        }
-      } catch {
-        thinking.remove();
-        appendMessage('derrick', 'Could not reach the server. Check your connection and try again.');
-      }
-
-      inputEl.disabled = false;
-      sendBtn.disabled = false;
-      inputEl.focus();
-    }
-
-    sendBtn.addEventListener('click', sendMessage);
-    inputEl.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-    });
-
-  </script>
 </body>
-
 </html>
