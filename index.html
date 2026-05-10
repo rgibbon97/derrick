@@ -62,6 +62,34 @@
       text-shadow: 1px 1px 0 var(--gold-shadow);
     }
 
+    /* ── Derrick intro ──────────────────────────────────────────── */
+    .derrick-intro {
+      width: 100%;
+      border-left: 3px solid var(--orange);
+      padding: 16px 22px;
+      margin: 0 0 32px;
+      background: var(--bg-card);
+    }
+
+    .derrick-intro p {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 14px;
+      color: var(--fg);
+      line-height: 1.9;
+      margin: 0 0 12px;
+    }
+
+    .derrick-intro p:last-of-type { margin-bottom: 0; }
+
+    .derrick-intro__sig {
+      font-family: var(--font-pixel);
+      font-size: 6px;
+      color: var(--orange);
+      letter-spacing: 2px;
+      margin-top: 16px;
+      display: block;
+    }
+
     /* ── Hub grid ────────────────────────────────────────────────── */
     .hub-grid {
       display: grid;
@@ -203,23 +231,29 @@
 
     <section class="hero">
       <div class="hero__title">DERRICK</div>
-      <div class="hero__subtitle">DRILLING INTELLIGENCE FOR THE OIL PATCH</div>
+      <div class="hero__subtitle">RETIRED FROM THE RIG. NOT FROM THE INDUSTRY.</div>
     </section>
+
+    <div class="derrick-intro">
+      <p>Started roughnecking in the North Sea in '93. Drilled wells across the Gulf of Mexico, the Middle East, and West Africa. Seen the booms, the busts, the automation hype, and the same well control mistakes made on repeat for thirty years.</p>
+      <p>Retired from the rig. Still watching the market, reading the noise, and telling you what actually matters.</p>
+      <span class="derrick-intro__sig">&#9654; DERRICK</span>
+    </div>
 
     <div class="hub-grid">
 
       <a class="hub-card hub-card--ai" href="ask.html">
         <div class="hub-card__tag">&#9654; AI ASSISTANT</div>
         <div class="hub-card__title">ASK DERRICK</div>
-        <p class="hub-card__desc">Ask anything about well control, mud engineering, BHA, and IWCF prep.</p>
-        <div class="hub-card__cta">&#9654; OPEN ASSISTANT</div>
+        <p class="hub-card__desc">Got a question? I've probably been there. Well control, mud engineering, BHA, IWCF — ask me.</p>
+        <div class="hub-card__cta">&#9654; ASK A QUESTION</div>
       </a>
 
       <a class="hub-card" href="news.html">
-        <div class="hub-card__tag">&#9654; NEWS</div>
+        <div class="hub-card__tag">&#9654; DERRICK'S BRIEFING</div>
         <div class="hub-card__title">INDUSTRY NEWS</div>
-        <p class="hub-card__desc">AI &amp; automation developments in oil &amp; gas technology.</p>
-        <div class="hub-card__cta">&#9654; READ NEWS</div>
+        <p class="hub-card__desc">What I'm reading this week. AI, automation, and market moves in oil &amp; gas.</p>
+        <div class="hub-card__cta">&#9654; READ THE BRIEFING</div>
       </a>
 
       <a class="hub-card" href="/rigs">
