@@ -52,7 +52,7 @@ exports.handler = async function (event) {
       headers: { 'Content-Type': 'application/json', 'Cache-Control': 'max-age=300' },
       body: JSON.stringify({ articles }),
     };
-  } catch (err) {
-    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
+  } catch {
+    return { statusCode: 500, body: JSON.stringify({ error: 'Failed to fetch news. Try again shortly.' }) };
   }
 };

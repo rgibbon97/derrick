@@ -38,7 +38,7 @@ exports.handler = async function () {
       url(`${SITE_URL}/`,               'monthly', '1.0'),
       url(`${SITE_URL}/rigs`,           'daily',   '0.9'),
       url(`${SITE_URL}/news.html`,      'daily',   '0.6'),
-      url(`${SITE_URL}/derrick.html`,   'monthly', '0.5'),
+      url(`${SITE_URL}/ask.html`,        'monthly', '0.5'),
       url(`${SITE_URL}/timer.html`,     'monthly', '0.4'),
       url(`${SITE_URL}/converter.html`, 'monthly', '0.4'),
       url(`${SITE_URL}/calculator.html`,'monthly', '0.4'),
