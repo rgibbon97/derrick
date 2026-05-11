@@ -348,15 +348,73 @@
       animation-delay: 0.4s;
     }
 
+    /* ── Featured article ───────────────────────────────────────── */
+    .featured-article {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 28px 28px 26px;
+      background: var(--bg-card);
+      border: 2px solid var(--orange);
+      box-shadow: 0 0 24px rgba(255, 107, 53, 0.08);
+      text-decoration: none;
+      margin-bottom: 24px;
+      transition: box-shadow 0.15s;
+    }
+
+    .featured-article:hover {
+      box-shadow: 0 0 40px rgba(255, 107, 53, 0.18);
+    }
+
+    .featured-label {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: #0a0a1a;
+      background: var(--orange);
+      padding: 4px 10px;
+      letter-spacing: 2px;
+      align-self: flex-start;
+    }
+
+    .featured-title {
+      font-family: var(--font-pixel);
+      font-size: 12px;
+      color: var(--gold);
+      line-height: 2.2;
+      letter-spacing: 1px;
+    }
+
+    .featured-summary {
+      font-family: var(--font-prose);
+      font-size: 15px;
+      color: #b8b8cc;
+      line-height: 1.75;
+    }
+
     /* ── Tag filter bar ─────────────────────────────────────────── */
     .tag-filter-bar {
       width: 100%;
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+      flex-direction: column;
+      gap: 10px;
       padding: 16px 0 20px;
       border-bottom: 2px solid var(--border-dim);
       margin-bottom: 32px;
+    }
+
+    .filter-bar-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .filter-bar-label {
+      font-family: var(--font-pixel);
+      font-size: 6px;
+      color: var(--subtle);
+      letter-spacing: 2px;
+      min-width: 48px;
     }
 
     .tag-pill {
@@ -636,6 +694,8 @@
       </svg>
     </header>
 
+    <div id="featured-container"></div>
+
     <div id="tag-filter" class="tag-filter-bar" style="display:none" aria-label="Filter by tag"></div>
 
     <div id="news-container" class="news-grid" aria-live="polite" aria-label="News articles">
@@ -679,6 +739,8 @@
 
   <script>
     let allArticles = [];
+    let activeTag = null;
+    let activeDays = null;
 
     async function loadNews() {
       const container = document.getElementById('news-container');
@@ -689,50 +751,156 @@
           showState(container, '&#9888;', data.error || 'No articles found.');
           return;
         }
-        allArticles = data.articles;
+        allArticles = data.articles.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        renderFeatured();
         renderFilterBar();
-        renderArticles(allArticles);
+        applyFilters();
       } catch {
         showState(container, '&#9888;', 'Could not reach the server. Check your connection.');
       }
     }
 
+    function renderFeatured() {
+      const container = document.getElementById('featured-container');
+      if (!allArticles.length) return;
+      const latestDate = allArticles[0].date;
+      const candidate = allArticles
+        .filter(a => a.date === latestDate && a.relevance != null)
+        .sort((a, b) => b.relevance - a.relevance)[0] || allArticles[0];
+
+      const a = document.createElement('a');
+      a.className = 'featured-article';
+      a.href = candidate.url || '#';
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+
+      const label = document.createElement('div');
+      label.className = 'featured-label';
+      label.textContent = '► HOT RIGHT NOW';
+
+      const meta = document.createElement('div');
+      meta.className = 'card-meta';
+      if (candidate.source) {
+        const src = document.createElement('span');
+        src.className = 'card-source';
+        src.textContent = candidate.source;
+        meta.appendChild(src);
+      }
+      const dateStr = formatDate(candidate.date);
+      if (dateStr) {
+        const dateEl = document.createElement('span');
+        dateEl.className = 'card-date';
+        dateEl.textContent = dateStr;
+        meta.appendChild(dateEl);
+      }
+
+      const title = document.createElement('div');
+      title.className = 'featured-title';
+      title.textContent = candidate.title;
+
+      a.appendChild(label);
+      a.appendChild(meta);
+      a.appendChild(title);
+
+      if (candidate.summary) {
+        const summary = document.createElement('div');
+        summary.className = 'featured-summary';
+        summary.textContent = candidate.summary;
+        a.appendChild(summary);
+      }
+
+      container.appendChild(a);
+    }
+
     function renderFilterBar() {
       const bar = document.getElementById('tag-filter');
+      bar.style.display = '';
+
+      // ── Date row ──
+      const dateRow = document.createElement('div');
+      dateRow.className = 'filter-bar-row';
+      const dateLabel = document.createElement('span');
+      dateLabel.className = 'filter-bar-label';
+      dateLabel.textContent = 'WHEN';
+      dateRow.appendChild(dateLabel);
+
+      [{ label: 'ALL', days: null }, { label: '30 DAYS', days: 30 }, { label: '7 DAYS', days: 7 }].forEach(({ label, days }) => {
+        const btn = document.createElement('button');
+        btn.className = 'tag-pill' + (days === null ? ' tag-pill--active' : '');
+        btn.textContent = label;
+        btn.addEventListener('click', () => {
+          activeDays = days;
+          dateRow.querySelectorAll('.tag-pill').forEach(p => p.classList.remove('tag-pill--active'));
+          btn.classList.add('tag-pill--active');
+          applyFilters();
+        });
+        dateRow.appendChild(btn);
+      });
+      bar.appendChild(dateRow);
+
+      // ── Tag row ──
       const tagSet = new Set();
       allArticles.forEach(a => (a.tags || []).forEach(t => tagSet.add(t)));
       const tags = [...tagSet].sort();
       if (tags.length === 0) return;
 
-      bar.style.display = '';
+      const tagRow = document.createElement('div');
+      tagRow.className = 'filter-bar-row';
+      const topicLabel = document.createElement('span');
+      topicLabel.className = 'filter-bar-label';
+      topicLabel.textContent = 'TOPIC';
+      tagRow.appendChild(topicLabel);
 
       const allPill = document.createElement('button');
       allPill.className = 'tag-pill tag-pill--active';
       allPill.textContent = 'ALL';
-      allPill.dataset.tag = '';
-      allPill.addEventListener('click', () => setFilter(null, allPill));
-      bar.appendChild(allPill);
+      allPill.addEventListener('click', () => {
+        activeTag = null;
+        tagRow.querySelectorAll('.tag-pill').forEach(p => p.classList.remove('tag-pill--active'));
+        allPill.classList.add('tag-pill--active');
+        applyFilters();
+      });
+      tagRow.appendChild(allPill);
 
       tags.forEach(tag => {
         const pill = document.createElement('button');
         pill.className = 'tag-pill';
         pill.textContent = tag;
-        pill.dataset.tag = tag;
-        pill.addEventListener('click', () => setFilter(tag, pill));
-        bar.appendChild(pill);
+        pill.addEventListener('click', () => {
+          activeTag = tag;
+          tagRow.querySelectorAll('.tag-pill').forEach(p => p.classList.remove('tag-pill--active'));
+          pill.classList.add('tag-pill--active');
+          applyFilters();
+        });
+        tagRow.appendChild(pill);
       });
+      bar.appendChild(tagRow);
     }
 
-    function setFilter(tag, clickedPill) {
-      document.querySelectorAll('#tag-filter .tag-pill').forEach(p => p.classList.remove('tag-pill--active'));
-      clickedPill.classList.add('tag-pill--active');
-      const filtered = tag ? allArticles.filter(a => (a.tags || []).includes(tag)) : allArticles;
+    function applyFilters() {
+      let filtered = allArticles;
+
+      if (activeDays) {
+        const cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - activeDays);
+        const cutoffStr = cutoff.toISOString().split('T')[0];
+        filtered = filtered.filter(a => (a.date || '') >= cutoffStr);
+      }
+
+      if (activeTag) {
+        filtered = filtered.filter(a => (a.tags || []).includes(activeTag));
+      }
+
       renderArticles(filtered);
     }
 
     function renderArticles(articles) {
       const container = document.getElementById('news-container');
       container.innerHTML = '';
+      if (articles.length === 0) {
+        showState(container, '&#9654;', 'No articles match this filter.');
+        return;
+      }
       articles.forEach(article => container.appendChild(buildCard(article)));
     }
 
