@@ -303,7 +303,7 @@
           });
           const data = await res.json();
           if (data.ok) {
-            msg.textContent = '&#9654; You\'re on the list. Derrick will be in touch.';
+            msg.textContent = '► You\'re on the list. Derrick will be in touch.';
             msg.className = 'email-capture__msg email-capture__msg--ok';
             form.reset();
           } else {
