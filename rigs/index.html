@@ -277,7 +277,7 @@
     .rigs-table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 900px;
+      min-width: 600px;
     }
 
     .rigs-table thead th {
@@ -382,6 +382,16 @@
       .page-header h1 { font-size: 13px; }
       .filters-grid { grid-template-columns: 1fr 1fr; }
       .stat-chip { min-width: 70px; }
+
+      /* Hide TYPE, REGION, DAY RATE columns — keep RIG NAME, CONTRACTOR, STATUS, CUSTOMER, LOCATION, CONTRACT END */
+      .rigs-table th:nth-child(3),
+      .rigs-table td:nth-child(3),
+      .rigs-table th:nth-child(7),
+      .rigs-table td:nth-child(7),
+      .rigs-table th:nth-child(9),
+      .rigs-table td:nth-child(9) {
+        display: none;
+      }
     }
   </style>
 </head>

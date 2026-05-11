@@ -751,8 +751,8 @@ textarea:disabled {
 .email-capture__msg--ok    { color: #88ff88; }
 .email-capture__msg--error { color: var(--orange); }
 
-@media (max-width: 540px) {
+@media (max-width: 620px) {
   .email-capture__form { flex-direction: column; }
   .email-capture__form input[type="email"] { border-right: 2px solid var(--gold); border-bottom: none; }
-  .email-capture__form button { border-top: none; }
+  .email-capture__form button { border-top: none; width: 100%; }
 }
