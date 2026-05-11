@@ -649,6 +649,16 @@
       </div>
     </div>
 
+    <div class="email-capture">
+      <div class="email-capture__heading">&#9654; GET DERRICK'S BRIEFING</div>
+      <div class="email-capture__sub">Weekly oil &amp; gas intelligence, written by Derrick. Leave your email and you'll be first to know.</div>
+      <form class="email-capture__form" id="subscribe-form">
+        <input type="email" id="subscribe-email" placeholder="your@email.com" autocomplete="email" required>
+        <button type="submit">NOTIFY ME &#9654;</button>
+      </form>
+      <div class="email-capture__msg" id="subscribe-msg" aria-live="polite"></div>
+    </div>
+
     <div class="support-bar">
       <a href="https://www.buymeacoffee.com/rgibbon97o" target="_blank" id="bmc-btn" title="Buy Me a Coffee">
         <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee">
@@ -812,6 +822,48 @@
     }
 
     loadNews();
+  </script>
+
+  <script>
+    (function () {
+      const form = document.getElementById('subscribe-form');
+      const emailEl = document.getElementById('subscribe-email');
+      const msg = document.getElementById('subscribe-msg');
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const email = emailEl.value.trim();
+        if (!email) return;
+
+        const btn = form.querySelector('button');
+        btn.disabled = true;
+        btn.textContent = 'SENDING...';
+        msg.textContent = '';
+        msg.className = 'email-capture__msg';
+
+        try {
+          const res = await fetch('/.netlify/functions/subscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, source: 'news' }),
+          });
+          const data = await res.json();
+          if (data.ok) {
+            msg.textContent = '► You\'re on the list. Derrick will be in touch.';
+            msg.className = 'email-capture__msg email-capture__msg--ok';
+            form.reset();
+          } else {
+            throw new Error();
+          }
+        } catch {
+          msg.textContent = 'Something went wrong. Try again in a moment.';
+          msg.className = 'email-capture__msg email-capture__msg--error';
+        }
+
+        btn.disabled = false;
+        btn.textContent = 'NOTIFY ME ►';
+      });
+    })();
   </script>
 
 </body>
