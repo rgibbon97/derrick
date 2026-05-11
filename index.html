@@ -65,7 +65,7 @@
     /* ── Hub grid ────────────────────────────────────────────────── */
     .hub-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 16px;
       width: 100%;
       margin: 8px 0 24px;
@@ -171,7 +171,7 @@
     .tools-row a:hover { color: var(--gold); border-color: var(--gold); }
 
     /* ── Responsive ─────────────────────────────────────────────── */
-    @media (max-width: 560px) {
+    @media (max-width: 760px) {
       .hub-grid { grid-template-columns: 1fr; }
       .hero__title { font-size: 30px; letter-spacing: 3px; }
       .hero__subtitle { font-size: 6px; }
@@ -187,7 +187,6 @@
       <a href="index.html" aria-current="page">&#9654; HOME</a>
       <a href="news.html">&#9654; NEWS</a>
       <a href="/rigs">&#9654; FLEET STATUS</a>
-      <a href="automation.html">&#9654; AUTOMATION</a>
       <div class="nav-dropdown">
         <button class="nav-dropdown__toggle" type="button">&#9654; TOOLS &#9660;</button>
         <div class="nav-dropdown__menu">
@@ -227,13 +226,6 @@
         <div class="hub-card__title">FLEET STATUS</div>
         <p class="hub-card__desc">Offshore rig tracker across major contractors worldwide.</p>
         <div class="hub-card__cta">&#9654; VIEW FLEET</div>
-      </a>
-
-      <a class="hub-card" href="automation.html">
-        <div class="hub-card__tag">&#9654; COMING SOON</div>
-        <div class="hub-card__title">AUTOMATION</div>
-        <p class="hub-card__desc">Custom n8n workflow automation for oil &amp; gas operations.</p>
-        <div class="hub-card__cta">&#9654; LEARN MORE</div>
       </a>
 
     </div>

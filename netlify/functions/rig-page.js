@@ -47,7 +47,6 @@ function navHtml() {
   return `<a href="/">&#9654; HOME</a>
     <a href="/news.html">&#9654; NEWS</a>
     <a href="/rigs" aria-current="page">&#9654; FLEET STATUS</a>
-    <a href="/automation.html">&#9654; AUTOMATION</a>
     <div class="nav-dropdown">
       <button class="nav-dropdown__toggle" type="button">&#9654; TOOLS &#9660;</button>
       <div class="nav-dropdown__menu">
