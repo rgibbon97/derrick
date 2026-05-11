@@ -81,6 +81,20 @@
     .stat-chip__value--orange { color: var(--orange); }
     .stat-chip__value--muted { color: var(--muted); }
 
+    /* ── Data notice ────────────────────────────────────────────── */
+    .data-notice {
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      line-height: 2.2;
+      border: 2px solid var(--border-dim);
+      border-left: 3px solid var(--gold);
+      background: var(--bg-card);
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+
     /* ── Filters panel ──────────────────────────────────────────── */
     .filters-panel {
       background: var(--bg-card);
@@ -418,6 +432,10 @@
           <div class="stat-chip__value stat-chip__value--muted" id="stat-other">—</div>
         </div>
       </div>
+    </div>
+
+    <div class="data-notice">
+      &#9654; DATA NOTE: Rig status is sourced from the latest publicly available fleet reports — this is not a live feed. Some entries may reflect operations that have since changed. Each rig page shows the date of its last known update.
     </div>
 
     <div class="filters-panel">
