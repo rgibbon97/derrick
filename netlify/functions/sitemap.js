@@ -42,6 +42,7 @@ exports.handler = async function () {
       url(`${SITE_URL}/timer.html`,     'monthly', '0.4'),
       url(`${SITE_URL}/converter.html`, 'monthly', '0.4'),
       url(`${SITE_URL}/calculator.html`,'monthly', '0.4'),
+      url(`${SITE_URL}/wellvolumes.html`,'monthly','0.4'),
       url(`${SITE_URL}/acronyms.html`,  'monthly', '0.4'),
       url(`${SITE_URL}/wellcontrol.html`,'monthly','0.4'),
     ];

@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Well Fluids Volume Calculator — Dynamic Bit Position | DERRICK</title>
+  <link rel="canonical" href="https://drillodoro.com/wellvolumes">
+  <meta name="description" content="Live drilling fluid volume calculator. Enter well geometry and BHA/string makeup once, then update bit depth and hole depth — annulus, internal string, steel displacement, and circulating volumes recalculate instantly for drilling, tripping and circulating.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .page-wrap { max-width: 1100px; }
+
+    .page-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 8px;
+      margin-bottom: 40px;
+    }
+
+    /* ── Shared card ─────────────────────────────────────────────── */
+    .wv-card {
+      background: var(--dark-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 18px 18px;
+      margin-bottom: 20px;
+      width: 100%;
+    }
+
+    .wv-card h2 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--orange);
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      margin-top: 0;
+      text-shadow: none;
+    }
+
+    .wv-card__note {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: -8px;
+      margin-bottom: 14px;
+    }
+
+    /* ── Dashboard: inputs + outputs ─────────────────────────────── */
+    .wv-dashboard {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .wv-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .wv-row:last-child { margin-bottom: 0; }
+
+    .wv-row label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      white-space: nowrap;
+      min-width: 150px;
+    }
+
+    .wv-row input {
+      flex: 1;
+      min-width: 0;
+      font-size: 14px;
+      padding: 8px 10px;
+      border-radius: 7px;
+    }
+
+    .wv-unit {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      white-space: nowrap;
+      min-width: 52px;
+      text-align: left;
+    }
+
+    .wv-sep { height: 1px; background: var(--border); margin: 12px 0; }
+
+    .wv-output {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 7px;
+    }
+    .wv-output:last-child { margin-bottom: 0; }
+
+    .wv-output label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      min-width: 190px;
+    }
+
+    .wv-result {
+      flex: 1;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--green);
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .wv-result-unit {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      min-width: 52px;
+    }
+
+    .wv-output--primary .wv-result { color: var(--orange-light); font-size: 18px; }
+
+    /* ── Checks strip ────────────────────────────────────────────── */
+    .wv-checks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .wv-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(74,222,128,0.1);
+      color: var(--green);
+      border: 1px solid rgba(74,222,128,0.25);
+    }
+    .wv-badge.bad {
+      background: rgba(249,115,22,0.12);
+      color: var(--orange-light);
+      border-color: rgba(249,115,22,0.3);
+    }
+
+    /* ── Tables ──────────────────────────────────────────────────── */
+    .wv-table-wrap { overflow-x: auto; }
+
+    table.wv-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 640px;
+    }
+
+    table.wv-table th {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: left;
+      padding: 8px 8px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    table.wv-table td {
+      padding: 6px 8px;
+      border-bottom: 1px solid var(--row-divider);
+      vertical-align: middle;
+    }
+
+    table.wv-table tr:last-child td { border-bottom: none; }
+
+    table.wv-table input[type="text"],
+    table.wv-table input[type="number"] {
+      width: 100%;
+      min-width: 70px;
+      padding: 6px 8px;
+      font-size: 13px;
+      border-radius: 6px;
+    }
+
+    table.wv-table input[disabled] {
+      background: transparent;
+      border-color: transparent;
+      color: var(--muted);
+      cursor: default;
+    }
+
+    table.wv-table .wv-computed {
+      color: var(--muted);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .wv-remove-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--muted);
+      padding: 4px 8px;
+      font-size: 13px;
+      border-radius: 6px;
+    }
+    .wv-remove-btn:hover {
+      color: var(--orange-light);
+      border-color: rgba(249,115,22,0.3);
+      background: rgba(249,115,22,0.08);
+    }
+
+    .wv-add-btn {
+      margin-top: 12px;
+      font-size: 12px;
+      padding: 8px 14px;
+    }
+
+    @media (max-width: 760px) {
+      .wv-dashboard { grid-template-columns: 1fr; }
+      .wv-row label, .wv-output label { min-width: 130px; font-size: 10px; }
+    }
+
+    /* ── SEO section (reuse calculator.html pattern) ────────────── */
+    .seo-section {
+      width: 100%;
+      margin-top: 24px;
+      background: var(--dark-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+    .seo-inner { padding: 40px 36px; font-size: 15px; color: var(--muted); line-height: 1.8; }
+    .seo-inner h2 { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; margin-bottom: 16px; margin-top: 0; text-shadow: none; }
+    .seo-inner h3 { font-size: 13px; font-weight: 600; color: var(--orange); letter-spacing: 0.3px; text-transform: uppercase; margin-top: 32px; margin-bottom: 12px; text-shadow: none; }
+    .seo-inner p { margin-bottom: 14px; }
+    .seo-divider { height: 1px; background: var(--border); margin: 28px 0; }
+    .seo-features { list-style: none; padding: 0; }
+    .seo-features li { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--row-divider); font-size: 15px; color: var(--muted); }
+    .seo-features li:last-child { border-bottom: none; }
+    .seo-features li::before { content: '▸'; color: var(--green); font-size: 12px; flex-shrink: 0; margin-top: 3px; }
+    @media (max-width: 620px) { .seo-inner { padding: 28px 20px; } }
+  </style>
+</head>
+<body>
+  <nav class="page-nav">
+    <div class="page-nav__inner">
+      <a href="index.html" class="page-nav__brand">DERRICK</a>
+      <ul class="page-nav__links">
+        <li><a href="news.html">News</a></li>
+        <li><a href="/rigs">Fleet</a></li>
+        <li class="page-nav__dropdown">
+          <button class="page-nav__dropdown-toggle active" type="button">Tools ▾</button>
+          <div class="page-nav__dropdown-menu">
+            <a href="ask.html">Ask Derrick</a>
+            <a href="timer.html">Drill-o-doro</a>
+            <a href="converter.html">Unit Converter</a>
+            <a href="calculator.html">Drilling Calculator</a>
+            <a href="wellvolumes.html" aria-current="page">Well Fluid Volumes</a>
+            <a href="acronyms.html">Acronym Lookup</a>
+            <a href="wellcontrol.html">Well Control</a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="page-wrap">
+
+    <h1>Well Fluids Volume Calculator</h1>
+    <p class="page-subtitle">Enter well geometry and string makeup once — then just move the bit. Volumes update live for drilling, tripping, running in hole and circulating.</p>
+
+    <!-- ── Dashboard ────────────────────────────────────────────── -->
+    <div class="wv-dashboard">
+
+      <div class="wv-card">
+        <h2>Dashboard — Inputs</h2>
+        <div class="wv-row">
+          <label for="bitDepth">CURRENT BIT DEPTH</label>
+          <input type="number" id="bitDepth" placeholder="0" step="any">
+          <span class="wv-unit">m</span>
+        </div>
+        <div class="wv-row">
+          <label for="holeDepth">CURRENT HOLE DEPTH</label>
+          <input type="number" id="holeDepth" placeholder="0" step="any">
+          <span class="wv-unit">m</span>
+        </div>
+        <div class="wv-row">
+          <label for="pumpRate">PUMP RATE</label>
+          <input type="number" id="pumpRate" placeholder="0" step="any">
+          <span class="wv-unit">bbl/min</span>
+        </div>
+        <div class="wv-row">
+          <label for="activePit">ACTIVE PIT VOLUME</label>
+          <input type="number" id="activePit" placeholder="0" step="any">
+          <span class="wv-unit">bbl</span>
+        </div>
+        <div class="wv-row">
+          <label for="sandTrap">SAND TRAP VOLUME</label>
+          <input type="number" id="sandTrap" placeholder="0" step="any">
+          <span class="wv-unit">bbl</span>
+        </div>
+        <div class="wv-row">
+          <label for="surfaceLines">SURFACE LINES VOLUME</label>
+          <input type="number" id="surfaceLines" placeholder="0" step="any">
+          <span class="wv-unit">bbl</span>
+        </div>
+
+        <div class="wv-sep"></div>
+        <div class="wv-checks" id="checks"></div>
+      </div>
+
+      <div class="wv-card">
+        <h2>Dashboard — Outputs</h2>
+        <div class="wv-output wv-output--primary">
+          <label>OPEN WELL VOLUME</label>
+          <span class="wv-result" id="out-openVol">—</span>
+          <span class="wv-result-unit">bbl</span>
+        </div>
+        <div class="wv-output">
+          <label>ANNULUS VOLUME</label>
+          <span class="wv-result" id="out-annVol">—</span>
+          <span class="wv-result-unit">bbl</span>
+        </div>
+        <div class="wv-output">
+          <label>INTERNAL STRING VOLUME</label>
+          <span class="wv-result" id="out-intVol">—</span>
+          <span class="wv-result-unit">bbl</span>
+        </div>
+        <div class="wv-output">
+          <label>STEEL DISPLACEMENT</label>
+          <span class="wv-result" id="out-steelVol">—</span>
+          <span class="wv-result-unit">bbl</span>
+        </div>
+        <div class="wv-output wv-output--primary">
+          <label>TOTAL CIRCULATING VOLUME</label>
+          <span class="wv-result" id="out-totalCirc">—</span>
+          <span class="wv-result-unit">bbl</span>
+        </div>
+        <div class="wv-output">
+          <label>BOTTOMS-UP TIME</label>
+          <span class="wv-result" id="out-bottomsUp">—</span>
+          <span class="wv-result-unit">min</span>
+        </div>
+        <div class="wv-output">
+          <label>TOTAL SURFACE VOLUME</label>
+          <span class="wv-result" id="out-totalSurface">—</span>
+          <span class="wv-result-unit">bbl</span>
+        </div>
+        <div class="wv-output wv-output--primary">
+          <label>FULL SYSTEM VOLUME</label>
+          <span class="wv-result" id="out-fullSystem">—</span>
+          <span class="wv-result-unit">bbl</span>
+        </div>
+        <div class="wv-output">
+          <label>FULL SYSTEM CIRC. TIME</label>
+          <span class="wv-result" id="out-fullCircTime">—</span>
+          <span class="wv-result-unit">min</span>
+        </div>
+        <div class="wv-output">
+          <label>RATHOLE (HOLE − BIT)</label>
+          <span class="wv-result" id="out-rathole">—</span>
+          <span class="wv-result-unit">m</span>
+        </div>
+      </div>
+
+    </div><!-- /wv-dashboard -->
+
+    <!-- ── Well Geometry ────────────────────────────────────────── -->
+    <div class="wv-card">
+      <h2>Well Geometry</h2>
+      <p class="wv-card__note">Enter once. Top MD chains from the section above; the last section's Bottom MD always tracks Current Hole Depth.</p>
+      <div class="wv-table-wrap">
+        <table class="wv-table" id="sectionsTable">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Top MD (m)</th>
+              <th>Bottom MD (m)</th>
+              <th>Hole ID (in)</th>
+              <th>Length (m)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="sectionsBody"></tbody>
+        </table>
+      </div>
+      <button class="wv-add-btn" id="addSection" type="button">+ Add well section</button>
+    </div>
+
+    <!-- ── String Makeup ────────────────────────────────────────── -->
+    <div class="wv-card">
+      <h2>String Makeup</h2>
+      <p class="wv-card__note">Enter once, order from the BIT upward (bottommost component first). Bottom/Top MD are computed automatically from Current Bit Depth.</p>
+      <div class="wv-table-wrap">
+        <table class="wv-table" id="componentsTable">
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>OD (in)</th>
+              <th>ID (in)</th>
+              <th>Length (m)</th>
+              <th>Bottom MD (m)</th>
+              <th>Top MD (m)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="componentsBody"></tbody>
+        </table>
+      </div>
+      <button class="wv-add-btn" id="addComponent" type="button">+ Add string component</button>
+    </div>
+
+    <!-- ── SEO Content ─────────────────────────────────────────── -->
+    <section class="seo-section" aria-label="About the well fluids volume model">
+      <div class="seo-inner">
+
+        <h2>HOW THE POSITION-BASED VOLUME MODEL WORKS</h2>
+        <p>
+          Most drilling fluid spreadsheets are static — a snapshot of the well with the BHA on bottom at TD. The
+          moment you trip, drill ahead, or circulate off bottom, the manually entered pipe lengths per section are
+          wrong and someone has to re-split them by hand. This calculator removes that step: string position is
+          driven entirely by <strong>Current Bit Depth</strong> and <strong>Current Hole Depth</strong>, and every
+          other length is derived automatically.
+        </p>
+
+        <div class="seo-divider"></div>
+
+        <h3>THE OVERLAP METHOD</h3>
+        <p>
+          Each string component's Bottom MD and Top MD are computed by chaining lengths upward from the bit —
+          the bottommost component's Bottom MD equals Current Bit Depth, and each component's Top MD is its own
+          Bottom MD minus its length, which becomes the Bottom MD of the component above it. Well sections
+          (casing, liner, open hole) chain the same way from surface down, with the last section's Bottom MD tied
+          to Current Hole Depth.
+        </p>
+        <p>
+          For every component × well-section pair, the length of that component actually inside that section is:
+        </p>
+        <p><strong>Overlap = MAX(0, MIN(Component Bottom, Section Bottom) − MAX(Component Top, Section Top))</strong></p>
+        <p>
+          Summed across all pairs, this automatically redistributes pipe between casing, liner and open hole as
+          the bit moves — no manual interval lengths, ever.
+        </p>
+
+        <div class="seo-divider"></div>
+
+        <h3>DRILLING, TRIPPING AND CIRCULATING</h3>
+        <ul class="seo-features">
+          <li><strong>Drilling ahead:</strong> update Bit Depth and Hole Depth together as you drill down.</li>
+          <li><strong>Tripping out:</strong> update Bit Depth only — Hole Depth stays fixed at the last drilled TD. Components above surface simply stop contributing volume.</li>
+          <li><strong>Running in hole:</strong> update Bit Depth only, up to the fixed Hole Depth.</li>
+          <li><strong>Backreaming / circulating off bottom:</strong> set Bit Depth to the pipe's actual position; Hole Depth stays fixed.</li>
+        </ul>
+
+      </div>
+    </section>
+
+    <div class="support-bar">
+      <a href="https://www.buymeacoffee.com/rgibbon97o" target="_blank" id="bmc-btn" title="Buy Me a Coffee">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee">
+      </a>
+      <a href="https://www.linkedin.com/in/ross-gibbon-506a2316a/" target="_blank" class="linkedin-btn" title="LinkedIn">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-label="LinkedIn">
+          <path d="M20.447 20.452H17.01v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.583V9h3.296v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a1.914 1.914 0 1 1 0-3.828 1.914 1.914 0 0 1 0 3.828zm1.658 13.019H3.68V9h3.315v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+        </svg>
+      </a>
+    </div>
+
+    <footer class="site-footer">
+      <p>DRILL-O-DORO &mdash; drillodoro.com</p>
+    </footer>
+
+  </div><!-- /page-wrap -->
+
+  <script>
+    // ── Constants ──────────────────────────────────────────────────
+    const FT_PER_M = 3.28084;
+    const CAP_CONST = 1029.4;
+
+    const openCap  = (holeId) => (holeId * holeId) / CAP_CONST * FT_PER_M;
+    const annCap   = (holeId, od) => (holeId * holeId - od * od) / CAP_CONST * FT_PER_M;
+    const intCap   = (id) => (id * id) / CAP_CONST * FT_PER_M;
+    const steelCap = (od, id) => (od * od - id * id) / CAP_CONST * FT_PER_M;
+
+    // ── State ──────────────────────────────────────────────────────
+    let nextId = 1;
+    let sections = [
+      { id: nextId++, desc: 'Casing',    top: 0, bottom: undefined, holeId: undefined },
+      { id: nextId++, desc: 'Liner',     bottom: undefined, holeId: undefined },
+      { id: nextId++, desc: 'Open Hole', holeId: undefined } // bottom auto = hole depth
+    ];
+    let components = [
+      { id: nextId++, name: 'Drill Collars', od: undefined, idIn: undefined, length: undefined },
+      { id: nextId++, name: 'Drill Pipe',     od: undefined, idIn: undefined, length: undefined },
+      { id: nextId++, name: 'Drill Pipe',     od: undefined, idIn: undefined, length: undefined }
+    ];
+
+    // ── Helpers ────────────────────────────────────────────────────
+    function numVal(id) {
+      const v = parseFloat(document.getElementById(id).value);
+      return isNaN(v) ? 0 : v;
+    }
+    function fmt(v, dp = 2) {
+      if (v === null || !isFinite(v)) return '—';
+      return v.toFixed(dp);
+    }
+
+    // ── Rendering: Well Geometry table ───────────────────────────
+    function renderSections() {
+      const body = document.getElementById('sectionsBody');
+      body.innerHTML = '';
+      sections.forEach((s, i) => {
+        const isFirst = i === 0;
+        const isLast = i === sections.length - 1;
+        const tr = document.createElement('tr');
+        tr.dataset.row = i;
+        tr.innerHTML = `
+          <td><input type="text" data-field="desc" placeholder="e.g. Casing" value="${s.desc ?? ''}"></td>
+          <td><input type="number" step="any" placeholder="0" data-field="top" value="${isFirst ? (s.top ?? 0) : ''}" ${isFirst ? '' : 'disabled'}></td>
+          <td><input type="number" step="any" placeholder="0" data-field="bottom" value="${isLast ? '' : (s.bottom ?? '')}" ${isLast ? 'disabled' : ''}></td>
+          <td><input type="number" step="any" placeholder="0.000" data-field="holeId" value="${s.holeId ?? ''}"></td>
+          <td class="wv-computed" data-out="length">—</td>
+          <td>${sections.length > 1 ? '<button type="button" class="wv-remove-btn" title="Remove section">✕</button>' : ''}</td>
+        `;
+        body.appendChild(tr);
+
+        tr.querySelectorAll('input').forEach(inp => {
+          inp.addEventListener('input', () => {
+            const field = inp.dataset.field;
+            s[field] = field === 'desc' ? inp.value : parseFloat(inp.value);
+            recalc();
+          });
+        });
+        const rmBtn = tr.querySelector('.wv-remove-btn');
+        if (rmBtn) {
+          rmBtn.addEventListener('click', () => {
+            sections.splice(i, 1);
+            renderSections();
+            recalc();
+          });
+        }
+      });
+    }
+
+    // ── Rendering: String Makeup table ───────────────────────────
+    function renderComponents() {
+      const body = document.getElementById('componentsBody');
+      body.innerHTML = '';
+      components.forEach((c, i) => {
+        const tr = document.createElement('tr');
+        tr.dataset.row = i;
+        tr.innerHTML = `
+          <td><input type="text" data-field="name" placeholder="e.g. Drill Pipe" value="${c.name ?? ''}"></td>
+          <td><input type="number" step="any" placeholder="0.000" data-field="od" value="${c.od ?? ''}"></td>
+          <td><input type="number" step="any" placeholder="0.000" data-field="idIn" value="${c.idIn ?? ''}"></td>
+          <td><input type="number" step="any" placeholder="0" data-field="length" value="${c.length ?? ''}"></td>
+          <td class="wv-computed" data-out="bottom">—</td>
+          <td class="wv-computed" data-out="top">—</td>
+          <td>${components.length > 1 ? '<button type="button" class="wv-remove-btn" title="Remove component">✕</button>' : ''}</td>
+        `;
+        body.appendChild(tr);
+
+        tr.querySelectorAll('input').forEach(inp => {
+          inp.addEventListener('input', () => {
+            const field = inp.dataset.field;
+            c[field] = field === 'name' ? inp.value : parseFloat(inp.value);
+            recalc();
+          });
+        });
+        const rmBtn = tr.querySelector('.wv-remove-btn');
+        if (rmBtn) {
+          rmBtn.addEventListener('click', () => {
+            components.splice(i, 1);
+            renderComponents();
+            recalc();
+          });
+        }
+      });
+    }
+
+    // ── Derived positions ─────────────────────────────────────────
+    function computeSectionPositions(holeDepth) {
+      let prevBottom = null;
+      return sections.map((s, i) => {
+        const top = i === 0 ? (s.top || 0) : prevBottom;
+        const bottom = i === sections.length - 1 ? holeDepth : (s.bottom ?? top);
+        prevBottom = bottom;
+        return { ...s, top, bottom, holeId: s.holeId || 0 };
+      });
+    }
+
+    function computeComponentPositions(bitDepth) {
+      let prevTop = null;
+      return components.map((c, i) => {
+        const length = c.length || 0;
+        const bottom = i === 0 ? bitDepth : prevTop;
+        const top = bottom - length;
+        prevTop = top;
+        return { ...c, od: c.od || 0, idIn: c.idIn || 0, length, bottom, top };
+      });
+    }
+
+    // ── Main recalculation ─────────────────────────────────────────
+    function recalc() {
+      const bitDepth = numVal('bitDepth');
+      const holeDepth = numVal('holeDepth');
+      const pumpRate = numVal('pumpRate');
+      const activePit = numVal('activePit');
+      const sandTrap = numVal('sandTrap');
+      const surfaceLines = numVal('surfaceLines');
+
+      const secs = computeSectionPositions(holeDepth);
+      const comps = computeComponentPositions(bitDepth);
+
+      // Open well volume — independent of string position
+      let openVol = 0;
+      secs.forEach(s => {
+        openVol += Math.max(0, s.bottom - s.top) * openCap(s.holeId);
+      });
+
+      // Overlap model — annulus / internal / steel
+      let annVol = 0, intVol = 0, steelVol = 0;
+      let odExceeds = false;
+      comps.forEach(c => {
+        let inHole = 0;
+        secs.forEach(s => {
+          const overlap = Math.max(0, Math.min(c.bottom, s.bottom) - Math.max(c.top, s.top));
+          if (overlap > 0) {
+            inHole += overlap;
+            annVol += overlap * annCap(s.holeId, c.od);
+            if (c.od >= s.holeId) odExceeds = true;
+          }
+        });
+        intVol += inHole * intCap(c.idIn);
+        steelVol += inHole * steelCap(c.od, c.idIn);
+      });
+
+      const totalCirc = annVol + intVol;
+      const bottomsUpTime = pumpRate > 0 ? annVol / pumpRate : null;
+      const totalSurface = activePit + sandTrap + surfaceLines;
+      const fullSystem = totalCirc + totalSurface;
+      const fullCircTime = pumpRate > 0 ? fullSystem / pumpRate : null;
+      const rathole = holeDepth - bitDepth;
+      const stringTop = comps.length ? comps[comps.length - 1].top : 0;
+
+      // ── Update outputs ──────────────────────────────────────────
+      document.getElementById('out-openVol').textContent = fmt(openVol);
+      document.getElementById('out-annVol').textContent = fmt(annVol);
+      document.getElementById('out-intVol').textContent = fmt(intVol);
+      document.getElementById('out-steelVol').textContent = fmt(steelVol);
+      document.getElementById('out-totalCirc').textContent = fmt(totalCirc);
+      document.getElementById('out-bottomsUp').textContent = fmt(bottomsUpTime);
+      document.getElementById('out-totalSurface').textContent = fmt(totalSurface);
+      document.getElementById('out-fullSystem').textContent = fmt(fullSystem);
+      document.getElementById('out-fullCircTime').textContent = fmt(fullCircTime);
+      document.getElementById('out-rathole').textContent = fmt(rathole);
+
+      // ── Update computed table cells ─────────────────────────────
+      const secRows = document.querySelectorAll('#sectionsBody tr');
+      secRows.forEach((tr, i) => {
+        const s = secs[i];
+        tr.querySelector('[data-out="length"]').textContent = fmt(Math.max(0, s.bottom - s.top));
+        if (i > 0) {
+          const topInput = tr.querySelector('[data-field="top"]');
+          if (topInput) topInput.value = fmt(s.top);
+        }
+        if (i === secs.length - 1) {
+          const bottomInput = tr.querySelector('[data-field="bottom"]');
+          if (bottomInput) bottomInput.value = fmt(s.bottom);
+        }
+      });
+
+      const compRows = document.querySelectorAll('#componentsBody tr');
+      compRows.forEach((tr, i) => {
+        const c = comps[i];
+        tr.querySelector('[data-out="bottom"]').textContent = fmt(c.bottom);
+        tr.querySelector('[data-out="top"]').textContent = fmt(c.top);
+      });
+
+      // ── Checks ───────────────────────────────────────────────────
+      const checks = document.getElementById('checks');
+      const checkList = [
+        { ok: !odExceeds, label: odExceeds ? 'Pipe OD ≥ hole ID somewhere' : 'All pipe fits its section' },
+        { ok: holeDepth >= bitDepth, label: holeDepth >= bitDepth ? 'Hole depth ≥ bit depth' : 'Bit depth below hole depth' },
+        { ok: Math.abs(stringTop) <= 0.01, label: Math.abs(stringTop) <= 0.01 ? 'String reaches surface' : `String top ${fmt(stringTop)} m (not at surface)` }
+      ];
+      checks.innerHTML = checkList.map(c =>
+        `<span class="wv-badge ${c.ok ? '' : 'bad'}">${c.ok ? '✓' : '!'} ${c.label}</span>`
+      ).join('');
+    }
+
+    // ── Add row buttons ────────────────────────────────────────────
+    document.getElementById('addSection').addEventListener('click', () => {
+      // insert new spare section second-to-last, so the last row (open hole / TD) stays last
+      sections.splice(sections.length - 1, 0, { id: nextId++, desc: 'New section', bottom: undefined, holeId: undefined });
+      renderSections();
+      recalc();
+    });
+
+    document.getElementById('addComponent').addEventListener('click', () => {
+      components.push({ id: nextId++, name: 'New component', od: undefined, idIn: undefined, length: 0 });
+      renderComponents();
+      recalc();
+    });
+
+    // ── Dashboard input bindings ────────────────────────────────────
+    ['bitDepth', 'holeDepth', 'pumpRate', 'activePit', 'sandTrap', 'surfaceLines'].forEach(id => {
+      document.getElementById(id).addEventListener('input', recalc);
+    });
+
+    // ── Init ──────────────────────────────────────────────────────
+    renderSections();
+    renderComponents();
+    recalc();
+  </script>
+</body>
+</html>
