@@ -37,20 +37,26 @@ async function supabase(path) {
 }
 
 function navHtml() {
-  return `<a href="/">&#9654; HOME</a>
-    <a href="/news.html">&#9654; NEWS</a>
-    <a href="/rigs" aria-current="page">&#9654; FLEET STATUS</a>
-    <div class="nav-dropdown">
-      <button class="nav-dropdown__toggle" type="button">&#9654; TOOLS &#9660;</button>
-      <div class="nav-dropdown__menu">
-        <a href="/ask.html">Ask Derrick</a>
-        <a href="/timer.html">Drill-o-doro</a>
-        <a href="/converter.html">Unit Converter</a>
-        <a href="/calculator.html">Drilling Calculator</a>
-        <a href="/acronyms.html">Acronym Lookup</a>
-        <a href="/wellcontrol.html">Well Control</a>
-      </div>
-    </div>`;
+  return `<nav class="page-nav">
+    <div class="page-nav__inner">
+      <a href="/" class="page-nav__brand">DERRICK</a>
+      <ul class="page-nav__links">
+        <li><a href="/news.html">News</a></li>
+        <li><a href="/rigs" aria-current="page">Fleet</a></li>
+        <li class="page-nav__dropdown">
+          <button class="page-nav__dropdown-toggle" type="button">Tools ▾</button>
+          <div class="page-nav__dropdown-menu">
+            <a href="/ask.html">Ask Derrick</a>
+            <a href="/timer.html">Drill-o-doro</a>
+            <a href="/converter.html">Unit Converter</a>
+            <a href="/calculator.html">Drilling Calculator</a>
+            <a href="/acronyms.html">Acronym Lookup</a>
+            <a href="/wellcontrol.html">Well Control</a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>`;
 }
 
 function getCurrentContract(rig) {
@@ -141,7 +147,7 @@ function renderContractorPage(contractor, rigs) {
   <link rel="canonical" href="${SITE_URL}/contractors/${contractorSlug}">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="/style.css">
   <script type="application/ld+json">
   {
@@ -154,17 +160,6 @@ function renderContractorPage(contractor, rigs) {
   <style>
     body { padding: 0 20px 80px; justify-content: flex-start; align-items: center; }
     .page-shell { max-width: 1100px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; }
-    .top-nav {
-      width: 100%; display: flex; gap: 2px; flex-wrap: wrap;
-      padding: 20px 0 24px; border-bottom: 2px solid var(--border-dim);
-    }
-    .top-nav a {
-      font-family: var(--font-pixel); font-size: 7px; color: var(--muted);
-      text-decoration: none; letter-spacing: 1px; padding: 7px 11px;
-      border: 2px solid transparent; text-transform: uppercase;
-      transition: color 0.1s, border-color 0.1s;
-    }
-    .top-nav a:hover { color: var(--gold); border-color: var(--gold); }
     .breadcrumb {
       margin: 24px 0 8px; font-family: var(--font-pixel); font-size: 6px;
       color: var(--muted); letter-spacing: 1px; display: flex; gap: 8px;
@@ -223,12 +218,8 @@ function renderContractorPage(contractor, rigs) {
   </style>
 </head>
 <body>
-
+  ${navHtml()}
 <div class="page-shell">
-
-  <nav class="top-nav" aria-label="Site navigation">
-    ${navHtml()}
-  </nav>
 
   <div class="breadcrumb">
     <a href="/rigs">FLEET HUB</a>
@@ -295,25 +286,22 @@ function render404(slug) {
   <meta name="robots" content="noindex">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="/style.css">
   <style>
     body { padding: 0 20px 80px; }
     .page-shell { max-width: 720px; margin: 0 auto; }
-    .top-nav { display: flex; gap: 2px; flex-wrap: wrap; padding: 20px 0 24px; border-bottom: 2px solid var(--border-dim); }
-    .top-nav a { font-family: var(--font-pixel); font-size: 7px; color: var(--muted); text-decoration: none; letter-spacing: 1px; padding: 7px 11px; border: 2px solid transparent; }
-    .top-nav a:hover { color: var(--gold); border-color: var(--gold); }
     .not-found { padding: 60px 0; text-align: center; }
   </style>
 </head>
 <body>
+  ${navHtml()}
 <div class="page-shell">
-  <nav class="top-nav">${navHtml()}</nav>
   <div class="not-found">
-    <h1 style="font-size:14px;color:var(--orange);margin-bottom:24px">CONTRACTOR NOT FOUND</h1>
-    <p style="font-family:var(--font-pixel);font-size:7px;color:var(--muted);letter-spacing:1px;line-height:2.5">
-      No contractor found for <strong style="color:var(--gold)">${esc(slug)}</strong>.<br>
-      <a href="/rigs" style="color:var(--gold)">&#9654; BACK TO FLEET HUB</a>
+    <h1 style="font-size:22px;color:var(--orange);margin-bottom:24px">Contractor not found</h1>
+    <p style="font-size:14px;color:var(--muted);line-height:2">
+      No contractor found for <strong style="color:var(--orange)">${esc(slug)}</strong>.<br>
+      <a href="/rigs" style="color:var(--orange)">&#9654; Back to Fleet Hub</a>
     </p>
   </div>
 </div>

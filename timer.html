@@ -7,9 +7,111 @@
   <meta name="description" content="Free Pomodoro timer built for oil and gas professionals. Stay focused during IWCF revision, study sessions, and rig planning with customisable work and break intervals.">
   <link rel="canonical" href="https://drillodoro.com/timer">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Global nav ─────────────────────────────────────────────── */
+    .page-nav {
+      width: 100%;
+      position: sticky;
+      top: 0;
+      z-index: 300;
+      background: rgba(10,10,26,0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .page-nav__inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .page-nav__brand {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-weight: 700;
+      font-size: 17px;
+      color: #f1f5f9;
+      text-decoration: none;
+      letter-spacing: 2px;
+    }
+    .page-nav__links {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .page-nav__links a {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+      letter-spacing: 0;
+      border: none;
+    }
+    .page-nav__links a:hover { color: #f1f5f9; background: rgba(255,255,255,0.07); }
+    .page-nav__links a[aria-current="page"] { color: #f97316; }
+    .page-nav__dropdown { position: relative; }
+    .page-nav__dropdown-toggle {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      background: transparent;
+      color: rgba(255,255,255,0.6);
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: color 0.15s, background 0.15s;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+    .page-nav__dropdown-toggle:hover,
+    .page-nav__dropdown:hover .page-nav__dropdown-toggle { color: #f1f5f9; background: rgba(255,255,255,0.07); }
+    .page-nav__dropdown-toggle.active { color: #f97316; }
+    .page-nav__dropdown-toggle:active { transform: none; }
+    .page-nav__dropdown-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: #13131e;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      min-width: 190px;
+      z-index: 400;
+      flex-direction: column;
+      padding: 6px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+    .page-nav__dropdown:hover .page-nav__dropdown-menu,
+    .page-nav__dropdown:focus-within .page-nav__dropdown-menu { display: flex; }
+    .page-nav__dropdown-menu a {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      padding: 9px 12px;
+      border-radius: 7px;
+      border: none;
+      display: block;
+      transition: color 0.1s, background 0.1s;
+      white-space: nowrap;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .page-nav__dropdown-menu a:hover { color: #f1f5f9; background: rgba(255,255,255,0.07); }
+    .page-nav__dropdown-menu a[aria-current="page"] { color: #f97316; }
 
     body {
       background: #0a0a1a;
@@ -587,22 +689,25 @@
   </style>
 </head>
 <body>
-  <a class="site-brand" href="index.html">DERRICK</a>
-  <nav class="site-nav" aria-label="Site navigation">
-    <a href="index.html">&#9654; HOME</a>
-    <a href="news.html">&#9654; NEWS</a>
-    <a href="/rigs">&#9654; FLEET STATUS</a>
-    <div class="nav-dropdown">
-      <button class="nav-dropdown__toggle active" type="button">&#9654; TOOLS &#9660;</button>
-      <div class="nav-dropdown__menu">
-        <a href="ask.html">Ask Derrick</a>
-        <a href="timer.html" aria-current="page">Drill-o-doro</a>
-        <a href="converter.html">Unit Converter</a>
-        <a href="calculator.html">Drilling Calculator</a>
-        <a href="wellvolumes.html">Well Fluid Volumes</a>
-        <a href="acronyms.html">Acronym Lookup</a>
-        <a href="wellcontrol.html">Well Control</a>
-      </div>
+  <nav class="page-nav">
+    <div class="page-nav__inner">
+      <a href="index.html" class="page-nav__brand">DERRICK</a>
+      <ul class="page-nav__links">
+        <li><a href="news.html">News</a></li>
+        <li><a href="/rigs">Fleet</a></li>
+        <li class="page-nav__dropdown">
+          <button class="page-nav__dropdown-toggle active" type="button">Tools ▾</button>
+          <div class="page-nav__dropdown-menu">
+            <a href="ask.html">Ask Derrick</a>
+            <a href="timer.html" aria-current="page">Drill-o-doro</a>
+            <a href="converter.html">Unit Converter</a>
+            <a href="calculator.html">Drilling Calculator</a>
+            <a href="wellvolumes.html">Well Fluid Volumes</a>
+            <a href="acronyms.html">Acronym Lookup</a>
+            <a href="wellcontrol.html">Well Control</a>
+          </div>
+        </li>
+      </ul>
     </div>
   </nav>
   <div id="app">

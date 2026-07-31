@@ -7,194 +7,863 @@
   <title>DERRICK — Free Tools for Oil &amp; Gas Professionals</title>
   <link rel="canonical" href="https://drillodoro.com/">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <meta name="description"
-    content="Free tools for oil and gas professionals — AI assistant, offshore rig fleet tracker, industry news, and workflow automation.">
+  <meta name="description" content="Free tools for oil and gas professionals — AI assistant, offshore rig fleet tracker, industry news, and workflow automation.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
-  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap">
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --dark:        #06060a;
+      --dark-card:   #0f0f16;
+      --dark-border: rgba(255,255,255,0.07);
+      --dark-text:   #f1f5f9;
+      --dark-muted:  rgba(255,255,255,0.45);
+      --dark-subtle: rgba(255,255,255,0.16);
+
+      --cream:        #f7f3ed;
+      --cream-card:   #ffffff;
+      --cream-border: rgba(0,0,0,0.07);
+      --cream-text:   #1c1917;
+      --cream-muted:  #78716c;
+      --cream-subtle: #c4bdb5;
+
+      --orange:     #f97316;
+      --amber:      #f59e0b;
+      --orange-dim: rgba(249,115,22,0.10);
+
+      --font: 'Inter', system-ui, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
     body {
-      justify-content: flex-start;
-      align-items: center;
-      padding: 0 20px 80px;
-      min-height: 100vh;
+      font-family: var(--font);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
-    .page-shell {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: 800px;
+    /* ── Film grain overlay ──────────────────────────────────────── */
+    .grain {
+      position: fixed;
+      inset: -50%;
+      width: 200%; height: 200%;
+      z-index: 9998;
+      pointer-events: none;
+      opacity: 0.032;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 180px 180px;
+      animation: filmGrain 0.4s steps(1) infinite;
+    }
+
+    @keyframes filmGrain {
+      0%   { transform: translate(0,    0); }
+      10%  { transform: translate(-3%,  -8%); }
+      20%  { transform: translate(-10%, 4%); }
+      30%  { transform: translate(5%,  -18%); }
+      40%  { transform: translate(15%,  18%); }
+      50%  { transform: translate(-18%,  7%); }
+      60%  { transform: translate(10%,   3%); }
+      70%  { transform: translate(0%,   11%); }
+      80%  { transform: translate(18%,  24%); }
+      90%  { transform: translate(-7%,   7%); }
+      100% { transform: translate(0,    0); }
+    }
+
+    /* ── Scroll-entrance animation ───────────────────────────────── */
+    [data-animate] {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    [data-animate].visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Nav ─────────────────────────────────────────────────────── */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
       display: flex;
-      flex-direction: column;
       align-items: center;
+      justify-content: space-between;
+      padding: 18px 48px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(6,6,10,0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
     }
 
-    /* ── Hero ────────────────────────────────────────────────────── */
+    .nav__brand {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 5px;
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .nav__links {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      list-style: none;
+    }
+
+    .nav__links a {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--dark-muted);
+      text-decoration: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .nav__links a:hover { color: #fff; background: rgba(255,255,255,0.06); }
+
+    .nav__links .nav__cta {
+      color: #fff;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      margin-left: 8px;
+    }
+
+    .nav__links .nav__cta:hover { background: rgba(255,255,255,0.15); }
+
+    .nav__dropdown { position: relative; display: inline-flex; align-items: center; }
+
+    .nav__dropdown-toggle {
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--dark-muted);
+      background: none;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .nav__dropdown-toggle:hover { color: #fff; background: rgba(255,255,255,0.06); }
+
+    .nav__dropdown-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 10px); right: 0;
+      background: #111118;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 6px;
+      min-width: 190px;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.6);
+      z-index: 200;
+    }
+
+    .nav__dropdown:hover .nav__dropdown-menu,
+    .nav__dropdown:focus-within .nav__dropdown-menu { display: block; }
+
+    .nav__dropdown-menu a {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--dark-muted);
+      text-decoration: none;
+      padding: 9px 12px;
+      border-radius: 7px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .nav__dropdown-menu a:hover { color: #fff; background: rgba(255,255,255,0.07); }
+
+    /* ── HERO ────────────────────────────────────────────────────── */
     .hero {
+      background: var(--dark);
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
-      width: 100%;
-      padding: 48px 0 40px;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 48px 100px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Animated mesh gradient */
+    .mesh { position: absolute; inset: 0; pointer-events: none; }
+
+    .mesh-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      will-change: transform;
+    }
+
+    .mesh-blob--1 {
+      width: 700px; height: 700px;
+      background: rgba(249,115,22,0.16);
+      top: -200px; left: -150px;
+      animation: meshFloat1 10s ease-in-out infinite;
+    }
+
+    .mesh-blob--2 {
+      width: 500px; height: 500px;
+      background: rgba(245,158,11,0.11);
+      top: 50px; right: -100px;
+      animation: meshFloat2 13s ease-in-out infinite;
+      animation-delay: -4s;
+    }
+
+    .mesh-blob--3 {
+      width: 400px; height: 400px;
+      background: rgba(220,38,38,0.07);
+      bottom: -100px; left: 35%;
+      animation: meshFloat3 9s ease-in-out infinite;
+      animation-delay: -7s;
+    }
+
+    .mesh-blob--4 {
+      width: 350px; height: 350px;
+      background: rgba(99,102,241,0.07);
+      bottom: 50px; right: 10%;
+      animation: meshFloat1 15s ease-in-out infinite;
+      animation-delay: -2s;
+    }
+
+    @keyframes meshFloat1 {
+      0%,100% { transform: translate(0,   0)   scale(1);   }
+      33%     { transform: translate(40px, -50px) scale(1.08); }
+      66%     { transform: translate(-30px, 30px) scale(0.94); }
+    }
+
+    @keyframes meshFloat2 {
+      0%,100% { transform: translate(0,   0)   scale(1);   }
+      33%     { transform: translate(-50px, 30px) scale(1.12); }
+      66%     { transform: translate(30px, -40px) scale(0.92); }
+    }
+
+    @keyframes meshFloat3 {
+      0%,100% { transform: translate(0,    0)    scale(1);   }
+      50%     { transform: translate(-40px, -30px) scale(1.1); }
+    }
+
+    /* Hero content entrance (CSS animation, not scroll-triggered) */
+    .hero__label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 28px;
+      position: relative;
+      animation: heroUp 0.9s cubic-bezier(0.16,1,0.3,1) both;
+      animation-delay: 0.15s;
     }
 
     .hero__title {
-      font-family: var(--font-pixel);
-      font-size: 52px;
-      color: var(--orange);
-      text-shadow:
-        4px 4px 0 var(--orange-shadow),
-        8px 8px 0 #3a1800,
-        -1px -1px 0 var(--gold);
-      letter-spacing: 6px;
-      text-align: center;
-      line-height: 1.3;
+      font-size: clamp(64px, 12vw, 140px);
+      font-weight: 900;
+      letter-spacing: -4px;
+      line-height: 1.0;
+      color: #fff;
+      margin-bottom: 28px;
+      position: relative;
+      animation: heroUp 0.9s cubic-bezier(0.16,1,0.3,1) both;
+      animation-delay: 0.3s;
     }
 
-    .hero__subtitle {
-      font-family: var(--font-pixel);
-      font-size: 7px;
-      color: var(--gold);
+    .hero__sub {
+      font-size: clamp(15px, 2vw, 18px);
+      font-weight: 400;
+      color: var(--dark-muted);
+      line-height: 1.65;
+      max-width: 380px;
+      margin-bottom: 44px;
+      position: relative;
+      animation: heroUp 0.9s cubic-bezier(0.16,1,0.3,1) both;
+      animation-delay: 0.45s;
+    }
+
+    .hero__actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      position: relative;
+      animation: heroUp 0.9s cubic-bezier(0.16,1,0.3,1) both;
+      animation-delay: 0.6s;
+    }
+
+    @keyframes heroUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero__scroll-hint {
+      position: absolute;
+      bottom: 36px; left: 50%; transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: var(--dark-subtle);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      animation: heroUp 1s ease both, scrollBounce 2.5s ease-in-out 1.2s infinite;
+    }
+
+    @keyframes scrollBounce {
+      0%,100% { transform: translateX(-50%) translateY(0); }
+      50%     { transform: translateX(-50%) translateY(7px); }
+    }
+
+    /* ── Buttons ─────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 8px;
+      padding: 13px 26px;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+
+    .btn--white {
+      background: #fff;
+      color: var(--dark);
+    }
+    .btn--white:hover { box-shadow: 0 8px 32px rgba(255,255,255,0.2); }
+
+    .btn--outline-light {
+      background: transparent;
+      color: var(--dark-muted);
+      border: 1px solid var(--dark-border);
+    }
+    .btn--outline-light:hover { color: #fff; border-color: rgba(255,255,255,0.22); }
+
+    .btn--orange {
+      background: var(--orange);
+      color: #fff;
+    }
+    .btn--orange:hover { background: #ea6c10; box-shadow: 0 8px 28px rgba(249,115,22,0.35); }
+
+    /* ── Marquee ─────────────────────────────────────────────────── */
+    .marquee-section {
+      background: var(--dark);
+      border-top: 1px solid var(--dark-border);
+      border-bottom: 1px solid var(--dark-border);
+      padding: 28px 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .marquee {
+      overflow: hidden;
+      /* fade edges */
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+      mask-image:         linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+    }
+
+    .marquee__track {
+      display: inline-flex;
+      gap: 10px;
+      white-space: nowrap;
+      will-change: transform;
+    }
+
+    .marquee--left  .marquee__track { animation: marqLeft  35s linear infinite; }
+    .marquee--right .marquee__track { animation: marqRight 35s linear infinite; }
+
+    .marquee:hover .marquee__track { animation-play-state: paused; }
+
+    @keyframes marqLeft {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    @keyframes marqRight {
+      from { transform: translateX(-50%); }
+      to   { transform: translateX(0); }
+    }
+
+    .marquee__item {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--dark-muted);
+      padding: 8px 18px;
+      border: 1px solid var(--dark-border);
+      border-radius: 100px;
+      background: rgba(255,255,255,0.03);
+      flex-shrink: 0;
+    }
+
+    .marquee__item .dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--orange);
+      opacity: 0.6;
+      flex-shrink: 0;
+    }
+
+    /* ── MANIFESTO (dark, scroll-reveal) ─────────────────────────── */
+    .manifesto {
+      background: var(--dark);
+      padding: 120px 48px 140px;
+      border-top: 1px solid var(--dark-border);
+    }
+
+    .manifesto__inner { max-width: 860px; margin: 0 auto; }
+
+    .section-label-light {
+      font-size: 11px;
+      font-weight: 600;
       letter-spacing: 3px;
-      text-align: center;
-      text-shadow: 1px 1px 0 var(--gold-shadow);
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 48px;
+      display: block;
     }
 
-    /* ── Hub grid ────────────────────────────────────────────────── */
-    .hub-grid {
+    .reveal-text {
+      font-size: clamp(26px, 3.8vw, 46px);
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: -0.5px;
+    }
+
+    .reveal-text .word {
+      display: inline;
+      color: rgba(255,255,255,0.1);
+      transition: color 0.45s ease;
+    }
+
+    .reveal-text .word.lit    { color: #fff; }
+    .reveal-text .word.orange { color: rgba(249,115,22,0.15); }
+    .reveal-text .word.orange.lit { color: var(--orange); }
+
+    /* ── FEATURES (cream) ────────────────────────────────────────── */
+    .features {
+      background: var(--cream);
+      padding: 120px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .features__blob-1 {
+      position: absolute;
+      top: -100px; right: -80px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(249,115,22,0.08) 0%, transparent 65%);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: meshFloat2 14s ease-in-out infinite;
+    }
+
+    .features__blob-2 {
+      position: absolute;
+      bottom: -120px; left: -60px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(245,158,11,0.07) 0%, transparent 65%);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: meshFloat3 11s ease-in-out infinite;
+      animation-delay: -5s;
+    }
+
+    .features__inner {
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-label-dark {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .features__heading {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 800;
+      color: var(--cream-text);
+      letter-spacing: -1.5px;
+      margin-bottom: 56px;
+      max-width: 480px;
+      line-height: 1.15;
+    }
+
+    .features-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 16px;
-      width: 100%;
-      margin: 8px 0 24px;
     }
 
-    .hub-card {
+    .feature-card {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      padding: 24px 22px;
-      border: 2px solid var(--border-dim);
-      background: var(--bg-card);
+      gap: 16px;
+      padding: 32px 28px;
+      background: var(--cream-card);
+      border: 1px solid var(--cream-border);
+      border-radius: 24px;
       text-decoration: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+      /* tilt handled by JS; base transition for leave */
+      transition: box-shadow 0.5s ease, transform 0.5s cubic-bezier(0.16,1,0.3,1);
+      will-change: transform;
+      transform-style: preserve-3d;
     }
 
-    .hub-card:hover {
-      border-color: var(--gold);
-      box-shadow: 0 0 20px var(--gold-dim);
+    .feature-card__icon {
+      font-size: 24px;
+      line-height: 1;
     }
 
-    .hub-card--ai {
-      border-color: var(--orange);
-      box-shadow: 0 0 12px rgba(255, 107, 53, 0.1);
-    }
-
-    .hub-card--ai:hover {
-      border-color: var(--orange);
-      box-shadow: 0 0 28px rgba(255, 107, 53, 0.22);
-    }
-
-    .hub-card__tag {
-      font-family: var(--font-pixel);
-      font-size: 6px;
-      color: var(--muted);
-      letter-spacing: 2px;
-    }
-
-    .hub-card__title {
-      font-family: var(--font-pixel);
-      font-size: 10px;
+    .feature-card__tag {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
       color: var(--orange);
-      letter-spacing: 2px;
-      line-height: 1.6;
     }
 
-    .hub-card--ai .hub-card__title { color: var(--gold); }
+    .feature-card__title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--cream-text);
+      letter-spacing: -0.3px;
+    }
 
-    .hub-card__desc {
-      font-family: var(--font-pixel);
-      font-size: 7px;
-      color: var(--muted);
-      letter-spacing: 0.5px;
-      line-height: 2.2;
+    .feature-card__desc {
+      font-size: 13px;
+      color: var(--cream-muted);
+      line-height: 1.7;
       flex: 1;
     }
 
-    .hub-card__cta {
-      font-family: var(--font-pixel);
-      font-size: 7px;
-      color: var(--border-dim);
-      letter-spacing: 1px;
+    .feature-card__link {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--orange);
+      display: flex;
+      align-items: center;
+      gap: 6px;
       margin-top: 4px;
-      transition: color 0.1s;
     }
 
-    .hub-card:hover .hub-card__cta { color: var(--gold); }
-    .hub-card--ai:hover .hub-card__cta { color: var(--orange); }
+    .arrow { transition: transform 0.15s; }
+    .feature-card:hover .arrow { transform: translateX(4px); }
 
-    /* ── Tools row ───────────────────────────────────────────────── */
-    .tools-section {
-      width: 100%;
-      margin-bottom: 32px;
+    /* ── TOOLS (dark) ────────────────────────────────────────────── */
+    .tools {
+      background: var(--dark);
+      padding: 100px 48px;
+      position: relative;
+      overflow: hidden;
     }
 
-    .tools-label {
-      font-family: var(--font-pixel);
-      font-size: 6px;
-      color: var(--muted);
-      letter-spacing: 3px;
-      margin-bottom: 12px;
-      border-top: 2px solid var(--border-dim);
-      padding-top: 20px;
+    .tools__blob {
+      position: absolute;
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 700px; height: 300px;
+      background: radial-gradient(ellipse, rgba(249,115,22,0.05) 0%, transparent 65%);
+      pointer-events: none;
+      animation: meshFloat2 16s ease-in-out infinite;
     }
 
-    .tools-row {
+    .tools__inner {
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .tools__heading {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -1.5px;
+      margin-bottom: 8px;
+    }
+
+    .tools__sub {
+      font-size: 15px;
+      color: var(--dark-muted);
+      margin-bottom: 40px;
+    }
+
+    .tools-grid {
       display: flex;
       flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .tool-chip {
+      display: inline-flex;
+      align-items: center;
       gap: 8px;
-    }
-
-    .tools-row a {
-      font-family: var(--font-pixel);
-      font-size: 7px;
-      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--dark-muted);
       text-decoration: none;
-      padding: 8px 12px;
-      border: 2px solid var(--border-dim);
-      letter-spacing: 1px;
-      transition: color 0.1s, border-color 0.1s;
+      padding: 10px 20px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--dark-border);
+      border-radius: 100px;
+      transition: color 0.15s, border-color 0.15s, background 0.15s, transform 0.15s;
     }
 
-    .tools-row a:hover { color: var(--gold); border-color: var(--gold); }
+    .tool-chip:hover {
+      color: #fff;
+      border-color: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.08);
+      transform: translateY(-2px);
+    }
 
-    /* ── Responsive ─────────────────────────────────────────────── */
+    /* ── EMAIL (cream) ───────────────────────────────────────────── */
+    .email-section {
+      background: var(--cream);
+      padding: 120px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .email-section__ring-1 {
+      position: absolute;
+      top: -160px; right: -160px;
+      width: 500px; height: 500px;
+      border: 80px solid rgba(249,115,22,0.05);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: meshFloat1 18s ease-in-out infinite;
+    }
+
+    .email-section__ring-2 {
+      position: absolute;
+      bottom: -100px; left: -80px;
+      width: 320px; height: 320px;
+      border: 50px solid rgba(245,158,11,0.06);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: meshFloat3 12s ease-in-out infinite;
+      animation-delay: -6s;
+    }
+
+    .email-section__glow {
+      position: absolute;
+      top: -60px; left: 50%; transform: translateX(-50%);
+      width: 700px; height: 400px;
+      background: radial-gradient(ellipse, rgba(249,115,22,0.07) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .email-section__inner {
+      max-width: 560px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .email-section__title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800;
+      color: var(--cream-text);
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    .email-section__sub {
+      font-size: 15px;
+      color: var(--cream-muted);
+      line-height: 1.65;
+      margin-bottom: 36px;
+    }
+
+    .email-form {
+      display: flex;
+      gap: 8px;
+      max-width: 420px;
+      margin: 0 auto 14px;
+    }
+
+    .email-form input[type="email"] {
+      flex: 1;
+      font-family: var(--font);
+      font-size: 14px;
+      color: var(--cream-text);
+      background: #fff;
+      border: 1px solid var(--cream-border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      outline: none;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      min-width: 0;
+    }
+
+    .email-form input::placeholder { color: var(--cream-subtle); }
+    .email-form input:focus {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(249,115,22,0.12);
+    }
+
+    .email-form button {
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      background: var(--orange);
+      border: none;
+      border-radius: 8px;
+      padding: 12px 22px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .email-form button:hover { background: #ea6c10; transform: translateY(-1px); }
+    .email-form button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .email-msg { font-size: 13px; color: var(--cream-muted); min-height: 20px; }
+    .email-msg--ok    { color: #16a34a; }
+    .email-msg--error { color: var(--orange); }
+
+    /* ── Section dividers ───────────────────────────────────────── */
+    .s-divide {
+      height: 80px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: -1px;
+    }
+
+    /* dark → cream */
+    .s-divide--d2c { background: var(--dark); }
+    .s-divide--d2c::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: -5%;
+      width: 110%; height: 100%;
+      background: var(--cream);
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    }
+
+    /* cream → dark */
+    .s-divide--c2d { background: var(--cream); }
+    .s-divide--c2d::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: -5%;
+      width: 110%; height: 100%;
+      background: var(--dark);
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    }
+
+    /* ── FOOTER ──────────────────────────────────────────────────── */
+    .footer {
+      background: var(--dark);
+      border-top: 1px solid var(--dark-border);
+      padding: 32px 48px 48px;
+    }
+
+    .footer__inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer__copy { font-size: 13px; color: rgba(255,255,255,0.2); }
+
+    .footer__links { display: flex; align-items: center; gap: 16px; }
+
+    .footer__links a {
+      display: flex;
+      align-items: center;
+      opacity: 0.25;
+      transition: opacity 0.15s;
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .footer__links a:hover { opacity: 1; }
+
+    /* ── Responsive ──────────────────────────────────────────────── */
     @media (max-width: 760px) {
-      .hub-grid { grid-template-columns: 1fr; }
-      .hero__title { font-size: 30px; letter-spacing: 3px; }
-      .hero__subtitle { font-size: 6px; }
-    }
+      .nav { padding: 16px 20px; }
+      .nav__links { display: none; }
 
-    @media (max-width: 620px) {
-      body { padding: 0 16px 60px; }
-      .hero__title { font-size: 24px; letter-spacing: 2px; }
+      .hero { padding: 100px 24px 80px; }
+      .hero__title { letter-spacing: -3px; }
+
+      .manifesto { padding: 80px 24px 100px; }
+
+      .features { padding: 80px 24px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .features__heading { margin-bottom: 36px; }
+
+      .tools { padding: 72px 24px; }
+
+      .email-section { padding: 80px 24px; }
+      .email-form { flex-direction: column; }
+
+      .footer { padding: 24px 20px 40px; }
+      .footer__inner { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
 
 <body>
 
-  <div class="page-shell">
+  <!-- Film grain -->
+  <div class="grain" aria-hidden="true"></div>
 
-    <nav class="top-nav" aria-label="Site navigation">
-      <a href="index.html" aria-current="page">&#9654; HOME</a>
-      <a href="news.html">&#9654; NEWS</a>
-      <a href="/rigs">&#9654; FLEET STATUS</a>
-      <div class="nav-dropdown">
-        <button class="nav-dropdown__toggle" type="button">&#9654; TOOLS &#9660;</button>
-        <div class="nav-dropdown__menu">
+  <!-- Nav -->
+  <nav class="nav">
+    <a href="index.html" class="nav__brand">DERRICK</a>
+    <ul class="nav__links">
+      <li><a href="news.html">News</a></li>
+      <li><a href="/rigs">Fleet</a></li>
+      <li class="nav__dropdown">
+        <button class="nav__dropdown-toggle">
+          Tools
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
+            <path d="M2 4l3.5 3.5L9 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="nav__dropdown-menu">
           <a href="ask.html">Ask Derrick</a>
           <a href="timer.html">Drill-o-doro</a>
           <a href="converter.html">Unit Converter</a>
@@ -203,119 +872,348 @@
           <a href="acronyms.html">Acronym Lookup</a>
           <a href="wellcontrol.html">Well Control</a>
         </div>
-      </div>
-    </nav>
+      </li>
+      <li><a href="ask.html" class="nav__cta">Ask Derrick</a></li>
+    </ul>
+  </nav>
 
-    <section class="hero">
-      <div class="hero__title">DERRICK</div>
-      <div class="hero__subtitle">TOOLS BUILT BY DRILLERS, FOR DRILLERS.</div>
-    </section>
-
-    <div class="hub-grid">
-
-      <a class="hub-card hub-card--ai" href="ask.html">
-        <div class="hub-card__tag">&#9654; AI ASSISTANT</div>
-        <div class="hub-card__title">ASK DERRICK</div>
-        <p class="hub-card__desc">Got a question? I've probably been there. Well control, mud engineering, BHA, IWCF — ask me.</p>
-        <div class="hub-card__cta">&#9654; ASK A QUESTION</div>
-      </a>
-
-      <a class="hub-card" href="news.html">
-        <div class="hub-card__tag">&#9654; DERRICK'S BRIEFING</div>
-        <div class="hub-card__title">INDUSTRY NEWS</div>
-        <p class="hub-card__desc">What I'm reading this week. AI, automation, and market moves in oil &amp; gas.</p>
-        <div class="hub-card__cta">&#9654; READ THE BRIEFING</div>
-      </a>
-
-      <a class="hub-card" href="/rigs">
-        <div class="hub-card__tag">&#9654; FLEET DATA</div>
-        <div class="hub-card__title">FLEET STATUS</div>
-        <p class="hub-card__desc">Offshore rig tracker across major contractors. Based on the latest available fleet reports — not a live feed.</p>
-        <div class="hub-card__cta">&#9654; VIEW FLEET</div>
-      </a>
-
+  <!-- Hero -->
+  <section class="hero">
+    <div class="mesh" aria-hidden="true">
+      <div class="mesh-blob mesh-blob--1"></div>
+      <div class="mesh-blob mesh-blob--2"></div>
+      <div class="mesh-blob mesh-blob--3"></div>
+      <div class="mesh-blob mesh-blob--4"></div>
     </div>
-
-    <div class="tools-section">
-      <div class="tools-label">&#9654; TOOLS</div>
-      <div class="tools-row">
-        <a href="timer.html">DRILL-O-DORO</a>
-        <a href="converter.html">UNIT CONVERTER</a>
-        <a href="calculator.html">DRILLING CALCULATOR</a>
-        <a href="acronyms.html">ACRONYM LOOKUP</a>
-        <a href="wellcontrol.html">WELL CONTROL</a>
-      </div>
-    </div>
-
-    <div class="email-capture">
-      <div class="email-capture__heading">&#9654; DERRICK'S BRIEFING IS COMING</div>
-      <div class="email-capture__sub">Weekly AI and tech news for the energy industry, written by Derrick. Leave your email and you'll be first to know.</div>
-      <form class="email-capture__form" id="subscribe-form">
-        <input type="email" id="subscribe-email" placeholder="your@email.com" autocomplete="email" required>
-        <button type="submit">NOTIFY ME &#9654;</button>
-      </form>
-      <div class="email-capture__msg" id="subscribe-msg" aria-live="polite"></div>
-    </div>
-
-    <div class="support-bar">
-      <a href="https://www.buymeacoffee.com/rgibbon97o" target="_blank" id="bmc-btn" title="Buy Me a Coffee">
-        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee">
-      </a>
-      <a href="https://www.linkedin.com/in/ross-gibbon-506a2316a/" target="_blank" class="linkedin-btn"
-        title="LinkedIn">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-label="LinkedIn">
-          <path
-            d="M20.447 20.452H17.01v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.583V9h3.296v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a1.914 1.914 0 1 1 0-3.828 1.914 1.914 0 0 1 0 3.828zm1.658 13.019H3.68V9h3.315v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+    <div class="hero__label">Free tools for oil &amp; gas</div>
+    <h1 class="hero__title">DERRICK</h1>
+    <p class="hero__sub">Tools built by drillers, for drillers.</p>
+    <div class="hero__actions">
+      <a href="ask.html" class="btn btn--white">
+        Ask Derrick
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </a>
+      <a href="/rigs" class="btn btn--outline-light">View Fleet Status</a>
+    </div>
+    <div class="hero__scroll-hint" aria-hidden="true">
+      <svg width="16" height="20" viewBox="0 0 16 20" fill="none">
+        <rect x="1" y="1" width="14" height="18" rx="7" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="8" y1="5" x2="8" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      scroll
+    </div>
+  </section>
+
+  <!-- Marquee -->
+  <div class="marquee-section" aria-hidden="true">
+
+    <!-- Row 1 — scrolls left -->
+    <div class="marquee marquee--left">
+      <div class="marquee__track">
+        <span class="marquee__item"><span class="dot"></span>Well Control</span>
+        <span class="marquee__item"><span class="dot"></span>Kill Calculations</span>
+        <span class="marquee__item"><span class="dot"></span>Fleet Tracking</span>
+        <span class="marquee__item"><span class="dot"></span>IWCF Prep</span>
+        <span class="marquee__item"><span class="dot"></span>Mud Engineering</span>
+        <span class="marquee__item"><span class="dot"></span>BHA Design</span>
+        <span class="marquee__item"><span class="dot"></span>Unit Converter</span>
+        <span class="marquee__item"><span class="dot"></span>Acronym Lookup</span>
+        <span class="marquee__item"><span class="dot"></span>Drilling Calculator</span>
+        <span class="marquee__item"><span class="dot"></span>Industry News</span>
+        <span class="marquee__item"><span class="dot"></span>Ask Derrick</span>
+        <span class="marquee__item"><span class="dot"></span>Offshore Rigs</span>
+        <!-- duplicate for seamless loop -->
+        <span class="marquee__item"><span class="dot"></span>Well Control</span>
+        <span class="marquee__item"><span class="dot"></span>Kill Calculations</span>
+        <span class="marquee__item"><span class="dot"></span>Fleet Tracking</span>
+        <span class="marquee__item"><span class="dot"></span>IWCF Prep</span>
+        <span class="marquee__item"><span class="dot"></span>Mud Engineering</span>
+        <span class="marquee__item"><span class="dot"></span>BHA Design</span>
+        <span class="marquee__item"><span class="dot"></span>Unit Converter</span>
+        <span class="marquee__item"><span class="dot"></span>Acronym Lookup</span>
+        <span class="marquee__item"><span class="dot"></span>Drilling Calculator</span>
+        <span class="marquee__item"><span class="dot"></span>Industry News</span>
+        <span class="marquee__item"><span class="dot"></span>Ask Derrick</span>
+        <span class="marquee__item"><span class="dot"></span>Offshore Rigs</span>
+      </div>
     </div>
 
-    <footer class="site-footer">
-      Started because I needed it. Kept going because others might too.
-    </footer>
+    <!-- Row 2 — scrolls right -->
+    <div class="marquee marquee--right">
+      <div class="marquee__track">
+        <span class="marquee__item"><span class="dot"></span>Driller's Method</span>
+        <span class="marquee__item"><span class="dot"></span>Wait &amp; Weight</span>
+        <span class="marquee__item"><span class="dot"></span>Kill Mud Weight</span>
+        <span class="marquee__item"><span class="dot"></span>Formation Pressure</span>
+        <span class="marquee__item"><span class="dot"></span>MAASP</span>
+        <span class="marquee__item"><span class="dot"></span>Kick Detection</span>
+        <span class="marquee__item"><span class="dot"></span>Shut-in Procedures</span>
+        <span class="marquee__item"><span class="dot"></span>Pit Gain Analysis</span>
+        <span class="marquee__item"><span class="dot"></span>Pump Calculations</span>
+        <span class="marquee__item"><span class="dot"></span>Derrick's Briefing</span>
+        <span class="marquee__item"><span class="dot"></span>Rig Contractors</span>
+        <span class="marquee__item"><span class="dot"></span>Drill-o-doro</span>
+        <!-- duplicate for seamless loop -->
+        <span class="marquee__item"><span class="dot"></span>Driller's Method</span>
+        <span class="marquee__item"><span class="dot"></span>Wait &amp; Weight</span>
+        <span class="marquee__item"><span class="dot"></span>Kill Mud Weight</span>
+        <span class="marquee__item"><span class="dot"></span>Formation Pressure</span>
+        <span class="marquee__item"><span class="dot"></span>MAASP</span>
+        <span class="marquee__item"><span class="dot"></span>Kick Detection</span>
+        <span class="marquee__item"><span class="dot"></span>Shut-in Procedures</span>
+        <span class="marquee__item"><span class="dot"></span>Pit Gain Analysis</span>
+        <span class="marquee__item"><span class="dot"></span>Pump Calculations</span>
+        <span class="marquee__item"><span class="dot"></span>Derrick's Briefing</span>
+        <span class="marquee__item"><span class="dot"></span>Rig Contractors</span>
+        <span class="marquee__item"><span class="dot"></span>Drill-o-doro</span>
+      </div>
+    </div>
 
   </div>
 
-  <script>
-    (function () {
-      const form = document.getElementById('subscribe-form');
-      const emailEl = document.getElementById('subscribe-email');
-      const msg = document.getElementById('subscribe-msg');
+  <!-- Manifesto -->
+  <div class="manifesto">
+    <div class="manifesto__inner">
+      <span class="section-label-light" data-animate>Built for the rig floor</span>
+      <p class="reveal-text" id="reveal-para"></p>
+    </div>
+  </div>
 
-      form.addEventListener('submit', async function (e) {
+  <!-- dark → cream -->
+  <div class="s-divide s-divide--d2c" aria-hidden="true"></div>
+
+  <!-- Features -->
+  <div class="features">
+    <div class="features__blob-1" aria-hidden="true"></div>
+    <div class="features__blob-2" aria-hidden="true"></div>
+    <div class="features__inner">
+      <span class="section-label-dark" data-animate>What's inside</span>
+      <h2 class="features__heading" data-animate data-delay="100">Everything you need, nothing you don't.</h2>
+      <div class="features-grid">
+        <a class="feature-card" href="ask.html" data-animate data-delay="0">
+          <div class="feature-card__icon">🤖</div>
+          <div class="feature-card__tag">AI Assistant</div>
+          <div class="feature-card__title">Ask Derrick</div>
+          <p class="feature-card__desc">Well control, mud engineering, BHA, IWCF — ask anything. Built on real drilling knowledge.</p>
+          <div class="feature-card__link">
+            Ask a question
+            <svg class="arrow" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </a>
+
+        <a class="feature-card" href="news.html" data-animate data-delay="120">
+          <div class="feature-card__icon">📰</div>
+          <div class="feature-card__tag">Derrick's Briefing</div>
+          <div class="feature-card__title">Industry News</div>
+          <p class="feature-card__desc">What I'm reading this week. AI, automation, and market moves in oil &amp; gas.</p>
+          <div class="feature-card__link">
+            Read the briefing
+            <svg class="arrow" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </a>
+
+        <a class="feature-card" href="/rigs" data-animate data-delay="240">
+          <div class="feature-card__icon">🛢️</div>
+          <div class="feature-card__tag">Fleet Data</div>
+          <div class="feature-card__title">Fleet Status</div>
+          <p class="feature-card__desc">Offshore rig tracker across major contractors. Based on the latest available fleet reports.</p>
+          <div class="feature-card__link">
+            View fleet
+            <svg class="arrow" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- cream → dark -->
+  <div class="s-divide s-divide--c2d" aria-hidden="true"></div>
+
+  <!-- Tools -->
+  <div class="tools">
+    <div class="tools__blob" aria-hidden="true"></div>
+    <div class="tools__inner">
+      <h2 class="tools__heading" data-animate>More tools</h2>
+      <p class="tools__sub" data-animate data-delay="80">Quick-access utilities for the job.</p>
+      <div class="tools-grid">
+        <a href="timer.html"      class="tool-chip" data-animate data-delay="0">⏱ Drill-o-doro</a>
+        <a href="converter.html"  class="tool-chip" data-animate data-delay="60">⚖️ Unit Converter</a>
+        <a href="calculator.html" class="tool-chip" data-animate data-delay="120">🔢 Drilling Calculator</a>
+        <a href="wellvolumes.html" class="tool-chip" data-animate data-delay="150">🛢️ Well Fluid Volumes</a>
+        <a href="acronyms.html"   class="tool-chip" data-animate data-delay="180">🔤 Acronym Lookup</a>
+        <a href="wellcontrol.html" class="tool-chip" data-animate data-delay="240">🚨 Well Control</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- dark → cream -->
+  <div class="s-divide s-divide--d2c" aria-hidden="true"></div>
+
+  <!-- Email -->
+  <div class="email-section">
+    <div class="email-section__ring-1" aria-hidden="true"></div>
+    <div class="email-section__ring-2" aria-hidden="true"></div>
+    <div class="email-section__glow"   aria-hidden="true"></div>
+    <div class="email-section__inner">
+      <h2 class="email-section__title" data-animate>Derrick's Briefing is coming</h2>
+      <p class="email-section__sub"    data-animate data-delay="80">Weekly AI and tech news for the energy industry, written by Derrick. Be first to know.</p>
+      <form class="email-form" id="subscribe-form" data-animate data-delay="160">
+        <input type="email" id="subscribe-email" placeholder="your@email.com" autocomplete="email" required>
+        <button type="submit">Notify me</button>
+      </form>
+      <div class="email-msg" id="subscribe-msg" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <!-- cream → dark -->
+  <div class="s-divide s-divide--c2d" aria-hidden="true"></div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <span class="footer__copy">Started because I needed it. Kept going because others might too.</span>
+      <div class="footer__links">
+        <a href="https://www.buymeacoffee.com/rgibbon97o" target="_blank" title="Buy Me a Coffee">
+          <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height:26px;width:auto;display:block;">
+        </a>
+        <a href="https://www.linkedin.com/in/ross-gibbon-506a2316a/" target="_blank" title="LinkedIn" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
+            <path d="M20.447 20.452H17.01v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.583V9h3.296v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a1.914 1.914 0 1 1 0-3.828 1.914 1.914 0 0 1 0 3.828zm1.658 13.019H3.68V9h3.315v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* ── Scroll entrance animations ─────────────────────────────── */
+    (function () {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          const el    = entry.target;
+          const delay = parseInt(el.dataset.delay || 0);
+          setTimeout(() => el.classList.add('visible'), delay);
+          observer.unobserve(el);
+        });
+      }, { threshold: 0.12 });
+
+      document.querySelectorAll('[data-animate]').forEach(el => observer.observe(el));
+    })();
+
+    /* ── 3D card tilt ───────────────────────────────────────────── */
+    (function () {
+      const TILT  = 7;   // max degrees
+      const LIFT  = 6;   // px translateY on hover
+
+      document.querySelectorAll('.feature-card').forEach(card => {
+        card.addEventListener('mousemove', e => {
+          const r  = card.getBoundingClientRect();
+          const x  = e.clientX - r.left;
+          const y  = e.clientY - r.top;
+          const rx = ((y - r.height / 2) / (r.height / 2)) * -TILT;
+          const ry = ((x - r.width  / 2) / (r.width  / 2)) *  TILT;
+          const sx = (ry / TILT) * -3;
+          const sy = (rx / TILT) * -3;
+          card.style.transition = 'box-shadow 0.1s, transform 0.1s';
+          card.style.transform  = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-${LIFT}px)`;
+          card.style.boxShadow  = `${sx}px ${sy + 16}px 40px rgba(0,0,0,0.12)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+          card.style.transition = 'box-shadow 0.5s cubic-bezier(0.16,1,0.3,1), transform 0.5s cubic-bezier(0.16,1,0.3,1)';
+          card.style.transform  = '';
+          card.style.boxShadow  = '';
+        });
+      });
+    })();
+
+    /* ── Scroll-reveal manifesto text ───────────────────────────── */
+    (function () {
+      const sentences = [
+        { text: 'Got a question about',                           orange: false },
+        { text: 'well control?',                                  orange: true  },
+        { text: 'Stuck on a mud calculation?',                    orange: false },
+        { text: 'Need to look up',                                orange: false },
+        { text: 'an acronym at 3am?',                             orange: true  },
+        { text: "We've",                                          orange: false },
+        { text: 'been there.',                                    orange: true  },
+        { text: 'Derrick is a free set of tools',                 orange: false },
+        { text: 'built by someone who works in the industry,',    orange: false },
+        { text: 'for everyone who does.',                         orange: true  },
+      ];
+
+      const para = document.getElementById('reveal-para');
+
+      sentences.forEach(({ text, orange }) => {
+        text.split(' ').forEach((word, i, arr) => {
+          const span = document.createElement('span');
+          span.className  = 'word' + (orange ? ' orange' : '');
+          span.textContent = word + (i < arr.length - 1 ? ' ' : '');
+          para.appendChild(span);
+        });
+        para.appendChild(document.createTextNode(' '));
+      });
+
+      const wordEls = para.querySelectorAll('.word');
+
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('lit'); });
+      }, { threshold: 0, rootMargin: '0px 0px -15% 0px' });
+
+      wordEls.forEach((w, i) => {
+        w.style.transitionDelay = `${i * 28}ms`;
+        obs.observe(w);
+      });
+    })();
+
+    /* ── Email subscribe ────────────────────────────────────────── */
+    (function () {
+      const form    = document.getElementById('subscribe-form');
+      const emailEl = document.getElementById('subscribe-email');
+      const msg     = document.getElementById('subscribe-msg');
+
+      form.addEventListener('submit', async e => {
         e.preventDefault();
         const email = emailEl.value.trim();
         if (!email) return;
 
         const btn = form.querySelector('button');
-        btn.disabled = true;
-        btn.textContent = 'SENDING...';
+        btn.disabled    = true;
+        btn.textContent = 'Sending...';
         msg.textContent = '';
-        msg.className = 'email-capture__msg';
+        msg.className   = 'email-msg';
 
         try {
-          const res = await fetch('/.netlify/functions/subscribe', {
+          const res  = await fetch('/.netlify/functions/subscribe', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, source: 'homepage' }),
           });
           const data = await res.json();
           if (data.ok) {
-            msg.textContent = '► You\'re on the list. Derrick will be in touch.';
-            msg.className = 'email-capture__msg email-capture__msg--ok';
+            msg.textContent = "You're on the list. Derrick will be in touch.";
+            msg.className   = 'email-msg email-msg--ok';
             form.reset();
-          } else {
-            throw new Error();
-          }
+          } else { throw new Error(); }
         } catch {
           msg.textContent = 'Something went wrong. Try again in a moment.';
-          msg.className = 'email-capture__msg email-capture__msg--error';
+          msg.className   = 'email-msg email-msg--error';
         }
 
-        btn.disabled = false;
-        btn.textContent = 'NOTIFY ME ►';
+        btn.disabled    = false;
+        btn.textContent = 'Notify me';
       });
     })();
   </script>
+
 </body>
 </html>

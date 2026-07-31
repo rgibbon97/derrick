@@ -7,26 +7,19 @@
   <link rel="canonical" href="https://drillodoro.com/calculator">
   <meta name="description" content="Drilling pressure and mud weight calculator: hydrostatic pressure, kill mud weight, MAASP, EMW, pressure gradient, and overbalance.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="style.css">
   <style>
-    /* ── Page layout ─────────────────────────────────────────────── */
-    .page-wrap {
-      width: 100%;
-      max-width: 960px;
-    }
+    .page-wrap { max-width: 960px; }
 
     .page-subtitle {
-      font-family: var(--font-pixel);
-      font-size: 7px;
+      font-size: 14px;
       color: var(--muted);
-      letter-spacing: 2px;
       text-align: center;
-      margin-top: 10px;
+      margin-top: 8px;
       margin-bottom: 40px;
     }
 
-    /* ── Calculator grid ─────────────────────────────────────────── */
     .calc-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -34,77 +27,40 @@
       width: 100%;
     }
 
-    /* ── Calculator card ─────────────────────────────────────────── */
     .calc-card {
-      background: var(--bg-card);
-      border: 4px solid var(--border-dim);
-      padding: 22px 18px 18px;
-      position: relative;
-      transition: border-color 0.15s;
-    }
-
-    /* top-left corner pixel accent */
-    .calc-card::before {
-      content: '';
-      position: absolute;
-      top: -4px;
-      left: -4px;
-      width: 10px;
-      height: 10px;
-      background: var(--bg-page);
-      border-right: 4px solid var(--border-dim);
-      border-bottom: 4px solid var(--border-dim);
-      transition: border-color 0.15s;
+      background: var(--dark-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 18px 18px;
+      transition: border-color 0.15s, box-shadow 0.15s;
     }
 
     .calc-card:focus-within {
-      border-color: var(--gold);
-      box-shadow: 0 0 20px var(--gold-dim);
-    }
-
-    .calc-card:focus-within::before {
-      border-color: var(--gold);
-    }
-
-    /* scanlines on cards */
-    .calc-card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: repeating-linear-gradient(
-        to bottom,
-        transparent 0px,
-        transparent 3px,
-        rgba(0, 0, 0, 0.07) 3px,
-        rgba(0, 0, 0, 0.07) 4px
-      );
-      pointer-events: none;
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(249,115,22,0.1);
     }
 
     .calc-card h2 {
-      font-size: 8px;
+      font-size: 13px;
+      font-weight: 600;
       color: var(--orange);
-      text-shadow: 1px 1px 0 var(--orange-shadow);
-      letter-spacing: 2px;
+      letter-spacing: 0.3px;
       margin-bottom: 10px;
       margin-top: 0;
+      text-shadow: none;
     }
 
-    /* ── Formula display ─────────────────────────────────────────── */
     .calc-formula {
-      font-family: var(--font-pixel);
-      font-size: 7.5px;
-      color: var(--gold);
-      letter-spacing: 1px;
-      line-height: 2;
-      margin-bottom: 16px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.7;
+      margin-bottom: 14px;
       padding: 10px 12px;
-      border-left: 3px solid var(--gold);
-      background: #12122a;
-      box-shadow: inset 0 0 12px rgba(232, 212, 77, 0.06);
+      border-left: 2px solid var(--orange);
+      background: rgba(249,115,22,0.05);
+      border-radius: 0 6px 6px 0;
     }
 
-    /* ── Field rows ──────────────────────────────────────────────── */
     .calc-row {
       display: flex;
       align-items: center;
@@ -112,15 +68,12 @@
       margin-bottom: 8px;
     }
 
-    .calc-row:last-child {
-      margin-bottom: 0;
-    }
+    .calc-row:last-child { margin-bottom: 0; }
 
     .calc-row label {
-      font-family: var(--font-pixel);
-      font-size: 6px;
+      font-size: 11px;
+      font-weight: 500;
       color: var(--muted);
-      letter-spacing: 1px;
       white-space: nowrap;
       min-width: 120px;
     }
@@ -128,33 +81,26 @@
     .calc-row input {
       flex: 1;
       min-width: 0;
-      font-size: 9px;
-      padding: 6px 7px;
-    }
-
-    .calc-row input:focus {
-      border-color: var(--orange);
-      color: var(--orange);
+      font-size: 14px;
+      padding: 8px 10px;
+      border-radius: 7px;
     }
 
     .calc-unit {
-      font-family: var(--font-pixel);
-      font-size: 7px;
+      font-size: 12px;
+      font-weight: 500;
       color: var(--muted);
       white-space: nowrap;
       min-width: 48px;
       text-align: left;
-      letter-spacing: 1px;
     }
 
-    /* ── Divider between inputs and outputs ──────────────────────── */
     .calc-sep {
       height: 1px;
-      background: var(--border-dim);
+      background: var(--border);
       margin: 12px 0;
     }
 
-    /* ── Output rows ─────────────────────────────────────────────── */
     .calc-output {
       display: flex;
       align-items: center;
@@ -162,26 +108,21 @@
       margin-bottom: 6px;
     }
 
-    .calc-output:last-child {
-      margin-bottom: 0;
-    }
+    .calc-output:last-child { margin-bottom: 0; }
 
     .calc-output label {
-      font-family: var(--font-pixel);
-      font-size: 6px;
+      font-size: 11px;
+      font-weight: 500;
       color: var(--muted);
-      letter-spacing: 1px;
       white-space: nowrap;
       min-width: 120px;
     }
 
     .calc-result {
       flex: 1;
-      font-family: var(--font-pixel);
-      font-size: 10px;
-      color: var(--green-glow);
-      text-shadow: 0 0 8px var(--green-glow);
-      letter-spacing: 1px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--green);
       min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -189,90 +130,58 @@
     }
 
     .calc-result-unit {
-      font-family: var(--font-pixel);
-      font-size: 7px;
+      font-size: 12px;
+      font-weight: 500;
       color: var(--muted);
       white-space: nowrap;
       min-width: 48px;
-      letter-spacing: 1px;
     }
 
-    /* ── Responsive ──────────────────────────────────────────────── */
     @media (max-width: 620px) {
-      .calc-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-      }
-
-      body {
-        padding: 24px 16px 60px;
-        align-items: flex-start;
-      }
-
-      .calc-card h2 {
-        font-size: 7px;
-      }
-
-      .calc-row label,
-      .calc-output label {
-        min-width: 90px;
-        font-size: 5px;
-      }
-
-      .calc-unit,
-      .calc-result-unit {
-        min-width: 38px;
-        font-size: 6px;
-      }
+      .calc-grid { grid-template-columns: 1fr; gap: 12px; }
+      .calc-row label, .calc-output label { min-width: 90px; font-size: 10px; }
+      .calc-unit, .calc-result-unit { min-width: 38px; font-size: 11px; }
     }
 
-    /* ── SEO content section ─────────────────────────────────────── */
     .seo-section {
       width: 100%;
-      max-width: 960px;
       margin-top: 64px;
-      border: 4px solid var(--border-dim);
-      background: var(--bg-card);
+      background: var(--dark-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
     }
 
     .seo-inner {
-      padding: 48px 44px;
-      font-family: var(--font-prose);
+      padding: 40px 36px;
       font-size: 15px;
-      color: #b8b8cc;
+      color: var(--muted);
       line-height: 1.8;
     }
 
     .seo-inner h2 {
-      font-family: var(--font-pixel);
-      font-size: 13px;
-      color: var(--gold);
-      text-shadow: 2px 2px 0 var(--gold-shadow);
-      letter-spacing: 2px;
-      margin-bottom: 20px;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.3px;
+      margin-bottom: 16px;
       margin-top: 0;
+      text-shadow: none;
     }
 
     .seo-inner h3 {
-      font-family: var(--font-pixel);
-      font-size: 9px;
+      font-size: 13px;
+      font-weight: 600;
       color: var(--orange);
-      text-shadow: 1px 1px 0 var(--orange-shadow);
-      letter-spacing: 2px;
-      margin-top: 40px;
-      margin-bottom: 16px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      margin-top: 32px;
+      margin-bottom: 12px;
+      text-shadow: none;
     }
 
-    .seo-inner p {
-      margin-bottom: 14px;
-    }
+    .seo-inner p { margin-bottom: 14px; }
 
-    .seo-divider {
-      width: 100%;
-      height: 2px;
-      background: linear-gradient(to right, transparent, var(--border-dim), transparent);
-      margin: 36px 0;
-    }
+    .seo-divider { height: 1px; background: var(--border); margin: 28px 0; }
 
     .seo-features {
       list-style: none;
@@ -286,63 +195,51 @@
       padding: 10px 0;
       border-bottom: 1px solid var(--row-divider);
       font-size: 15px;
+      color: var(--muted);
     }
 
-    .seo-features li:last-child {
-      border-bottom: none;
-    }
+    .seo-features li:last-child { border-bottom: none; }
 
     .seo-features li::before {
       content: '▸';
-      font-family: var(--font-pixel);
-      font-size: 9px;
-      color: var(--green-glow);
+      color: var(--green);
+      font-size: 12px;
       flex-shrink: 0;
       margin-top: 3px;
     }
 
     @media (max-width: 620px) {
-      .seo-section {
-        border-left: none;
-        border-right: none;
-        margin-top: 40px;
-      }
-
-      .seo-inner {
-        padding: 36px 24px;
-      }
-
-      .seo-inner h2 { font-size: 11px; }
-      .seo-inner h3 { font-size: 8px; }
-      .seo-inner p,
-      .seo-features li { font-size: 14px; }
+      .seo-inner { padding: 28px 20px; }
     }
   </style>
 </head>
 <body>
+  <nav class="page-nav">
+    <div class="page-nav__inner">
+      <a href="index.html" class="page-nav__brand">DERRICK</a>
+      <ul class="page-nav__links">
+        <li><a href="news.html">News</a></li>
+        <li><a href="/rigs">Fleet</a></li>
+        <li class="page-nav__dropdown">
+          <button class="page-nav__dropdown-toggle active" type="button">Tools ▾</button>
+          <div class="page-nav__dropdown-menu">
+            <a href="ask.html">Ask Derrick</a>
+            <a href="timer.html">Drill-o-doro</a>
+            <a href="converter.html">Unit Converter</a>
+            <a href="calculator.html" aria-current="page">Drilling Calculator</a>
+            <a href="wellvolumes.html">Well Fluid Volumes</a>
+            <a href="acronyms.html">Acronym Lookup</a>
+            <a href="wellcontrol.html">Well Control</a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
   <div class="page-wrap">
 
-    <a class="site-brand" href="index.html">DERRICK</a>
-    <nav class="site-nav" aria-label="Site navigation">
-      <a href="index.html">&#9654; HOME</a>
-      <a href="news.html">&#9654; NEWS</a>
-      <a href="/rigs">&#9654; FLEET STATUS</a>
-      <div class="nav-dropdown">
-        <button class="nav-dropdown__toggle active" type="button">&#9654; TOOLS &#9660;</button>
-        <div class="nav-dropdown__menu">
-          <a href="ask.html">Ask Derrick</a>
-          <a href="timer.html">Drill-o-doro</a>
-          <a href="converter.html">Unit Converter</a>
-          <a href="calculator.html" aria-current="page">Drilling Calculator</a>
-          <a href="wellvolumes.html">Well Fluid Volumes</a>
-          <a href="acronyms.html">Acronym Lookup</a>
-          <a href="wellcontrol.html">Well Control</a>
-        </div>
-      </div>
-    </nav>
-
-    <h1>DRILLING PRESSURE &amp; MUD CALCULATOR</h1>
-    <p class="page-subtitle">ENTER ANY INPUT &mdash; RESULTS UPDATE IN REAL TIME</p>
+    <h1>Drilling Pressure &amp; Mud Calculator</h1>
+    <p class="page-subtitle">Enter any input — results update in real time</p>
 
     <div class="calc-grid">
 

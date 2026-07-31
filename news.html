@@ -14,28 +14,18 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://drillodoro.com/news">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="style.css">
   <style>
-    body {
-      justify-content: flex-start;
-      align-items: center;
-      padding: 0 20px 80px;
-    }
-
     .page-shell {
-      width: 100%;
       max-width: 980px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
     }
 
     /* ── Page header ────────────────────────────────────────────── */
     .news-header {
       width: 100%;
-      padding: 44px 0 32px;
-      border-bottom: 2px solid var(--border-dim);
+      padding: 40px 0 32px;
+      border-bottom: 1px solid var(--border-dim);
       margin-bottom: 20px;
       display: flex;
       align-items: center;
@@ -49,9 +39,9 @@
 
     .news-header__rig {
       flex-shrink: 0;
-      width: 260px;
+      width: 240px;
       height: auto;
-      opacity: 0.8;
+      opacity: 0.75;
       overflow: visible;
     }
 
@@ -184,27 +174,26 @@
     }
 
     .news-header__eyebrow {
-      font-family: var(--font-pixel);
-      font-size: 7px;
+      font-size: 11px;
+      font-weight: 600;
       color: var(--orange);
-      letter-spacing: 3px;
+      letter-spacing: 1px;
       text-transform: uppercase;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
     h1.news-header__title {
-      font-family: var(--font-pixel);
-      font-size: 24px;
-      color: var(--gold);
-      text-shadow: 3px 3px 0 var(--gold-shadow);
-      letter-spacing: 3px;
-      line-height: 1.4;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      line-height: 1.2;
       text-align: left;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
+      text-shadow: none;
     }
 
     .news-header__sub {
-      font-family: var(--font-prose);
       font-size: 15px;
       color: var(--muted);
       line-height: 1.6;
@@ -220,26 +209,26 @@
 
     /* ── Card ───────────────────────────────────────────────────── */
     .news-card {
-      background: var(--bg-card);
-      border: var(--border-card);
-      border-left: 4px solid var(--border-dim);
+      background: var(--dark-card);
+      border: 1px solid var(--border-dim);
+      border-left: 3px solid var(--border-dim);
+      border-radius: 12px;
       display: flex;
       flex-direction: column;
       text-decoration: none;
-      padding: 28px 24px 30px;
-      gap: 14px;
+      padding: 24px;
+      gap: 12px;
       transition: border-left-color 0.15s, box-shadow 0.15s;
     }
 
-    /* Top article gets a permanent orange left accent — intentional, not a fallback */
     .news-card:first-child {
       grid-column: span 2;
       border-left-color: var(--orange);
     }
 
     .news-card:first-child .card-title {
-      font-size: 12px;
-      line-height: 2.2;
+      font-size: 17px;
+      line-height: 1.4;
     }
 
     .news-card:first-child .card-summary {
@@ -248,13 +237,8 @@
     }
 
     .news-card:hover {
-      border-left-color: var(--gold);
-      box-shadow: -4px 0 0 var(--gold-shadow), 0 0 28px var(--gold-dim);
-    }
-
-    .news-card:first-child:hover {
       border-left-color: var(--orange);
-      box-shadow: -4px 0 0 var(--orange-shadow), 0 0 28px rgba(255, 107, 53, 0.15);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
     }
 
     /* ── Card anatomy ───────────────────────────────────────────── */
@@ -262,36 +246,33 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 8px;
     }
 
     .card-source {
-      font-family: var(--font-pixel);
-      font-size: 7px;
+      font-size: 11px;
+      font-weight: 600;
       color: var(--orange);
-      letter-spacing: 1.5px;
+      letter-spacing: 0.5px;
       text-transform: uppercase;
     }
 
     .card-relevance {
-      font-family: var(--font-pixel);
-      font-size: 7px;
+      font-size: 11px;
       color: var(--subtle);
-      letter-spacing: 1px;
     }
 
     .card-title {
-      font-family: var(--font-pixel);
-      font-size: 9px;
-      color: var(--gold);
-      line-height: 2.1;
-      letter-spacing: 1px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.4;
     }
 
     .card-summary {
-      font-family: var(--font-prose);
       font-size: 14px;
-      color: #b8b8cc;
-      line-height: 1.75;
+      color: var(--muted);
+      line-height: 1.7;
       display: -webkit-box;
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
@@ -305,34 +286,24 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 22px;
+      gap: 16px;
     }
 
     .news-state__icon {
-      font-family: var(--font-pixel);
-      font-size: 28px;
-      color: var(--border-dim);
+      font-size: 32px;
+      color: var(--subtle);
     }
 
     .news-state__text {
-      font-family: var(--font-pixel);
-      font-size: 8px;
+      font-size: 14px;
       color: var(--muted);
-      letter-spacing: 2px;
       text-align: center;
-      line-height: 2.4;
+      line-height: 1.7;
     }
 
     @keyframes blink {
-
-      0%,
-      100% {
-        opacity: 1;
-      }
-
-      50% {
-        opacity: 0;
-      }
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
     }
 
     .loading-dot {
@@ -340,55 +311,51 @@
       animation: blink 1.2s infinite;
     }
 
-    .loading-dot:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-
-    .loading-dot:nth-child(3) {
-      animation-delay: 0.4s;
-    }
+    .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dot:nth-child(3) { animation-delay: 0.4s; }
 
     /* ── Featured article ───────────────────────────────────────── */
     .featured-article {
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      padding: 28px 28px 26px;
-      background: var(--bg-card);
-      border: 2px solid var(--orange);
-      box-shadow: 0 0 24px rgba(255, 107, 53, 0.08);
+      gap: 12px;
+      padding: 24px;
+      background: var(--dark-card);
+      border: 1px solid rgba(249,115,22,0.3);
+      border-radius: 14px;
+      box-shadow: 0 0 24px rgba(249,115,22,0.06);
       text-decoration: none;
       margin-bottom: 24px;
-      transition: box-shadow 0.15s;
+      transition: box-shadow 0.15s, border-color 0.15s;
     }
 
     .featured-article:hover {
-      box-shadow: 0 0 40px rgba(255, 107, 53, 0.18);
+      box-shadow: 0 0 40px rgba(249,115,22,0.12);
+      border-color: rgba(249,115,22,0.5);
     }
 
     .featured-label {
-      font-family: var(--font-pixel);
-      font-size: 7px;
-      color: #0a0a1a;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
       background: var(--orange);
+      border-radius: 6px;
       padding: 4px 10px;
-      letter-spacing: 2px;
+      letter-spacing: 0.5px;
       align-self: flex-start;
     }
 
     .featured-title {
-      font-family: var(--font-pixel);
-      font-size: 12px;
-      color: var(--gold);
-      line-height: 2.2;
-      letter-spacing: 1px;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.35;
     }
 
     .featured-summary {
-      font-family: var(--font-prose);
       font-size: 15px;
-      color: #b8b8cc;
-      line-height: 1.75;
+      color: var(--muted);
+      line-height: 1.7;
     }
 
     /* ── Tag filter bar ─────────────────────────────────────────── */
@@ -398,7 +365,7 @@
       flex-direction: column;
       gap: 10px;
       padding: 16px 0 20px;
-      border-bottom: 2px solid var(--border-dim);
+      border-bottom: 1px solid var(--border-dim);
       margin-bottom: 32px;
     }
 
@@ -410,43 +377,43 @@
     }
 
     .filter-bar-label {
-      font-family: var(--font-pixel);
-      font-size: 6px;
+      font-size: 11px;
+      font-weight: 600;
       color: var(--subtle);
-      letter-spacing: 2px;
+      letter-spacing: 0.5px;
       min-width: 48px;
     }
 
     .tag-pill {
-      font-family: var(--font-pixel);
-      font-size: 7px;
-      color: var(--gold);
-      background: var(--bg-card);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      background: rgba(255,255,255,0.04);
       border: 1px solid var(--border-dim);
-      padding: 5px 10px;
+      border-radius: 20px;
+      padding: 5px 12px;
       cursor: pointer;
-      letter-spacing: 1px;
-      text-transform: uppercase;
       transition: color 0.1s, border-color 0.1s, background 0.1s;
+      text-transform: none;
+      letter-spacing: 0;
     }
 
     .tag-pill:hover {
-      border-color: var(--gold);
-      color: var(--gold);
+      color: var(--text);
+      border-color: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.07);
     }
 
     .tag-pill--active {
       background: var(--orange);
-      color: #0a0a1a;
+      color: #fff;
       border-color: var(--orange);
     }
 
     /* ── Card date ───────────────────────────────────────────────── */
     .card-date {
-      font-family: var(--font-pixel);
-      font-size: 7px;
+      font-size: 11px;
       color: var(--muted);
-      letter-spacing: 1px;
     }
 
     /* ── Card tag pills ──────────────────────────────────────────── */
@@ -459,91 +426,58 @@
     }
 
     .card-tag {
-      font-family: var(--font-pixel);
-      font-size: 7px;
+      font-size: 11px;
+      font-weight: 500;
       color: var(--orange);
-      background: #100818;
-      border: 1px solid var(--border-dim);
-      padding: 3px 7px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
+      background: rgba(249,115,22,0.08);
+      border: 1px solid rgba(249,115,22,0.2);
+      border-radius: 4px;
+      padding: 2px 8px;
     }
 
     /* ── Responsive ─────────────────────────────────────────────── */
     @media (max-width: 840px) {
-      .news-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .news-card:first-child {
-        grid-column: span 2;
-      }
-
-      h1.news-header__title {
-        font-size: 18px;
-      }
-
-      .news-header__rig {
-        display: none;
-      }
-
-      .news-header {
-        gap: 0;
-      }
-    }
-
-    @media (max-width: 620px) {
-      .featured-article {
-        padding: 20px 18px;
-      }
-
-      .featured-title {
-        font-size: 10px;
-      }
+      .news-grid { grid-template-columns: repeat(2, 1fr); }
+      .news-card:first-child { grid-column: span 2; }
+      h1.news-header__title { font-size: 22px; }
+      .news-header__rig { display: none; }
+      .news-header { gap: 0; }
     }
 
     @media (max-width: 540px) {
-      .news-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .news-card:first-child {
-        grid-column: span 1;
-      }
-
-      .news-card:first-child .card-title {
-        font-size: 9px;
-      }
-
-      h1.news-header__title {
-        font-size: 13px;
-        letter-spacing: 2px;
-      }
+      .news-grid { grid-template-columns: 1fr; }
+      .news-card:first-child { grid-column: span 1; }
+      .news-card:first-child .card-title { font-size: 16px; }
+      h1.news-header__title { font-size: 20px; }
     }
   </style>
 </head>
 
 <body>
 
-  <div class="page-shell">
+  <nav class="page-nav">
+    <div class="page-nav__inner">
+      <a href="index.html" class="page-nav__brand">DERRICK</a>
+      <ul class="page-nav__links">
+        <li><a href="news.html" aria-current="page">News</a></li>
+        <li><a href="/rigs">Fleet</a></li>
+        <li class="page-nav__dropdown">
+          <button class="page-nav__dropdown-toggle" type="button">Tools ▾</button>
+          <div class="page-nav__dropdown-menu">
+            <a href="ask.html">Ask Derrick</a>
+            <a href="timer.html">Drill-o-doro</a>
+            <a href="converter.html">Unit Converter</a>
+            <a href="calculator.html">Drilling Calculator</a>
+            <a href="wellvolumes.html">Well Fluid Volumes</a>
+            <a href="acronyms.html">Acronym Lookup</a>
+            <a href="wellcontrol.html">Well Control</a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>
 
-    <nav class="top-nav" aria-label="Site navigation">
-      <a href="index.html">&#9654; HOME</a>
-      <a href="news.html" aria-current="page">&#9654; NEWS</a>
-      <a href="/rigs">&#9654; FLEET STATUS</a>
-      <div class="nav-dropdown">
-        <button class="nav-dropdown__toggle" type="button">&#9654; TOOLS &#9660;</button>
-        <div class="nav-dropdown__menu">
-          <a href="ask.html">Ask Derrick</a>
-          <a href="timer.html">Drill-o-doro</a>
-          <a href="converter.html">Unit Converter</a>
-          <a href="calculator.html">Drilling Calculator</a>
-          <a href="wellvolumes.html">Well Fluid Volumes</a>
-          <a href="acronyms.html">Acronym Lookup</a>
-          <a href="wellcontrol.html">Well Control</a>
-        </div>
-      </div>
-    </nav>
+  <div class="page-shell">
 
     <header class="news-header">
       <div class="news-header__text">

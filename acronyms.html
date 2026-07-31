@@ -7,60 +7,53 @@
   <link rel="canonical" href="https://drillodoro.com/acronyms">
   <meta name="description" content="Comprehensive drilling and oil &amp; gas acronym decoder. Instant search through 150+ acronyms covering MWD/LWD, well control, completions, HSE, production and more.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="style.css">
   <style>
-    .page-wrap {
-      width: 100%;
-      max-width: 900px;
-    }
+    .page-wrap { max-width: 900px; }
 
     .page-subtitle {
-      font-family: var(--font-pixel);
-      font-size: 7px;
+      font-size: 14px;
       color: var(--muted);
-      letter-spacing: 2px;
       text-align: center;
-      margin-top: 10px;
-      margin-bottom: 36px;
+      margin-top: 8px;
+      margin-bottom: 32px;
     }
 
     /* ── Search box ─────────────────────────────────────────────── */
     .search-wrap {
       position: relative;
-      margin-bottom: 28px;
+      margin-bottom: 16px;
     }
 
     .search-wrap::before {
       content: '▸';
       position: absolute;
-      left: 12px;
+      left: 14px;
       top: 50%;
       transform: translateY(-50%);
-      font-family: var(--font-pixel);
-      font-size: 10px;
+      font-size: 14px;
       color: var(--orange);
       pointer-events: none;
     }
 
     #search {
-      padding-left: 32px;
-      font-size: 11px;
-      height: 44px;
+      padding-left: 38px;
+      font-size: 15px;
+      height: 48px;
+      border-radius: 10px;
     }
 
     .search-count {
-      font-family: var(--font-pixel);
-      font-size: 7px;
+      font-size: 12px;
       color: var(--muted);
-      letter-spacing: 1px;
-      margin-top: 10px;
+      margin-top: 8px;
       text-align: right;
     }
 
     .search-count span {
-      color: var(--green-glow);
-      text-shadow: 0 0 8px var(--green-glow);
+      color: var(--green);
+      font-weight: 600;
     }
 
     /* ── Category filter pills ──────────────────────────────────── */
@@ -72,22 +65,28 @@
     }
 
     .filter-btn {
-      font-family: var(--font-pixel);
-      font-size: 7px;
-      background: var(--bg-input);
+      font-size: 12px;
+      font-weight: 500;
+      background: rgba(255,255,255,0.04);
       color: var(--muted);
-      border: 2px solid var(--border-dim);
-      padding: 6px 10px;
+      border: 1px solid var(--border-dim);
+      border-radius: 20px;
+      padding: 6px 14px;
       cursor: pointer;
-      letter-spacing: 1px;
-      text-transform: uppercase;
       transition: color 0.1s, border-color 0.1s, background 0.1s;
+      text-transform: none;
+      letter-spacing: 0;
     }
 
-    .filter-btn:hover,
+    .filter-btn:hover {
+      color: var(--text);
+      border-color: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.07);
+    }
+
     .filter-btn.active {
-      background: var(--bg-input);
-      color: var(--orange);
+      background: var(--orange);
+      color: #fff;
       border-color: var(--orange);
     }
 
@@ -98,23 +97,18 @@
     }
 
     .acro-table thead th {
-      font-family: var(--font-pixel);
-      font-size: 7px;
+      font-size: 11px;
+      font-weight: 600;
       color: var(--muted);
-      letter-spacing: 2px;
+      letter-spacing: 0.5px;
       text-transform: uppercase;
       text-align: left;
       padding: 8px 12px 12px;
-      border-bottom: 2px solid var(--border-dim);
+      border-bottom: 1px solid var(--border-dim);
     }
 
-    .acro-table thead th:first-child {
-      width: 90px;
-    }
-
-    .acro-table thead th:nth-child(2) {
-      width: 220px;
-    }
+    .acro-table thead th:first-child { width: 90px; }
+    .acro-table thead th:nth-child(2) { width: 220px; }
 
     .acro-table tbody tr {
       border-bottom: 1px solid var(--row-divider);
@@ -122,48 +116,41 @@
     }
 
     .acro-table tbody tr:hover {
-      background: #12122a;
+      background: rgba(255,255,255,0.03);
     }
 
-    .acro-table tbody tr.hidden {
-      display: none;
-    }
+    .acro-table tbody tr.hidden { display: none; }
 
     .acro-table td {
-      padding: 11px 12px;
+      padding: 12px;
       vertical-align: top;
     }
 
     .acro-abbr {
-      font-family: var(--font-pixel);
-      font-size: 9px;
+      font-size: 13px;
+      font-weight: 700;
       color: var(--orange);
-      text-shadow: 1px 1px 0 var(--orange-shadow);
-      letter-spacing: 1px;
       white-space: nowrap;
+      text-shadow: none;
     }
 
     .acro-full {
-      font-family: var(--font-pixel);
-      font-size: 7px;
-      color: var(--gold);
-      letter-spacing: 1px;
-      line-height: 1.7;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.5;
     }
 
     .acro-desc {
-      font-family: Georgia, serif;
       font-size: 13px;
-      color: #b8b8cc;
+      color: var(--muted);
       line-height: 1.7;
     }
 
     .acro-cat {
-      font-family: var(--font-pixel);
-      font-size: 6px;
-      color: var(--muted);
-      letter-spacing: 1px;
-      text-transform: uppercase;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--subtle);
       white-space: nowrap;
     }
 
@@ -172,17 +159,16 @@
       display: none;
       text-align: center;
       padding: 60px 20px;
-      font-family: var(--font-pixel);
-      font-size: 9px;
+      font-size: 15px;
       color: var(--muted);
-      letter-spacing: 2px;
     }
 
     /* ── Highlight matched text ──────────────────────────────────── */
     mark {
-      background: transparent;
-      color: var(--green-glow);
-      text-shadow: 0 0 8px var(--green-glow);
+      background: rgba(74,222,128,0.15);
+      color: var(--green);
+      border-radius: 2px;
+      padding: 0 2px;
     }
 
     /* ── SEO card ───────────────────────────────────────────────── */
@@ -192,45 +178,43 @@
 
     /* ── Mobile ─────────────────────────────────────────────────── */
     @media (max-width: 620px) {
-      .page-wrap { padding: 24px 16px; }
-
       .acro-table thead th:nth-child(2),
-      .acro-table td:nth-child(2) {
-        display: none;
-      }
-
+      .acro-table td:nth-child(2) { display: none; }
       .acro-cat { display: none; }
-
       .acro-table thead th:first-child { width: 80px; }
-      .acro-abbr { font-size: 8px; }
-      .acro-full { font-size: 6px; }
+      .acro-abbr { font-size: 12px; }
+      .acro-full { font-size: 12px; }
       .acro-desc { font-size: 12px; }
     }
   </style>
 </head>
 <body>
+  <nav class="page-nav">
+    <div class="page-nav__inner">
+      <a href="index.html" class="page-nav__brand">DERRICK</a>
+      <ul class="page-nav__links">
+        <li><a href="news.html">News</a></li>
+        <li><a href="/rigs">Fleet</a></li>
+        <li class="page-nav__dropdown">
+          <button class="page-nav__dropdown-toggle active" type="button">Tools ▾</button>
+          <div class="page-nav__dropdown-menu">
+            <a href="ask.html">Ask Derrick</a>
+            <a href="timer.html">Drill-o-doro</a>
+            <a href="converter.html">Unit Converter</a>
+            <a href="calculator.html">Drilling Calculator</a>
+            <a href="wellvolumes.html">Well Fluid Volumes</a>
+            <a href="acronyms.html" aria-current="page">Acronym Lookup</a>
+            <a href="wellcontrol.html">Well Control</a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
   <div class="page-wrap">
 
-    <nav class="site-nav" aria-label="Site navigation">
-      <a href="index.html">&#9654; HOME</a>
-      <a href="news.html">&#9654; NEWS</a>
-      <a href="/rigs">&#9654; FLEET STATUS</a>
-      <div class="nav-dropdown">
-        <button class="nav-dropdown__toggle active" type="button">&#9654; TOOLS &#9660;</button>
-        <div class="nav-dropdown__menu">
-          <a href="ask.html">Ask Derrick</a>
-          <a href="timer.html">Drill-o-doro</a>
-          <a href="converter.html">Unit Converter</a>
-          <a href="calculator.html">Drilling Calculator</a>
-          <a href="wellvolumes.html">Well Fluid Volumes</a>
-          <a href="acronyms.html" aria-current="page">Acronym Lookup</a>
-          <a href="wellcontrol.html">Well Control</a>
-        </div>
-      </div>
-    </nav>
-
-    <h1>DRILLING ACRONYM DECODER</h1>
-    <p class="page-subtitle">150+ OIL &amp; GAS TERMS — INSTANT SEARCH</p>
+    <h1>Drilling Acronym Decoder</h1>
+    <p class="page-subtitle">150+ oil &amp; gas terms — instant search</p>
 
     <!-- Search -->
     <div class="search-wrap">
@@ -444,24 +428,24 @@
       <div class="divider divider--spaced"></div>
       <div class="pixel-card">
         <div class="pixel-card__inner prose">
-          <h2>DRILLING ACRONYM DECODER</h2>
+          <h2>Drilling Acronym Decoder</h2>
 
-          <h3>WHAT IS THIS PAGE?</h3>
+          <h3>What is this page?</h3>
           <p>
             This is a free, searchable reference for oil and gas acronyms used every day on drilling rigs, in operations centres, and across the upstream energy industry. Whether you are a brand-new roughneck on your first hitch or an experienced petroleum engineer reviewing well programmes, the alphabet soup of abbreviations can be overwhelming. This decoder covers more than 150 of the most important terms across seven disciplines: drilling operations, well control, MWD/LWD, completions, production, health and safety (HSE), and general industry terms.
           </p>
 
-          <h3>WHY DO DRILLING ACRONYMS MATTER?</h3>
+          <h3>Why do drilling acronyms matter?</h3>
           <p>
             On a rig, communication must be fast, precise, and unambiguous. Acronyms exist because they compress long technical phrases into a handful of characters that every crew member can instantly decode on a morning report, over the radio, or in a drilling programme. When a driller shouts "BOP" or a company man queries the "ECD", there is no room for confusion — the wrong interpretation can mean the difference between a safe operation and a well control incident. Knowing your acronyms is therefore not just a career skill; in many situations it is a safety-critical one.
           </p>
 
-          <h3>HOW TO USE THE SEARCH</h3>
+          <h3>How to use the search</h3>
           <p>
             Type any acronym, full name, or keyword into the search box above and results filter instantly. The category buttons let you narrow down to a specific discipline — useful when you know you're looking for a well control term but can't quite remember the letters. All 155 entries include the acronym, the full expansion, and a plain-English one-liner so even non-engineers can get the gist.
           </p>
 
-          <h3>ABOUT DRILL-O-DORO</h3>
+          <h3>About DERRICK</h3>
           <p>
             DERRICK is a free suite of retro-styled tools built for oil and gas professionals — from wellsite to office. Alongside this acronym decoder you will find a Pomodoro-style deep-work timer tuned to rig schedules, a comprehensive drilling unit converter, and a hydraulics and well-control calculator — all free, no sign-up required.
           </p>

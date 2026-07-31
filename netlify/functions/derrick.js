@@ -14,13 +14,11 @@ exports.handler = async function (event) {
     return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
   }
 
-  // Block cross-origin requests from domains other than our own
   const origin = event.headers.origin;
   if (origin && !ALLOWED_ORIGINS.includes(origin)) {
     return { statusCode: 403, body: JSON.stringify({ error: 'Forbidden' }) };
   }
 
-  // Reject oversized payloads before parsing
   if (event.body && event.body.length > MAX_BODY_BYTES) {
     return { statusCode: 413, body: JSON.stringify({ error: 'Payload too large' }) };
   }
@@ -33,7 +31,6 @@ exports.handler = async function (event) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Request body must include a messages array' }) };
   }
 
-  // Cap conversation length and validate each message
   if (messages.length > MAX_MESSAGES) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Too many messages in conversation' }) };
   }

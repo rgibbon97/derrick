@@ -1,54 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
 /* ================================================================
-   DRILL-O-DORO — Shared Stylesheet
-   drillodoro.com
-   ================================================================
-   Usage: <link rel="stylesheet" href="style.css">
-   Also add to <head>:
-     <link rel="preconnect" href="https://fonts.googleapis.com">
-     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+   DERRICK — Shared Stylesheet (drillodoro.com)
    ================================================================ */
 
 
-/* ── Design Tokens ──────────────────────────────────────────────
-   Reference these custom properties anywhere on the site to keep
-   colours, shadows, and borders consistent across pages.
-   ────────────────────────────────────────────────────────────── */
+/* ── Design Tokens ──────────────────────────────────────────────── */
 :root {
-  /* Backgrounds */
-  --bg-page:        #0a0a1a;   /* main page background             */
-  --bg-panel:       #0a0a1a;   /* app panel / sidebar background   */
-  --bg-card:        #0d0d20;   /* slightly lighter card background */
-  --bg-input:       #1a1a3a;   /* input / button resting state     */
+  /* Core palette */
+  --dark:          #06060a;
+  --dark-card:     #0f0f16;
+  --dark-surface:  #141420;
+  --orange:        #f97316;
+  --orange-light:  #fb923c;
+  --green:         #4ade80;
 
-  /* Brand colours */
-  --gold:           #e8d44d;   /* primary gold — borders, text     */
-  --gold-shadow:    #7a5900;   /* gold drop-shadow                 */
-  --gold-dim:       #e8d44d33; /* gold at 20 % opacity (glows)     */
-  --orange:         #ff6b35;   /* accent orange — headings, alerts */
-  --orange-shadow:  #7a2e00;   /* orange drop-shadow               */
-  --green-glow:     #88ff88;   /* positive / depth readout         */
+  /* Text */
+  --text:          #f1f5f9;
+  --muted:         rgba(255,255,255,0.45);
+  --subtle:        rgba(255,255,255,0.2);
 
-  /* Neutral / muted */
-  --muted:          #aaa;      /* secondary labels                 */
-  --subtle:         #555;      /* de-emphasised text / units       */
-  --border-dim:     #333340;   /* divider / card border colour     */
-  --row-divider:    #1e1e38;   /* fine list-item rule              */
-
-  /* Typography */
-  --font-pixel:     'Press Start 2P', monospace;
-  --font-prose:     Georgia, 'Times New Roman', serif;
+  /* Font */
+  --font:          'Inter', system-ui, -apple-system, sans-serif;
 
   /* Borders */
-  --border-ui:      4px solid var(--gold);
-  --border-card:    4px solid var(--border-dim);
+  --border:        rgba(255,255,255,0.08);
+  --border-focus:  rgba(249,115,22,0.6);
 
-  /* Shadows */
-  --shadow-app:     0 0 0 4px var(--gold-shadow), 0 0 40px var(--gold-dim);
-  --shadow-app-mobile: 0 0 24px var(--gold-dim);
+  /* Legacy aliases — keep old variable names working in existing inline styles */
+  --bg-page:        #06060a;
+  --bg-panel:       #06060a;
+  --bg-card:        #0f0f16;
+  --bg-input:       rgba(255,255,255,0.05);
+  --gold:           #f97316;
+  --gold-shadow:    rgba(249,115,22,0.25);
+  --gold-dim:       rgba(249,115,22,0.1);
+  --border-dim:     rgba(255,255,255,0.08);
+  --row-divider:    rgba(255,255,255,0.05);
+  --green-glow:     #4ade80;
+  --font-pixel:     'Inter', system-ui, sans-serif;
+  --font-prose:     'Inter', system-ui, sans-serif;
+  --orange-shadow:  rgba(249,115,22,0.25);
+  --border-ui:      1px solid rgba(255,255,255,0.12);
+  --border-card:    1px solid rgba(255,255,255,0.08);
+  --shadow-app:     0 25px 50px -12px rgba(0,0,0,0.6);
+  --shadow-app-mobile: 0 10px 30px rgba(0,0,0,0.4);
 }
 
 
-/* ── Reset ──────────────────────────────────────────────────────*/
+/* ── Reset ──────────────────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -56,157 +56,390 @@
 }
 
 
-/* ── Base page ──────────────────────────────────────────────────*/
+/* ── Base page ──────────────────────────────────────────────────── */
 body {
-  background: var(--bg-page);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
+  background: var(--dark);
+  color: var(--text);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
   min-height: 100vh;
-  padding: 48px 20px 80px;
-  font-family: var(--font-pixel);
-  color: var(--gold);
 }
 
 
-/* ── Typography ─────────────────────────────────────────────────
-   Use these heading styles on any page to stay on-brand.
-   ────────────────────────────────────────────────────────────── */
+/* ── Page containers ────────────────────────────────────────────── */
+.page-shell,
+.page-wrap {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
 
-/* Page / app title */
-h1 {
-  font-family: var(--font-pixel);
+
+/* ── Site nav (new sticky page nav) ─────────────────────────────── */
+.page-nav {
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(6,6,10,0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.page-nav__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.page-nav__brand {
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--text);
+  text-decoration: none;
+  letter-spacing: 2px;
+  flex-shrink: 0;
+}
+
+.page-nav__links {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  list-style: none;
+}
+
+.page-nav__links > li > a {
   font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.page-nav__links > li > a:hover {
+  color: var(--text);
+  background: rgba(255,255,255,0.06);
+}
+
+.page-nav__links > li > a[aria-current="page"] {
   color: var(--orange);
-  text-shadow: 2px 2px 0 var(--orange-shadow);
-  letter-spacing: 2px;
+}
+
+/* Dropdown */
+.page-nav__dropdown {
+  position: relative;
+}
+
+.page-nav__dropdown-toggle {
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.15s, background 0.15s;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.page-nav__dropdown-toggle:hover,
+.page-nav__dropdown:hover .page-nav__dropdown-toggle {
+  color: var(--text);
+  background: rgba(255,255,255,0.06);
+}
+
+.page-nav__dropdown-toggle.active {
+  color: var(--orange);
+}
+
+.page-nav__dropdown-toggle:active {
+  transform: none;
+}
+
+.page-nav__dropdown-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #12121c;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  min-width: 180px;
+  z-index: 200;
+  flex-direction: column;
+  padding: 6px;
+  box-shadow: 0 16px 32px rgba(0,0,0,0.5);
+}
+
+.page-nav__dropdown:hover .page-nav__dropdown-menu,
+.page-nav__dropdown:focus-within .page-nav__dropdown-menu {
+  display: flex;
+}
+
+.page-nav__dropdown-menu a {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: color 0.1s, background 0.1s;
+  white-space: nowrap;
+  display: block;
+  border: none;
+  background: transparent;
+  text-transform: none;
+  letter-spacing: 0;
+  line-height: 1.4;
+}
+
+.page-nav__dropdown-menu a:hover {
+  color: var(--text);
+  background: rgba(255,255,255,0.06);
+}
+
+.page-nav__dropdown-menu a[aria-current="page"] {
+  color: var(--orange);
+  background: rgba(249,115,22,0.08);
+}
+
+/* Mobile nav */
+@media (max-width: 620px) {
+  .page-nav__inner { padding: 0 16px; }
+  .page-nav__links > li > a { font-size: 13px; padding: 5px 8px; }
+  .page-nav__dropdown-toggle { font-size: 13px; padding: 5px 8px; }
+
+  .page-nav__dropdown-menu {
+    position: fixed;
+    top: 60px;
+    right: 16px;
+    left: 16px;
+    border-radius: 10px;
+  }
+}
+
+
+/* ── Legacy nav classes — kept for backward compat ───────────────── */
+.site-nav,
+.top-nav {
+  display: none; /* replaced by .page-nav — hide if still in DOM */
+}
+
+.site-brand {
+  display: none; /* replaced by brand in .page-nav */
+}
+
+/* But if a page still uses the old nav without page-nav, show it */
+body:not(:has(.page-nav)) .site-nav,
+body:not(:has(.page-nav)) .top-nav {
+  display: flex;
+}
+
+/* ── Nav dropdown (old style — keep working) ─────────────────────── */
+.nav-dropdown {
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+}
+
+.nav-dropdown__toggle {
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 500;
+  background: transparent;
+  color: var(--muted);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+  line-height: 1;
+  white-space: nowrap;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.nav-dropdown__toggle:hover,
+.nav-dropdown:hover .nav-dropdown__toggle {
+  color: var(--text);
+  background: rgba(255,255,255,0.06);
+}
+
+.nav-dropdown__toggle.active { color: var(--orange); }
+.nav-dropdown__toggle:active { transform: none; }
+
+.nav-dropdown__menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: #12121c;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  min-width: 180px;
+  z-index: 200;
+  flex-direction: column;
+  padding: 6px;
+  box-shadow: 0 16px 32px rgba(0,0,0,0.5);
+}
+
+.nav-dropdown:hover .nav-dropdown__menu,
+.nav-dropdown:focus-within .nav-dropdown__menu {
+  display: flex;
+}
+
+.nav-dropdown__menu a {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  display: block;
+  text-transform: none;
+  letter-spacing: 0;
+  transition: color 0.1s, background 0.1s;
+  white-space: nowrap;
+}
+
+.nav-dropdown__menu a:last-child { border-bottom: none; }
+
+.nav-dropdown__menu a:hover {
+  color: var(--text);
+  background: rgba(255,255,255,0.06);
+}
+
+.nav-dropdown__menu a[aria-current="page"] {
+  color: var(--orange);
+  background: rgba(249,115,22,0.08);
+}
+
+
+/* ── Typography ──────────────────────────────────────────────────── */
+h1 {
+  font-family: var(--font);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.5px;
+  line-height: 1.2;
   text-align: center;
-  line-height: 1.6;
+  text-shadow: none;
 }
 
-/* Section heading — pixel style */
 h2 {
-  font-family: var(--font-pixel);
-  font-size: 13px;
-  color: var(--gold);
-  text-shadow: 2px 2px 0 var(--gold-shadow);
-  letter-spacing: 2px;
-  margin-bottom: 20px;
-}
-
-/* Sub-section heading — pixel style */
-h3 {
-  font-family: var(--font-pixel);
-  font-size: 9px;
-  color: var(--orange);
-  text-shadow: 1px 1px 0 var(--orange-shadow);
-  letter-spacing: 2px;
-  margin-top: 40px;
+  font-family: var(--font);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.3px;
   margin-bottom: 16px;
+  text-shadow: none;
 }
 
-/* Prose paragraph (use .prose class on a parent to activate) */
+h3 {
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--orange);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  text-shadow: none;
+}
+
 .prose p {
-  font-family: var(--font-prose);
+  font-family: var(--font);
   font-size: 15px;
-  color: #b8b8cc;
+  color: rgba(255,255,255,0.65);
   line-height: 1.8;
   margin-bottom: 14px;
 }
 
 
-/* ── Pixel-border card ──────────────────────────────────────────
-   A bordered box that matches the main app shell aesthetic.
-   Apply class="pixel-card" to any container.
-   ────────────────────────────────────────────────────────────── */
-.pixel-card {
-  background: var(--bg-card);
-  border: var(--border-card);
-  color: #b8b8cc;
-  font-family: var(--font-prose);
-  line-height: 1.8;
-}
-
-.pixel-card__inner {
-  padding: 48px 44px;
-}
-
-
-/* ── Horizontal divider ─────────────────────────────────────────
-   Matches the panel separators and SEO section dividers.
-   <div class="divider"></div>
-   ────────────────────────────────────────────────────────────── */
-.divider {
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(to right, transparent, var(--border-dim), transparent);
-  flex-shrink: 0;
-}
-
-/* Spacious variant used between prose sections */
-.divider--spaced {
-  margin: 36px 0;
-}
-
-
-/* ── Buttons ────────────────────────────────────────────────────
-   Default button matches the START / RESET style in the app.
-   ────────────────────────────────────────────────────────────── */
+/* ── Buttons ─────────────────────────────────────────────────────── */
 button,
 .btn {
-  display: inline-block;
-  font-family: var(--font-pixel);
-  font-size: 10px;
-  background: var(--bg-input);
-  color: var(--gold);
-  border: 3px solid var(--gold);
-  padding: 11px 14px;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 10px 18px;
+  border-radius: 8px;
   cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 1px;
   text-decoration: none;
-  transition: background 0.1s, color 0.1s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 button:hover,
 .btn:hover {
-  background: var(--gold);
-  color: var(--bg-page);
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.2);
+  color: var(--text);
 }
 
 button:active,
 .btn:active {
-  transform: translateY(2px);
+  transform: translateY(1px);
 }
 
-/* Orange accent variant */
-.btn--orange {
-  color: var(--orange);
+.btn--orange,
+.btn--primary {
+  background: var(--orange);
+  color: #fff;
   border-color: var(--orange);
 }
 
-.btn--orange:hover {
-  background: var(--orange);
-  color: var(--bg-page);
+.btn--orange:hover,
+.btn--primary:hover {
+  background: var(--orange-light);
+  border-color: var(--orange-light);
+  color: #fff;
 }
 
 
-/* ── Text inputs ────────────────────────────────────────────────*/
+/* ── Inputs ──────────────────────────────────────────────────────── */
 input[type="text"],
 input[type="email"],
 input[type="number"],
 input[type="search"],
 textarea {
-  font-family: var(--font-pixel);
-  font-size: 10px;
-  background: var(--bg-input);
-  color: var(--gold);
-  border: 3px solid var(--gold);
-  padding: 7px 8px;
+  font-family: var(--font);
+  font-size: 14px;
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 10px 12px;
   outline: none;
   width: 100%;
   -moz-appearance: textfield;
+  transition: border-color 0.15s;
 }
 
 input::-webkit-outer-spin-button,
@@ -217,7 +450,12 @@ input::-webkit-inner-spin-button {
 input:focus,
 textarea:focus {
   border-color: var(--orange);
-  color: var(--orange);
+  color: var(--text);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--subtle);
 }
 
 input:disabled,
@@ -227,106 +465,34 @@ textarea:disabled {
 }
 
 
-/* ── Status / label text ────────────────────────────────────────
-   Small pixel-font labels and readouts.
-   ────────────────────────────────────────────────────────────── */
-.label {
-  font-family: var(--font-pixel);
-  font-size: 8px;
-  color: var(--muted);
-  letter-spacing: 2px;
-}
-
-.label--gold {
-  color: var(--gold);
-}
-
-.label--orange {
-  color: var(--orange);
-  font-size: 7px;
-}
-
-.label--green {
-  color: var(--green-glow);
-  text-shadow: 0 0 8px var(--green-glow);
-}
-
-
-/* ── Scanlines effect ───────────────────────────────────────────
-   Apply to any element that should have the CRT scanline overlay.
-   The element must have position: relative.
-   ────────────────────────────────────────────────────────────── */
-.scanlines {
-  position: relative;
-  image-rendering: pixelated;
-}
-
-.scanlines::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    to bottom,
-    transparent 0px,
-    transparent 3px,
-    rgba(0, 0, 0, 0.18) 3px,
-    rgba(0, 0, 0, 0.18) 4px
-  );
-  pointer-events: none;
-}
-
-
-/* ── Glowing border box ─────────────────────────────────────────
-   The characteristic gold-glow border used on the main app shell.
-   ────────────────────────────────────────────────────────────── */
-.glow-border {
-  border: var(--border-ui);
-  box-shadow: var(--shadow-app);
-}
-
-
-/* ── Numbered steps list ────────────────────────────────────────
-   Used on how-to / guide pages.
-   <ol class="steps-list">
-   ────────────────────────────────────────────────────────────── */
-.steps-list {
-  list-style: none;
-  padding: 0;
-  counter-reset: step-counter;
-}
-
-.steps-list li {
-  counter-increment: step-counter;
-  display: flex;
-  gap: 18px;
-  align-items: flex-start;
-  margin-bottom: 18px;
-  font-family: var(--font-prose);
-  font-size: 15px;
-  color: #b8b8cc;
+/* ── Pixel card (legacy — now just a styled card) ────────────────── */
+.pixel-card {
+  background: var(--dark-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: rgba(255,255,255,0.65);
   line-height: 1.8;
 }
 
-.steps-list li::before {
-  content: counter(step-counter);
-  font-family: var(--font-pixel);
-  font-size: 10px;
-  color: var(--bg-page);
-  background: var(--gold);
-  min-width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-top: 2px;
+.pixel-card__inner {
+  padding: 40px 36px;
 }
 
 
-/* ── Feature / bullet list ──────────────────────────────────────
-   Clean ruled list with pixel arrow bullet.
-   <ul class="feature-list">
-   ────────────────────────────────────────────────────────────── */
+/* ── Divider ─────────────────────────────────────────────────────── */
+.divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+
+.divider--spaced {
+  margin: 32px 0;
+}
+
+
+/* ── Feature list ────────────────────────────────────────────────── */
 .feature-list {
   list-style: none;
   padding: 0;
@@ -337,10 +503,10 @@ textarea:disabled {
   gap: 12px;
   align-items: flex-start;
   padding: 10px 0;
-  border-bottom: 1px solid var(--row-divider);
-  font-family: var(--font-prose);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-family: var(--font);
   font-size: 15px;
-  color: #b8b8cc;
+  color: rgba(255,255,255,0.65);
   line-height: 1.8;
 }
 
@@ -350,113 +516,65 @@ textarea:disabled {
 
 .feature-list li::before {
   content: '▸';
-  font-family: var(--font-pixel);
-  font-size: 9px;
-  color: var(--green-glow);
+  color: var(--green);
+  font-size: 12px;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+
+/* ── Steps list ──────────────────────────────────────────────────── */
+.steps-list {
+  list-style: none;
+  padding: 0;
+  counter-reset: step-counter;
+}
+
+.steps-list li {
+  counter-increment: step-counter;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  font-family: var(--font);
+  font-size: 15px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.8;
+}
+
+.steps-list li::before {
+  content: counter(step-counter);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--dark);
+  background: var(--orange);
+  min-width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
   margin-top: 3px;
 }
 
 
-/* ── Buy Me a Coffee button ─────────────────────────────────────*/
-.bmc-btn {
-  display: block;
-  opacity: 0.55;
-  transition: opacity 0.2s;
-  image-rendering: auto;
-}
-
-.bmc-btn:hover {
-  opacity: 1;
-}
-
-.bmc-btn img {
-  height: 36px;
-  width: auto;
-  border: 2px solid var(--subtle);
-  image-rendering: auto;
-}
-
-
-/* ── Navigation bar ─────────────────────────────────────────────
-   Optional site-wide nav for multi-page use.
-   <nav class="site-nav"> <a href="/">HOME</a> … </nav>
-   ────────────────────────────────────────────────────────────── */
-.site-nav {
-  width: 100%;
-  max-width: 760px;
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-  margin-bottom: 32px;
-}
-
-.site-nav a {
-  font-family: var(--font-pixel);
-  font-size: 8px;
+/* ── Label ───────────────────────────────────────────────────────── */
+.label {
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 500;
   color: var(--muted);
-  text-decoration: none;
-  letter-spacing: 1px;
-  padding: 8px 12px;
-  border: 2px solid transparent;
-  text-transform: uppercase;
-  transition: color 0.1s, border-color 0.1s;
+  letter-spacing: 0.5px;
 }
 
-.site-nav a:hover {
-  color: var(--gold);
-  border-color: var(--gold);
-}
-
-.site-nav a[aria-current="page"] {
-  color: var(--orange);
-  border-color: var(--orange);
-}
-
-.top-nav {
-  width: 100%;
-  display: flex;
-  gap: 2px;
-  flex-wrap: wrap;
-  padding: 20px 0 24px;
-  border-bottom: 2px solid var(--border-dim);
-}
-
-.top-nav a {
-  font-family: var(--font-pixel);
-  font-size: 7px;
-  color: var(--muted);
-  text-decoration: none;
-  letter-spacing: 1px;
-  padding: 7px 11px;
-  border: 2px solid transparent;
-  text-transform: uppercase;
-  transition: color 0.1s, border-color 0.1s;
-}
-
-.top-nav a:hover { color: var(--gold); border-color: var(--gold); }
-.top-nav a[aria-current="page"] { color: var(--orange); border-color: var(--orange); }
+.label--gold,
+.label--orange { color: var(--orange); }
+.label--green  { color: var(--green); }
 
 
-/* ── Site brand (sub-page header) ──────────────────────────────*/
-.site-brand {
-  font-family: var(--font-pixel);
-  font-size: 10px;
-  color: var(--orange);
-  text-decoration: none;
-  letter-spacing: 4px;
-  text-shadow: 1px 1px 0 var(--orange-shadow);
-  display: block;
-  margin-bottom: 16px;
-  opacity: 0.8;
-  transition: opacity 0.1s;
-}
-
-.site-brand:hover {
-  opacity: 1;
-}
-
-/* ── Support bar (Buy Me a Coffee + LinkedIn) ───────────────────*/
+/* ── Support bar ─────────────────────────────────────────────────── */
 .support-bar {
   display: flex;
   align-items: center;
@@ -467,44 +585,40 @@ textarea:disabled {
 
 #bmc-btn {
   display: block;
-  opacity: 0.45;
+  opacity: 0.5;
   transition: opacity 0.2s;
-  image-rendering: auto;
 }
 #bmc-btn:hover { opacity: 1; }
 #bmc-btn img {
   height: 32px;
   width: auto;
-  border: 2px solid var(--border-dim);
-  image-rendering: auto;
+  border-radius: 6px;
 }
 
 .linkedin-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.45;
+  opacity: 0.5;
   transition: opacity 0.2s;
-  color: var(--gold);
+  color: var(--text);
   text-decoration: none;
 }
 .linkedin-btn:hover { opacity: 1; }
 .linkedin-btn svg {
   width: 32px;
   height: 32px;
-  border: 2px solid var(--border-dim);
-  fill: var(--gold);
+  fill: var(--text);
 }
 
-/* ── Page footer ────────────────────────────────────────────────*/
+
+/* ── Footer ──────────────────────────────────────────────────────── */
 .site-footer {
   margin-top: 64px;
-  font-family: var(--font-pixel);
-  font-size: 7px;
+  font-size: 13px;
   color: var(--subtle);
-  letter-spacing: 1px;
   text-align: center;
-  line-height: 2.2;
+  line-height: 2;
 }
 
 .site-footer a {
@@ -513,167 +627,22 @@ textarea:disabled {
 }
 
 .site-footer a:hover {
-  color: var(--gold);
+  color: var(--text);
+}
+
+.site-footer p {
+  color: var(--subtle);
+  font-size: 13px;
 }
 
 
-/* ── Responsive — short desktop / laptop screens ────────────────*/
-@media (max-height: 760px) and (min-width: 621px) {
-  h1 { font-size: 12px; }
-}
-
-@media (max-height: 640px) and (min-width: 621px) {
-  h1 { font-size: 11px; }
-}
-
-
-/* ── Responsive — mobile ────────────────────────────────────────*/
-@media (max-width: 620px) {
-  body {
-    align-items: flex-start;
-    justify-content: flex-start;
-    padding: 0 0 60px;
-  }
-
-  h1 { font-size: 15px; letter-spacing: 3px; }
-  h2 { font-size: 11px; }
-  h3 { font-size: 8px; }
-
-  button,
-  .btn {
-    font-size: 11px;
-    padding: 13px 18px;
-  }
-
-  .pixel-card__inner {
-    padding: 36px 24px;
-  }
-
-  .prose p,
-  .steps-list li,
-  .feature-list li {
-    font-size: 14px;
-  }
-
-  .bmc-btn img {
-    height: 40px;
-  }
-
-  .site-nav {
-    padding: 0 16px;
-  }
-}
-
-
-/* ── Nav dropdown ────────────────────────────────────────────────
-   TOOLS dropdown used in the main navigation on every page.
-   ────────────────────────────────────────────────────────────── */
-.nav-dropdown {
-  position: relative;
-  display: inline-flex;
-  align-items: stretch;
-}
-
-/* Override global button styles for the toggle */
-.nav-dropdown__toggle {
-  font-family: var(--font-pixel);
-  font-size: 7px;
-  background: transparent;
-  color: var(--muted);
-  border: 2px solid transparent;
-  padding: 7px 11px;
-  cursor: pointer;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  transition: color 0.1s, border-color 0.1s;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-.nav-dropdown__toggle:hover,
-.nav-dropdown:hover .nav-dropdown__toggle {
-  color: var(--gold);
-  border-color: var(--gold);
-  background: transparent;
-}
-
-.nav-dropdown__toggle:active {
-  transform: none;
-}
-
-.nav-dropdown__toggle.active {
-  color: var(--orange);
-  border-color: var(--orange);
-}
-
-.nav-dropdown__menu {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background: var(--bg-card);
-  border: 2px solid var(--gold);
-  min-width: 190px;
-  z-index: 200;
-  flex-direction: column;
-}
-
-.nav-dropdown:hover .nav-dropdown__menu,
-.nav-dropdown:focus-within .nav-dropdown__menu {
-  display: flex;
-}
-
-.nav-dropdown__menu a {
-  font-family: var(--font-pixel);
-  font-size: 7px;
-  color: var(--muted);
-  text-decoration: none;
-  letter-spacing: 1px;
-  padding: 10px 14px;
-  border: none;
-  border-bottom: 1px solid var(--border-dim);
-  background: transparent;
-  transition: color 0.1s, background 0.1s;
-  display: block;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.nav-dropdown__menu a:last-child {
-  border-bottom: none;
-}
-
-.nav-dropdown__menu a:hover {
-  color: var(--gold);
-  background: var(--bg-input);
-  border-color: var(--border-dim);
-}
-
-.nav-dropdown__menu a[aria-current="page"] {
-  color: var(--orange);
-}
-
-@media (max-width: 620px) {
-  .nav-dropdown {
-    width: 100%;
-    flex-direction: column;
-  }
-
-  .nav-dropdown__menu {
-    position: static;
-    border: none;
-    border-top: 1px solid var(--border-dim);
-    min-width: unset;
-    width: 100%;
-  }
-}
-
-/* ── Email capture bar ───────────────────────────────────────────── */
+/* ── Email capture ───────────────────────────────────────────────── */
 .email-capture {
   width: 100%;
-  border: 2px solid var(--border-dim);
-  background: var(--bg-card);
-  padding: 28px 24px;
+  background: var(--dark-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px 28px;
   margin-bottom: 32px;
   display: flex;
   flex-direction: column;
@@ -683,76 +652,128 @@ textarea:disabled {
 }
 
 .email-capture__heading {
-  font-family: var(--font-pixel);
-  font-size: 9px;
-  color: var(--gold);
-  letter-spacing: 2px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0;
 }
 
 .email-capture__sub {
-  font-family: var(--font-pixel);
-  font-size: 7px;
+  font-size: 14px;
   color: var(--muted);
-  letter-spacing: 1px;
-  line-height: 2;
+  line-height: 1.7;
+  max-width: 440px;
 }
 
 .email-capture__form {
   display: flex;
   width: 100%;
-  max-width: 480px;
+  max-width: 440px;
   gap: 0;
   margin-top: 4px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
 }
 
 .email-capture__form input[type="email"] {
   flex: 1;
-  font-family: var(--font-pixel);
-  font-size: 8px;
-  background: var(--bg-input);
-  color: var(--gold);
-  border: 2px solid var(--gold);
-  border-right: none;
+  font-size: 14px;
+  background: rgba(255,255,255,0.03);
+  color: var(--text);
+  border: none;
+  border-radius: 0;
   padding: 12px 16px;
   outline: none;
-  letter-spacing: 1px;
   min-width: 0;
 }
 
-.email-capture__form input[type="email"]::placeholder {
-  color: var(--subtle);
+.email-capture__form input[type="email"]:focus {
+  background: rgba(255,255,255,0.06);
 }
 
 .email-capture__form button {
-  font-family: var(--font-pixel);
-  font-size: 8px;
-  background: var(--gold);
-  color: var(--bg-page);
-  border: 2px solid var(--gold);
-  padding: 12px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  border-radius: 0;
+  padding: 12px 20px;
   cursor: pointer;
-  letter-spacing: 1px;
   white-space: nowrap;
-  transition: background 0.1s, color 0.1s;
+  transition: background 0.15s;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 .email-capture__form button:hover {
-  background: var(--orange);
-  border-color: var(--orange);
+  background: var(--orange-light);
+  color: #fff;
 }
 
+.email-capture__form button:active { transform: translateY(1px); }
+
 .email-capture__msg {
-  font-family: var(--font-pixel);
-  font-size: 7px;
-  letter-spacing: 1px;
+  font-size: 13px;
   min-height: 16px;
 }
 
-.email-capture__msg--ok    { color: #88ff88; }
+.email-capture__msg--ok    { color: var(--green); }
 .email-capture__msg--error { color: var(--orange); }
 
+@media (max-width: 480px) {
+  .email-capture__form { flex-direction: column; border-radius: 10px; }
+  .email-capture__form input[type="email"] { border-radius: 10px 10px 0 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .email-capture__form button { border-radius: 0 0 10px 10px; }
+}
+
+
+/* ── Scanlines (legacy — subtle) ─────────────────────────────────── */
+.scanlines { position: relative; }
+.scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0,0,0,0.04) 3px,
+    rgba(0,0,0,0.04) 4px
+  );
+  pointer-events: none;
+}
+
+.glow-border {
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 0 40px rgba(249,115,22,0.08);
+}
+
+
+/* ── Responsive ──────────────────────────────────────────────────── */
 @media (max-width: 620px) {
-  .email-capture__form { flex-direction: column; }
-  .email-capture__form input[type="email"] { border-right: 2px solid var(--gold); border-bottom: none; }
-  .email-capture__form button { border-top: none; width: 100%; }
+  body {
+    padding: 0;
+  }
+
+  .page-shell,
+  .page-wrap {
+    padding: 32px 16px 60px;
+  }
+
+  h1 { font-size: 22px; }
+  h2 { font-size: 18px; }
+
+  .pixel-card__inner {
+    padding: 28px 20px;
+  }
+
+  .prose p,
+  .steps-list li,
+  .feature-list li {
+    font-size: 14px;
+  }
+
+  .site-footer { font-size: 12px; }
 }

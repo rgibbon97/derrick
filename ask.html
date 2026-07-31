@@ -10,59 +10,40 @@
   <meta name="description"
     content="Ask Derrick your oil and gas questions — well control, mud weight, BHA, IWCF, rig operations, and more. Powered by Claude AI.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="style.css">
   <style>
-    body {
-      justify-content: flex-start;
-      align-items: center;
-      padding: 0 20px 80px;
-      min-height: 100vh;
-      position: relative;
-      overflow-x: hidden;
-    }
-
     .page-shell {
-      position: relative;
-      z-index: 1;
-      width: 100%;
       max-width: 720px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      padding-top: 56px;
     }
 
     .hero {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
       width: 100%;
-      padding: 48px 0 32px;
+      padding-bottom: 32px;
+      text-align: center;
     }
 
     .hero__title {
-      font-family: var(--font-pixel);
-      font-size: 52px;
-      color: var(--orange);
-      text-shadow:
-        4px 4px 0 var(--orange-shadow),
-        8px 8px 0 #3a1800,
-        -1px -1px 0 var(--gold);
-      letter-spacing: 6px;
-      text-align: center;
-      line-height: 1.3;
+      font-size: 64px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -2px;
+      line-height: 1;
     }
 
     .hero__subtitle {
-      font-family: var(--font-pixel);
-      font-size: 7px;
-      color: var(--gold);
-      letter-spacing: 3px;
-      text-align: center;
-      text-shadow: 1px 1px 0 var(--gold-shadow);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.5px;
     }
 
+    /* ── Chat input ──────────────────────────────────────────── */
     .chat-wrap {
       width: 100%;
       margin-top: 24px;
@@ -73,62 +54,56 @@
 
     .chat-input-row {
       display: flex;
-      border: 3px solid var(--gold);
-      box-shadow: 0 0 0 3px var(--gold-shadow), 0 0 32px var(--gold-dim);
-      background: var(--bg-input);
+      background: var(--dark-card);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      overflow: hidden;
       transition: border-color 0.15s, box-shadow 0.15s;
     }
 
     .chat-input-row:focus-within {
       border-color: var(--orange);
-      box-shadow: 0 0 0 3px var(--orange-shadow), 0 0 40px rgba(255, 107, 53, 0.18);
+      box-shadow: 0 0 0 3px rgba(249,115,22,0.12);
     }
 
     #chat-input {
       flex: 1;
-      font-family: var(--font-pixel);
-      font-size: 9px;
+      font-family: var(--font);
+      font-size: 15px;
       background: transparent;
-      color: var(--gold);
+      color: var(--text);
       border: none;
-      padding: 18px 20px;
+      border-radius: 0;
+      padding: 16px 20px;
       outline: none;
-      letter-spacing: 1px;
-      line-height: 1.8;
+      line-height: 1.6;
       resize: none;
-      min-height: 64px;
+      min-height: 60px;
     }
 
     #chat-input::placeholder { color: var(--subtle); }
-    #chat-input:focus { color: var(--gold); border: none; }
 
     .chat-send-btn {
-      font-family: var(--font-pixel);
-      font-size: 9px;
-      background: var(--bg-input);
-      color: var(--orange);
-      border: none;
-      border-left: 3px solid var(--gold);
-      padding: 18px 20px;
-      cursor: pointer;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      align-self: stretch;
-      transition: background 0.1s, color 0.1s, border-color 0.1s;
-    }
-
-    .chat-send-btn:hover {
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
       background: var(--orange);
-      color: var(--bg-page);
-      border-left-color: var(--orange);
+      color: #fff;
+      border: none;
+      border-radius: 0 13px 13px 0;
+      padding: 0 24px;
+      cursor: pointer;
+      flex-shrink: 0;
+      align-self: stretch;
+      transition: background 0.15s;
+      text-transform: none;
+      letter-spacing: 0;
     }
 
+    .chat-send-btn:hover { background: var(--orange-light); }
     .chat-send-btn:active { transform: none; }
 
+    /* ── Chips ───────────────────────────────────────────────── */
     .chips {
       display: flex;
       flex-wrap: wrap;
@@ -137,107 +112,102 @@
     }
 
     .chip {
-      font-family: var(--font-pixel);
-      font-size: 7px;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 500;
       color: var(--muted);
-      background: var(--bg-card);
-      border: 2px solid var(--border-dim);
-      padding: 10px 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 8px 14px;
       cursor: pointer;
-      letter-spacing: 1px;
-      line-height: 1.6;
-      text-align: left;
       transition: color 0.1s, border-color 0.1s, background 0.1s;
+      text-transform: none;
+      letter-spacing: 0;
     }
 
     .chip:hover {
-      color: var(--gold);
-      border-color: var(--gold);
-      background: var(--bg-input);
+      color: var(--text);
+      border-color: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.07);
     }
 
     .chip:active { transform: translateY(1px); }
 
     .chat-disclaimer {
-      font-family: var(--font-pixel);
-      font-size: 6px;
-      color: #a03a10;
-      letter-spacing: 1px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.25);
       text-align: center;
-      line-height: 2.2;
-      margin-top: 4px;
+      line-height: 1.7;
     }
 
+    /* ── Chat thread ─────────────────────────────────────────── */
     .chat-thread {
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
     }
 
     .chat-msg {
       display: flex;
       flex-direction: column;
       gap: 6px;
-      padding: 14px 16px;
-      border: 2px solid var(--border-dim);
-      background: var(--bg-card);
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: var(--dark-card);
     }
 
     .chat-msg--user {
-      border-color: var(--gold-shadow);
-      background: var(--bg-input);
+      background: rgba(249,115,22,0.07);
+      border-color: rgba(249,115,22,0.2);
       align-items: flex-end;
     }
 
     .chat-msg--derrick {
-      border-color: var(--orange);
-      box-shadow: 0 0 12px rgba(255, 107, 53, 0.08);
+      border-color: rgba(255,255,255,0.08);
     }
 
     .chat-msg__label {
-      font-family: var(--font-pixel);
-      font-size: 6px;
-      letter-spacing: 2px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
       text-transform: uppercase;
+      color: var(--muted);
     }
 
-    .chat-msg--user .chat-msg__label { color: var(--gold); }
-    .chat-msg--derrick .chat-msg__label { color: var(--orange); }
+    .chat-msg--user .chat-msg__label { color: var(--orange); }
+    .chat-msg--derrick .chat-msg__label { color: rgba(255,255,255,0.4); }
 
     .chat-msg__text {
-      font-family: var(--font-pixel);
-      font-size: 8px;
-      line-height: 2;
-      letter-spacing: 0.5px;
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--text);
       white-space: pre-wrap;
       word-break: break-word;
     }
 
-    .chat-msg--user .chat-msg__text { color: var(--gold); text-align: right; }
+    .chat-msg--user .chat-msg__text { text-align: right; }
 
     .chat-msg--derrick .chat-msg__text {
-      color: var(--fg);
-      font-size: 9px;
-      line-height: 2.4;
       white-space: normal;
     }
 
     .chat-msg--derrick .chat-msg__text h2 {
-      font-family: var(--font-pixel);
-      font-size: 9px;
+      font-size: 14px;
+      font-weight: 700;
       color: var(--orange);
-      letter-spacing: 2px;
-      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      text-transform: none;
       margin: 16px 0 8px;
-      padding-bottom: 4px;
-      border-bottom: 1px solid var(--border-dim);
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
     }
 
     .chat-msg--derrick .chat-msg__text strong {
-      color: var(--gold);
-      font-weight: normal;
-      text-shadow: 0 0 6px rgba(255, 180, 0, 0.3);
+      color: var(--text);
+      font-weight: 600;
     }
 
     .chat-msg--derrick .chat-msg__text ul {
@@ -249,8 +219,9 @@
     .chat-msg--derrick .chat-msg__text ul li {
       position: relative;
       padding-left: 16px;
-      margin-bottom: 8px;
-      line-height: 2.2;
+      margin-bottom: 6px;
+      line-height: 1.7;
+      color: rgba(255,255,255,0.75);
     }
 
     .chat-msg--derrick .chat-msg__text ul li::before {
@@ -258,22 +229,24 @@
       position: absolute;
       left: 0;
       color: var(--orange);
+      font-size: 11px;
     }
 
-    .chat-msg--derrick .chat-msg__text p { margin: 0 0 12px; }
+    .chat-msg--derrick .chat-msg__text p { margin: 0 0 10px; color: rgba(255,255,255,0.75); }
     .chat-msg--derrick .chat-msg__text p:last-child { margin-bottom: 0; }
 
+    /* ── Thinking ────────────────────────────────────────────── */
     .chat-thinking {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       padding: 12px 16px;
-      border: 2px solid var(--orange);
-      background: var(--bg-card);
-      font-family: var(--font-pixel);
-      font-size: 7px;
+      border: 1px solid rgba(249,115,22,0.2);
+      border-radius: 12px;
+      background: rgba(249,115,22,0.06);
+      font-size: 13px;
       color: var(--orange);
-      letter-spacing: 2px;
+      letter-spacing: 0.3px;
     }
 
     .chat-thinking__dots span { animation: blink 1.2s infinite; }
@@ -286,55 +259,49 @@
     }
 
     @media (max-width: 620px) {
-      .hero { padding: 32px 0 20px; }
-      .hero__title { font-size: 28px; letter-spacing: 2px; }
-      .hero__subtitle { font-size: 6px; }
-    }
-
-    @media (max-width: 540px) {
-      .hero { padding: 28px 0 16px; }
-      .hero__title { font-size: 22px; letter-spacing: 2px; }
-      #chat-input { font-size: 8px; padding: 14px; }
-      .chat-send-btn { font-size: 8px; padding: 14px; }
-      .chip { font-size: 6px; padding: 9px 11px; }
+      .hero { padding-bottom: 20px; }
+      .hero__title { font-size: 40px; }
+      .hero__subtitle { font-size: 13px; }
+      #chat-input { font-size: 14px; padding: 14px 16px; }
+      .chat-send-btn { padding: 0 16px; font-size: 13px; }
     }
   </style>
 </head>
 
 <body>
 
+  <nav class="page-nav">
+    <div class="page-nav__inner">
+      <a href="index.html" class="page-nav__brand">DERRICK</a>
+      <ul class="page-nav__links">
+        <li><a href="news.html">News</a></li>
+        <li><a href="/rigs">Fleet</a></li>
+        <li class="page-nav__dropdown">
+          <button class="page-nav__dropdown-toggle active" type="button">Tools ▾</button>
+          <div class="page-nav__dropdown-menu">
+            <a href="ask.html" aria-current="page">Ask Derrick</a>
+            <a href="timer.html">Drill-o-doro</a>
+            <a href="converter.html">Unit Converter</a>
+            <a href="calculator.html">Drilling Calculator</a>
+            <a href="wellvolumes.html">Well Fluid Volumes</a>
+            <a href="acronyms.html">Acronym Lookup</a>
+            <a href="wellcontrol.html">Well Control</a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
   <div class="page-shell">
 
-    <nav class="top-nav" aria-label="Site navigation">
-      <a href="index.html">&#9654; HOME</a>
-      <a href="news.html">&#9654; NEWS</a>
-      <a href="/rigs">&#9654; FLEET STATUS</a>
-      <div class="nav-dropdown">
-        <button class="nav-dropdown__toggle active" type="button">&#9654; TOOLS &#9660;</button>
-        <div class="nav-dropdown__menu">
-          <a href="ask.html" aria-current="page">Ask Derrick</a>
-          <a href="timer.html">Drill-o-doro</a>
-          <a href="converter.html">Unit Converter</a>
-          <a href="calculator.html">Drilling Calculator</a>
-          <a href="wellvolumes.html">Well Fluid Volumes</a>
-          <a href="acronyms.html">Acronym Lookup</a>
-          <a href="wellcontrol.html">Well Control</a>
-        </div>
-      </div>
-    </nav>
-
     <section class="hero">
-      <div>
-        <div class="hero__title">DERRICK</div>
-        <div class="hero__subtitle">THIRTY YEARS ON THE RIGS. ASK ME ANYTHING.</div>
-      </div>
+      <div class="hero__title">DERRICK</div>
+      <div class="hero__subtitle">Thirty years on the rigs. Ask me anything.</div>
 
       <div class="chat-wrap">
         <div class="chat-input-row">
           <textarea id="chat-input" rows="2" placeholder="Ask Derrick anything about drilling..."></textarea>
-          <button class="chat-send-btn" type="button" aria-label="Send">
-            SEND &#9654;
-          </button>
+          <button class="chat-send-btn" type="button" aria-label="Send">Send →</button>
         </div>
 
         <div class="chips" role="list" aria-label="Suggested questions">
@@ -468,7 +435,7 @@
     function showThinking() {
       const el = document.createElement('div');
       el.className = 'chat-thinking';
-      el.innerHTML = 'DERRICK IS THINKING<span class="chat-thinking__dots">' +
+      el.innerHTML = 'Derrick is thinking<span class="chat-thinking__dots">' +
         '<span>.</span><span>.</span><span>.</span></span>';
       thread.appendChild(el);
       el.scrollIntoView({ behavior: 'smooth', block: 'end' });
